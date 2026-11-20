@@ -1,8 +1,24 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "@playwright/test";
+
+const API = process.env.E2E_API_URL ?? "http://localhost:4000/api/v1";
+
+async function pickInStockProduct(request: APIRequestContext) {
+  const list = await request.get(`${API}/products?inStock=true&pageSize=30`);
+  const cards = (await list.json()).data.items as Array<{ slug: string }>;
+  for (const card of cards) {
+    const response = await request.get(`${API}/products/${card.slug}`);
+    if (!response.ok()) continue;
+    const product = (await response.json()).data;
+    const variant = product.variants.find((item: { inStock: boolean }) => item.inStock);
+    if (variant) return { product, variant };
+  }
+  throw new Error("No in-stock variant available for E2E purchase");
+}
 
 test.describe("Customer purchase journey", () => {
-  test("browses a product, applies a coupon, checks out and pays with the sandbox", async ({ page }) => {
+  test("browses a product, applies a coupon, checks out and pays with the sandbox", async ({ page, request }) => {
     const email = `e2e-${Date.now()}@example.com`;
+    const { product, variant } = await pickInStockProduct(request);
 
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Everyday");
@@ -10,22 +26,20 @@ test.describe("Customer purchase journey", () => {
     await page.goto("/collections/new-arrivals");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("New Arrivals");
 
-    await page.goto("/products/the-everyday-oversized-tee");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("The Everyday Oversized Tee");
+    await page.goto(`/products/${product.slug}`);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(product.name);
 
-    // Select an in-stock size and three units so the DAYSHIFT15 minimum is met.
-    await page.getByRole("button", { name: "L", exact: true }).click();
-    await page.getByRole("button", { name: "Increase quantity" }).click();
-    await page.getByRole("button", { name: "Increase quantity" }).click();
+    // Choose a live in-stock size rather than a fixed, depletable fixture.
+    await page.getByRole("button", { name: variant.size, exact: true }).click();
     await page.getByRole("button", { name: "Add to bag" }).click();
 
     await page.goto("/cart");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Shopping bag");
-    await expect(page.getByText("The Everyday Oversized Tee").first()).toBeVisible();
+    await expect(page.getByText(product.name).first()).toBeVisible();
 
-    await page.locator("#coupon").fill("DAYSHIFT15");
+    await page.locator("#coupon").fill("WELCOME10");
     await page.getByRole("button", { name: "Apply" }).click();
-    await expect(page.getByText("DAYSHIFT15")).toBeVisible();
+    await expect(page.getByText("WELCOME10")).toBeVisible();
 
     await page.getByRole("link", { name: /checkout/i }).first().click();
     await page.waitForURL("**/checkout");
@@ -49,9 +63,10 @@ test.describe("Customer purchase journey", () => {
     expect(orderNumber).toMatch(/^DS-/);
   });
 
-  test("cart rejects an ineligible coupon with a clear message", async ({ page }) => {
-    await page.goto("/products/classic-sneaker");
-    await page.getByRole("button", { name: "42", exact: true }).click();
+  test("cart rejects an ineligible coupon with a clear message", async ({ page, request }) => {
+    const { product, variant } = await pickInStockProduct(request);
+    await page.goto(`/products/${product.slug}`);
+    await page.getByRole("button", { name: variant.size, exact: true }).click();
     await page.getByRole("button", { name: "Add to bag" }).click();
     await page.goto("/cart");
     await page.locator("#coupon").fill("NOTACODE");

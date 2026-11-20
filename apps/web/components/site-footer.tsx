@@ -81,7 +81,7 @@ export function SiteFooter() {
             <Link href="/legal/accessibility" className="link-underline">Accessibility</Link>
           </div>
         </div>
-        <p className="mt-4 max-w-3xl text-[11px] leading-relaxed text-muted/80">
+        <p className="mt-4 max-w-3xl text-[11px] leading-relaxed text-muted">
           Demonstration storefront. Product imagery is illustrative studio art generated for this
           project, not photographs of real inventory. Sandbox payments are simulated locally and no
           money is processed.

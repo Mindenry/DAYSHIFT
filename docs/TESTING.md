@@ -11,7 +11,7 @@ Coverage:
 - Money: decimal parsing without drift, round-trip, malformed input rejection, shipping resolution.
 - Order state machine: full fulfilment chain, skipped/backwards transitions rejected, terminal states, inventory-commit statuses.
 
-Latest result: **2 suites, 16 tests, 16 passed**.
+Latest result: **3 suites, 18 tests, 18 passed** (pricing, order state/money, JSON-LD escaping).
 
 ## Integration suite — `node scripts/integration-test.mjs`
 
@@ -26,7 +26,7 @@ Runs against the live API, PostgreSQL and seed. Covers:
 7. Last-item concurrency: stock forced to 1, two simultaneous checkouts, exactly one success and one `409`.
 8. Inventory restored.
 
-Latest result: **10/10 checks passed**.
+Latest result: **18/18 checks passed** (plus exchange suite 8/8).
 
 ## API smoke — `node scripts/api-smoke.mjs`
 
@@ -66,15 +66,16 @@ Latest result: **7/7 passed**.
 | Prisma validate/migrate | `pnpm db:migrate` | Pass |
 | Seed | `pnpm db:seed` | Pass (40 products / 365 variants) |
 | Docker Compose config | `docker compose config` | Pass |
-| Docker image build | `docker compose --profile app build` | Not executed in this session (time); Dockerfiles provided |
+| Application images | `docker compose --profile app build` | API, worker, web, admin built; full stack started together for the LAN release |
+| Accessibility | `pnpm test:a11y` | 0 serious/critical on 6 surfaces |
 
 ## Not covered
 
-- No browser test for mobile navigation beyond manual screenshots.
 - No load testing or Lighthouse run was executed; no performance numbers are claimed.
 - Email delivery is verified by local `.eml` files and notification status, not a live SMTP server.
 - Payment webhook tests exercise the sandbox provider, not a real processor.
-- Docker image builds and full compose startup were not run to completion in this environment; see the release report.
+- The full `app` compose profile was launched as one stack for the LAN release; all six containers and the HTTP endpoints were verified.
+- Reservation expiry and daily reconciliation were not observed over their real time windows.
 
 ## Reproducing failure scenarios
 

@@ -1,5 +1,5 @@
 // Live API smoke test: exercises the real commerce workflow end to end.
-const BASE = "http://localhost:4000/api/v1";
+const BASE = process.env.SMOKE_API ?? "http://localhost:4000/api/v1";
 const jar = new Map();
 
 function cookieHeader() {

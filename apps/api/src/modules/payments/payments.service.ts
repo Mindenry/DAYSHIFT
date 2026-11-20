@@ -8,6 +8,7 @@ import { NotificationsService } from "../notifications/notifications.service";
 import { LoyaltyService } from "../loyalty/loyalty.service";
 import { AuditService } from "../audit/audit.service";
 import { AppError } from "../../common/app-error";
+import { randomToken } from "../../common/crypto";
 
 interface SandboxEvent {
   eventId: string;
@@ -223,28 +224,45 @@ export class PaymentsService {
     items?: Array<{ orderItemId: string; quantity: number; amountCents: number }>;
     actorId?: string;
     actorEmail?: string;
+    actorType?: "STAFF" | "CUSTOMER" | "SYSTEM";
   }) {
-    const order = await this.prisma.order.findUnique({
-      where: { id: input.orderId },
-      include: { payments: true, refunds: true },
-    });
-    if (!order) throw AppError.notFound("Order not found");
-    const paid = order.payments
-      .filter((p) => ["PAID", "PARTIALLY_REFUNDED", "REFUNDED"].includes(p.status))
-      .reduce((sum, p) => sum + toCents(p.amount), 0);
-    const alreadyRefunded = order.refunds
-      .filter((r) => r.status === "PROCESSED")
-      .reduce((sum, r) => sum + toCents(r.amount), 0);
-    if (input.amountCents <= 0) throw AppError.validation("Refund amount must be greater than zero.");
-    if (input.amountCents > paid - alreadyRefunded) {
-      throw AppError.validation("Refund exceeds the amount available to refund.");
-    }
-    if (order.paymentStatus === "PENDING") {
-      throw AppError.validation("This order has not been paid.");
+    if (input.amountCents <= 0) {
+      throw AppError.validation("Refund amount must be greater than zero.");
     }
 
-    const payment = order.payments.find((p) => ["PAID", "PARTIALLY_REFUNDED"].includes(p.status));
-    const refund = await this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
+      // Serialise all refunds for one order. Without this lock, two concurrent
+      // requests can both pass the remaining-balance check and over-refund.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${input.orderId}::text))`;
+      const order = await tx.order.findUnique({
+        where: { id: input.orderId },
+        include: { payments: true, refunds: true },
+      });
+      if (!order) throw AppError.notFound("Order not found");
+
+      if (input.returnRequestId) {
+        const existing = order.refunds.find(
+          (refund) => refund.returnRequestId === input.returnRequestId && refund.status === "PROCESSED",
+        );
+        if (existing) {
+          throw AppError.conflict("A refund has already been processed for this return.");
+        }
+      }
+
+      const paid = order.payments
+        .filter((p) => ["PAID", "PARTIALLY_REFUNDED", "REFUNDED"].includes(p.status))
+        .reduce((sum, p) => sum + toCents(p.amount), 0);
+      const alreadyRefunded = order.refunds
+        .filter((r) => r.status === "PROCESSED")
+        .reduce((sum, r) => sum + toCents(r.amount), 0);
+      if (input.amountCents > paid - alreadyRefunded) {
+        throw AppError.validation("Refund exceeds the amount available to refund.");
+      }
+      if (order.paymentStatus === "PENDING" || paid === 0) {
+        throw AppError.validation("This order has not been paid.");
+      }
+
+      const payment = order.payments.find((p) => ["PAID", "PARTIALLY_REFUNDED"].includes(p.status));
       const refund = await tx.refund.create({
         data: {
           orderId: order.id,
@@ -253,7 +271,7 @@ export class PaymentsService {
           amount: new Prisma.Decimal((input.amountCents / 100).toFixed(2)),
           reason: input.reason,
           status: "PROCESSED",
-          providerRef: `sbxrefund_${Date.now()}`,
+          providerRef: `sbxrefund_${randomToken(8)}`,
           processedById: input.actorId ?? null,
           processedAt: new Date(),
           items: input.items?.length
@@ -288,14 +306,16 @@ export class PaymentsService {
             orderId: order.id,
             fromStatus: order.status,
             toStatus: "REFUNDED",
-            actorType: "STAFF",
+            actorType: input.actorType ?? "STAFF",
             actorId: input.actorId,
             reason: input.reason,
           },
         });
       }
-      return refund;
+      return { refund, order };
     });
+
+    const { refund, order } = result;
 
     await this.notifications.email({
       userId: order.userId ?? undefined,
@@ -309,7 +329,7 @@ export class PaymentsService {
       dedupeKey: `refund-processed:${refund.id}`,
     });
     await this.audit.log({
-      actorType: "STAFF",
+      actorType: input.actorType ?? "STAFF",
       actorId: input.actorId,
       actorEmail: input.actorEmail,
       action: "refund.processed",

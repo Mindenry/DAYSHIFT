@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader, Badge } from "@/components/ui";
 import { apiGet } from "@/lib/api";
+import { STOREFRONT_URL } from "@/lib/site";
 import { getCookieHeader, requireStaff } from "@/lib/session";
 import { ProductForm } from "@/components/product-form";
 import { VariantManager } from "@/components/variant-manager";
@@ -61,7 +62,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         description={`${product.sku} · ${product.variants.length} variants`}
         back={{ href: "/products", label: "Products" }}
         actions={
-          <Link href={`http://localhost:3000/products/${product.slug}`} target="_blank" className="a-btn a-btn-outline">
+          <Link href={`${STOREFRONT_URL}/products/${product.slug}`} target="_blank" className="a-btn a-btn-outline">
             View on storefront
           </Link>
         }

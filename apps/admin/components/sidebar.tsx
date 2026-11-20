@@ -10,6 +10,7 @@ import {
   Store, LogOut, Menu, X, ClipboardList,
 } from "lucide-react";
 import { clientApi } from "@/lib/api";
+import { STOREFRONT_URL } from "@/lib/site";
 
 interface LinkItem {
   href: string;
@@ -96,7 +97,7 @@ export function Sidebar({
     <div className="flex h-full flex-col">
       <div className="flex h-16 items-center justify-between border-b border-sidebar-line px-5">
         <Link href="/" className="text-sm font-semibold tracking-[0.28em] text-paper">DAYSHIFT</Link>
-        <span className="rounded-sm border border-sidebar-line px-1.5 py-0.5 text-[9px] uppercase tracking-[0.14em] text-paper/50">Ops</span>
+        <span className="rounded-sm border border-sidebar-line px-1.5 py-0.5 text-[9px] uppercase tracking-[0.14em] text-paper/65">Ops</span>
       </div>
       <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Administration">
         {GROUPS.map((group) => {
@@ -104,7 +105,7 @@ export function Sidebar({
           if (!links.length) return null;
           return (
             <div key={group.title} className="mb-5">
-              <p className="px-2 pb-2 text-[9px] uppercase tracking-[0.16em] text-paper/35">{group.title}</p>
+              <p className="px-2 pb-2 text-[9px] uppercase tracking-[0.16em] text-paper/60">{group.title}</p>
               <ul className="space-y-0.5">
                 {links.map((link) => {
                   const active = link.href === "/" ? pathname === "/" : pathname === link.href || pathname.startsWith(`${link.href}/`);
@@ -132,9 +133,9 @@ export function Sidebar({
       </nav>
       <div className="border-t border-sidebar-line p-4">
         <p className="truncate text-xs text-paper">{user.firstName} {user.lastName}</p>
-        <p className="truncate text-[10px] text-paper/40">{user.staffRole?.replace(/_/g, " ").toLowerCase()}</p>
+        <p className="truncate text-[10px] text-paper/65">{user.staffRole?.replace(/_/g, " ").toLowerCase()}</p>
         <div className="mt-3 flex items-center justify-between">
-          <a href="http://localhost:3000" target="_blank" rel="noreferrer" className="text-[10px] uppercase tracking-[0.12em] text-paper/50 hover:text-paper">
+          <a href={STOREFRONT_URL} target="_blank" rel="noreferrer" className="text-[10px] uppercase tracking-[0.12em] text-paper/65 hover:text-paper">
             View store
           </a>
           <button
@@ -149,7 +150,7 @@ export function Sidebar({
                 router.refresh();
               }
             }}
-            className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-paper/50 hover:text-paper"
+            className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-paper/65 hover:text-paper"
           >
             <LogOut className="h-3 w-3" /> Sign out
           </button>

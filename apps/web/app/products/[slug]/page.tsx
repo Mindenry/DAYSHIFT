@@ -11,6 +11,7 @@ import { ProductCard } from "@/components/product-card";
 import { ReviewForm } from "@/components/review-form";
 import { HelpfulButton } from "@/components/helpful-button";
 import { RecentlyViewed } from "@/components/recently-viewed";
+import { serializeJsonLd } from "@dayshift/config";
 
 type Product = ProductDetailDto & { reviewTotal?: number };
 
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 function Stars({ rating, className = "" }: { rating: number; className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-0.5 ${className}`} aria-label={`${rating} out of 5 stars`}>
+    <span className={`inline-flex items-center gap-0.5 ${className}`} role="img" aria-label={`${rating} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((star) => (
         <span key={star} aria-hidden className={star <= Math.round(rating) ? "text-ink" : "text-line"}>★</span>
       ))}
@@ -96,8 +97,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }} />
 
       <ProductExperience product={product} />
 

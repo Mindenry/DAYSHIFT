@@ -1,0 +1,43 @@
+﻿import { chromium } from "@playwright/test";
+import { mkdirSync } from "node:fs";
+const SITE = process.env.E2E_BASE_URL ?? "http://192.168.1.107:3000";
+const ADMIN = process.env.E2E_ADMIN_URL ?? "http://192.168.1.107:3001";
+const OUT = "docs/screenshots";
+mkdirSync(OUT, { recursive: true });
+const browser = await chromium.launch();
+
+const desk = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const page = await desk.newPage();
+await page.goto(`${SITE}/`, { waitUntil: "networkidle" });
+await page.screenshot({ path: `${OUT}/storefront-home.png` });
+await page.goto(`${SITE}/collections/new-arrivals`, { waitUntil: "networkidle" });
+await page.screenshot({ path: `${OUT}/storefront-listing.png` });
+await page.goto(`${SITE}/products/the-everyday-oversized-tee`, { waitUntil: "networkidle" });
+await page.screenshot({ path: `${OUT}/storefront-product.png` });
+await page.goto(`${SITE}/cart`, { waitUntil: "networkidle" });
+await page.screenshot({ path: `${OUT}/storefront-cart.png` });
+await desk.close();
+
+const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+const mpage = await mobile.newPage();
+await mpage.goto(`${SITE}/`, { waitUntil: "networkidle" });
+await mpage.screenshot({ path: `${OUT}/storefront-mobile.png` });
+await mobile.close();
+
+const adminCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const apage = await adminCtx.newPage();
+await apage.goto(`${ADMIN}/login`, { waitUntil: "networkidle" });
+await apage.screenshot({ path: `${OUT}/admin-login.png` });
+await apage.locator('input[name="email"]').fill("admin@dayshift.example");
+await apage.locator('input[name="password"]').fill("Admin1234!Pass");
+await apage.getByRole("button", { name: "Sign in" }).click();
+await apage.waitForURL(`${ADMIN}/`);
+await apage.waitForLoadState("networkidle");
+await apage.screenshot({ path: `${OUT}/admin-dashboard.png` });
+await apage.goto(`${ADMIN}/orders`, { waitUntil: "networkidle" });
+await apage.screenshot({ path: `${OUT}/admin-orders.png` });
+await apage.goto(`${ADMIN}/inventory`, { waitUntil: "networkidle" });
+await apage.screenshot({ path: `${OUT}/admin-inventory.png` });
+await adminCtx.close();
+await browser.close();
+console.log("screenshots captured");

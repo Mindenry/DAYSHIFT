@@ -27,6 +27,7 @@ import {
 import { CurrentUser, Public } from "../../common/decorators";
 import { AuthUser, SESSION_COOKIE } from "../../common/types";
 import { AppError } from "../../common/app-error";
+import { secureCookies } from "../../common/cookies";
 
 const COOKIE_MAX_AGE = 30 * 86_400_000;
 
@@ -38,7 +39,7 @@ function setSessionCookie(res: Response, token: string) {
   res.cookie(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: secureCookies(),
     path: "/",
     maxAge: COOKIE_MAX_AGE,
   });

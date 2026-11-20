@@ -19,6 +19,10 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:e2e": "pnpm --filter @dayshift/e2e test",
+    "test:integration": "node scripts/integration-test.mjs",
+    "test:exchange": "node scripts/exchange-test.mjs",
+    "test:smoke": "node scripts/api-smoke.mjs",
+    "audit:deps": "pnpm audit --audit-level=high",
     "db:generate": "pnpm --filter @dayshift/db generate",
     "db:migrate": "pnpm --filter @dayshift/db migrate:dev",
     "db:deploy": "pnpm --filter @dayshift/db migrate:deploy",
@@ -30,10 +34,11 @@
     "infra:down": "docker compose down",
     "infra:logs": "docker compose logs -f",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,md,json,css}\""
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json,css}\"",
+    "test:a11y": "pnpm --filter @dayshift/e2e a11y"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.39.5",
     "@next/eslint-plugin-next": "^16.4.6",
     "@types/node": "^22.10.5",
     "eslint": "^9.39.5",
@@ -51,6 +56,11 @@
       "prisma",
       "esbuild",
       "sharp"
-    ]
+    ],
+    "overrides": {
+      "postcss": "8.5.33",
+      "deepmerge-ts": "^8.0.0",
+      "effect": "^3.22.1"
+    }
   }
 }

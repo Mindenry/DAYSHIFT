@@ -19,7 +19,7 @@ App profile services: `api`, `worker`, `web`, `admin`. The API container runs `p
 
 Notes:
 - `NEXT_PUBLIC_API_URL` is provided at image build time; the apps use relative `/api` paths so no CORS is required.
-- The full-stack image build was **not executed** in this session (time). Dockerfiles are multi-stage and should be built before relying on them; verify with `docker compose --profile app build`.
+- Application images were built and the complete `app` profile (API, worker, storefront, admin, PostgreSQL, Redis) was started together on the Windows LAN host. API health returned 200 and the web/admin proxies reached it through Docker DNS.
 - Put TLS termination and a real reverse proxy (Nginx/Caddy/Cloud LB) in front of ports 3000/3001 for production; do not expose PostgreSQL or Redis publicly.
 
 ## Environment-specific configuration

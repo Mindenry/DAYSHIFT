@@ -13,12 +13,18 @@ export class JobService implements OnModuleDestroy {
 
   async add(name: string, data: Record<string, unknown>, options?: JobsOptions) {
     try {
+      // BullMQ custom ids may not contain colons (used by dedupe keys and
+      // return numbers). Normalise while preserving uniqueness.
+      const jobId = options?.jobId
+        ? String(options.jobId).replace(/[^A-Za-z0-9_-]/g, "-").slice(0, 120)
+        : undefined;
       return await this.queue.add(name, data, {
         attempts: 5,
         backoff: { type: "exponential", delay: 2000 },
         removeOnComplete: { age: 86400, count: 1000 },
         removeOnFail: { age: 604800 },
         ...options,
+        ...(jobId ? { jobId } : {}),
       });
     } catch (error) {
       // Queue outages must not break the customer-facing transaction. The

@@ -169,6 +169,7 @@ export class OrdersService {
           reason: reason ?? "Order cancelled",
           actorId: actor.id,
           actorEmail: actor.email,
+          actorType: actor.type,
         });
       }
       await this.inventory.restockCancelledOrder(order.id, "Order cancelled after payment");
@@ -240,6 +241,20 @@ export class OrdersService {
     }
     if (target === "SHIPPED" && !order.shipments.some((shipment) => shipment.status !== "CANCELLED")) {
       throw AppError.validation("Create a shipment with tracking before marking the order shipped.");
+    }
+    if (
+      target === "DELIVERED" &&
+      !order.shipments.some((shipment) => shipment.status === "DELIVERED")
+    ) {
+      throw AppError.validation("Mark the shipment delivered before completing the order delivery.");
+    }
+    if (target === "PAID") {
+      throw AppError.validation(
+        "Orders become paid only when a payment is captured. Use the payment provider or refund workflow.",
+      );
+    }
+    if (target === "PAYMENT_FAILED") {
+      throw AppError.validation("Payment failure is recorded by the payment provider, not manually.");
     }
     if (target === "REFUNDED" || target === "REFUND_PENDING") {
       throw AppError.validation("Refunds are processed from the returns workflow.");
@@ -686,6 +701,11 @@ export class OrdersService {
     if (!RETURN_TRANSITIONS[request.status]?.includes(dto.status)) {
       throw AppError.conflict(`Cannot move this return from ${request.status} to ${dto.status}.`);
     }
+    if (dto.status === "REFUNDED") {
+      throw AppError.validation(
+        "A return can only become refunded by processing the refund. Use the refund action.",
+      );
+    }
 
     if (dto.status === "APPROVED" && request.resolution === "EXCHANGE") {
       for (const item of request.items) {
@@ -698,6 +718,30 @@ export class OrdersService {
     }
 
     let exchangeFulfilled = false;
+    if (dto.status === "INSPECTED") {
+      // These inventory operations are idempotent per return. Run them before
+      // the status commit so a failure leaves the return retryable instead of
+      // marking it inspected without restocking or exchange consumption.
+      await this.inventory.restockReturn(
+        request.id,
+        request.items
+          .map((item) => ({
+            variantId: item.orderItem.variantId ?? "",
+            quantity: item.quantity,
+          }))
+          .filter((item) => !!item.variantId),
+      );
+      if (request.resolution === "EXCHANGE") {
+        const exchanges = request.items
+          .filter((item) => item.exchangeVariantId)
+          .map((item) => ({ variantId: item.exchangeVariantId!, quantity: item.quantity }));
+        if (exchanges.length) {
+          await this.inventory.fulfilExchange(request.id, exchanges);
+          exchangeFulfilled = true;
+        }
+      }
+    }
+
     await this.prisma.$transaction(async (tx) => {
       await tx.returnRequest.update({
         where: { id: request.id },
@@ -755,25 +799,6 @@ export class OrdersService {
         });
       }
     });
-
-    if (dto.status === "INSPECTED") {
-      await this.inventory.restockReturn(
-        request.id,
-        request.items.map((item) => ({
-          variantId: item.orderItem.variantId ?? "",
-          quantity: item.quantity,
-        })).filter((item) => !!item.variantId),
-      );
-      if (request.resolution === "EXCHANGE") {
-        const exchanges = request.items
-          .filter((item) => item.exchangeVariantId)
-          .map((item) => ({ variantId: item.exchangeVariantId!, quantity: item.quantity }));
-        if (exchanges.length) {
-          await this.inventory.fulfilExchange(request.id, exchanges);
-          exchangeFulfilled = true;
-        }
-      }
-    }
 
     if (request.order.userId) {
       await this.notifications.email({
@@ -833,6 +858,7 @@ export class OrdersService {
       })),
       actorId: actor.id,
       actorEmail: actor.email,
+      actorType: "STAFF",
     });
     await this.prisma.returnRequest.update({
       where: { id: request.id },

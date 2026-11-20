@@ -556,6 +556,23 @@ export class AdminCatalogService {
 
   async updateCategory(id: string, dto: Record<string, unknown>, actor: AdminActor) {
     if (dto.parentId === id) throw AppError.validation("A category cannot be its own parent.");
+    if (dto.parentId) {
+      // Walk up from the proposed parent; if we reach this category, the
+      // change would create a cycle and make the navigation tree unrenderable.
+      let cursor: string | null = dto.parentId as string;
+      let depth = 0;
+      while (cursor && depth < 50) {
+        if (cursor === id) {
+          throw AppError.validation("A category cannot be moved beneath one of its own descendants.");
+        }
+        const parent: { parentId: string | null } | null = await this.prisma.category.findUnique({
+          where: { id: cursor },
+          select: { parentId: true },
+        });
+        cursor = parent?.parentId ?? null;
+        depth += 1;
+      }
+    }
     const updated = await this.prisma.category.update({
       where: { id },
       data: {

@@ -16,6 +16,7 @@ import { AddCartItemDto, ApplyCouponDto, UpdateCartItemDto } from "./cart.dto";
 import { CurrentUser, Public } from "../../common/decorators";
 import { AuthUser, CART_COOKIE } from "../../common/types";
 import { AppError } from "../../common/app-error";
+import { secureCookies } from "../../common/cookies";
 
 const CART_MAX_AGE = 90 * 86_400_000;
 
@@ -37,7 +38,7 @@ export class CartController {
       res.cookie(CART_COOKIE, result.issuedGuestToken, {
         httpOnly: true,
         sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
+        secure: secureCookies(),
         path: "/",
         maxAge: CART_MAX_AGE,
       });

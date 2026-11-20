@@ -149,6 +149,17 @@ export class PricingService {
           if (strict) throw AppError.validation("This code is valid on your first order only.");
           return null;
         }
+      } else if (email) {
+        const orderCount = await this.prisma.order.count({
+          where: {
+            email: email.toLowerCase(),
+            status: { notIn: ["CANCELLED", "PAYMENT_FAILED"] },
+          },
+        });
+        if (orderCount > 0) {
+          if (strict) throw AppError.validation("This code is valid on your first order only.");
+          return null;
+        }
       }
     }
 

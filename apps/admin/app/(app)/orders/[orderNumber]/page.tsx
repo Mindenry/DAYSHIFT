@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader, Badge } from "@/components/ui";
 import { apiGet, money, dateTime } from "@/lib/api";
+import { STOREFRONT_URL } from "@/lib/site";
 import { getCookieHeader, requireStaff } from "@/lib/session";
 import { OrderOperations } from "@/components/order-operations";
 
@@ -52,7 +53,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           <div className="flex items-center gap-2">
             <Badge status={order.status} />
             <Badge status={order.paymentStatus} />
-            <Link href={`http://localhost:3000/account/orders/${order.orderNumber}`} target="_blank" className="a-btn a-btn-outline a-btn-sm">Customer view</Link>
+            <Link href={`${STOREFRONT_URL}/account/orders/${order.orderNumber}`} target="_blank" className="a-btn a-btn-outline a-btn-sm">Customer view</Link>
           </div>
         }
       />

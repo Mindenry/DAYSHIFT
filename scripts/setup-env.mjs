@@ -39,6 +39,7 @@ const shared = {
   SMTP_PASSWORD: env.SMTP_PASSWORD,
   PAYMENT_PROVIDER: env.PAYMENT_PROVIDER,
   SHIPPING_PROVIDER: env.SHIPPING_PROVIDER,
+  COOKIE_SECURE: env.COOKIE_SECURE,
   NODE_ENV: "development",
 };
 
@@ -55,6 +56,7 @@ const files = {
     NEXT_PUBLIC_API_URL: env.API_URL ?? "http://localhost:4000",
     API_INTERNAL_URL: env.API_URL ?? "http://localhost:4000",
     NEXT_PUBLIC_ADMIN_URL: env.ADMIN_URL ?? "http://localhost:3001",
+    NEXT_PUBLIC_SITE_URL: env.APP_URL ?? "http://localhost:3000",
   },
   "tests/e2e/.env": {
     E2E_BASE_URL: env.APP_URL ?? "http://localhost:3000",

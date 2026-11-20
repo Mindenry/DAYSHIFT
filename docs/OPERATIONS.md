@@ -8,6 +8,19 @@
 
 ## Starting and stopping locally
 
+Docker deployment on the Windows host:
+
+```powershell
+.\scripts\deploy.ps1          # build, start, firewall, HTTP verification
+.\scripts\status.ps1          # containers, endpoints, firewall
+.\scripts\health.ps1          # strict checks; non-zero on failure
+.\scripts\logs.ps1 -Service api -Tail 100
+.\scripts\stop.ps1            # stop app containers; volumes preserved
+.\scripts\stop.ps1 -All       # also stop PostgreSQL and Redis
+```
+
+Local development process:
+
 ```bash
 docker compose up -d postgres redis
 pnpm dev                     # all four apps
@@ -17,15 +30,19 @@ docker compose down          # keeps volumes
 docker compose down -v       # DESTROYS local data
 ```
 
-Application processes started separately for this demo can be inspected via `apps/api/api.out.log`, `apps/worker/worker.out.log`, `apps/web/web.out.log`, `apps/admin/admin.out.log`.
-
 ## Backup
 
-```bash
-pnpm db:backup               # backups/dayshift-YYYYMMDD-HHMMSS.sql
+```powershell
+.\scripts\backup.ps1          # compressed dump + SHA-256 in backups/
 ```
 
-Uses `pg_dump -Fc` inside `dayshift-postgres`. For production, use managed snapshots plus logical dumps, store off-host, encrypt, and test restores.
+Or:
+
+```bash
+pnpm db:backup               # backups/dayshift-YYYYMMDD-HHMMSS.dump
+```
+
+Both use `pg_dump -Fc` inside `dayshift-postgres`. For production, use managed snapshots plus logical dumps, store off-host, encrypt, and test restores.
 
 ## Restore
 

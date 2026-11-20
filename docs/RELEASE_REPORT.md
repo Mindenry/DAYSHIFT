@@ -1,5 +1,7 @@
 # Release report — v1.0.0
 
+> **Superseded for audit purposes by `INDEPENDENT_AUDIT_REPORT.md`, `REMEDIATION_REPORT.md` and `RELEASE_VERIFICATION_REPORT.md` (20 Nov 2026).** Docker is now built and exercised; exchanges were verified after remediation. Test counts in this historical report were 16 unit / 10 integration / 7 E2E and have been superseded.
+
 **Project:** DAYSHIFT — Everyday style. Your way.
 **Release date:** 20 November 2026
 **Environment verified:** Windows, Node 26.13.0, pnpm 10.34.9, Docker 29.9.3, PostgreSQL 16 (container), Redis 7 (container).
