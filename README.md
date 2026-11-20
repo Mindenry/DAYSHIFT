@@ -186,13 +186,14 @@ pnpm test:smoke                         # live API smoke
 pnpm --filter @dayshift/e2e test        # Playwright purchase and admin flows
 pnpm test:a11y                          # Axe scan of six surfaces
 pnpm test:mobile                        # 320px and 390px overflow/tap-target audit
+pnpm test:workflows                     # account, support, fulfilment, review, loyalty, cancellation
 pnpm build                              # all production builds
 pnpm audit:deps
 ```
 
 Live suites target `http://localhost:4000` by default. Point them at the LAN deployment with `INTEGRATION_API`, `SMOKE_API`, `EXCHANGE_API`, `INTEGRATION_STOREFRONT`, `E2E_BASE_URL`, `E2E_ADMIN_URL` and `E2E_API_URL`.
 
-Current results: typecheck 12/12, lint 7/7, unit 18/18, integration 18/18, exchange 8/8, smoke 24/24, Playwright 7/7, mobile audit 11 pages × 2 widths, Axe 0 serious/critical on six surfaces, all four production images built. Details: [TESTING.md](docs/TESTING.md) · [TEST_MATRIX.md](docs/TEST_MATRIX.md).
+Current results: typecheck 12/12, lint 7/7, unit 18/18, integration 18/18, exchange 8/8, smoke 24/24, workflows 19/19, Playwright 7/7, mobile audit 11 pages × 2 widths, Axe 0 serious/critical on six surfaces, all four production images built. Details: [TESTING.md](docs/TESTING.md) · [TEST_MATRIX.md](docs/TEST_MATRIX.md) · [SYSTEM_VERIFICATION.md](docs/SYSTEM_VERIFICATION.md).
 
 ---
 
@@ -287,6 +288,7 @@ These are tracked in [Production readiness](docs/PRODUCTION_READINESS.md).
 - [Production readiness](docs/PRODUCTION_READINESS.md)
 - [Independent audit](docs/INDEPENDENT_AUDIT_REPORT.md) · [Remediation](docs/REMEDIATION_REPORT.md) · [Release verification](docs/RELEASE_VERIFICATION_REPORT.md)
 - [Release report](docs/RELEASE_REPORT.md) (historical) · [GitHub release](docs/GITHUB_RELEASE.md) · [Final release report](docs/FINAL_RELEASE_REPORT.md)
+- [Full system verification](docs/SYSTEM_VERIFICATION.md)
 
 ---
 

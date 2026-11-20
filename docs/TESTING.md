@@ -59,6 +59,20 @@ Latest result: **7/7 passed** at desktop and against the LAN URLs.
 
 Latest result: **passed on all 11 routes at both widths**. Interactive checks confirm the menu, search, filter and size-guide overlays lock background scroll and close correctly; a full mobile checkout reaches the sandbox payment page through the fixed submit bar.
 
+## Account and workflow suite — `pnpm test:workflows`
+
+`scripts/verify-workflows.mjs` registers a new customer and exercises:
+
+- address book, wishlist add/remove;
+- support ticket, customer reply, staff reply and resolution;
+- paid order, loyalty award and account export;
+- admin fulfilment with shipment events to delivered;
+- verified review creation and admin approval;
+- IDOR rejection for another customer's order;
+- customer cancellation with refund.
+
+Latest result: **19/19 passed**.
+
 ## SEO and AEO checks
 
 | Check | Result |
@@ -88,6 +102,7 @@ See [STOREFRONT_UX.md](STOREFRONT_UX.md) for the full SEO/AEO map.
 | Application images | `docker compose --profile app build` | API, worker, web, admin built; full stack started together for the LAN release |
 | Accessibility | `pnpm test:a11y` | 0 serious/critical on 6 surfaces |
 | Mobile responsiveness | `pnpm test:mobile` | 11 routes × 320/390, no overflow or console errors |
+| Account/workflow suite | `pnpm test:workflows` | 19/19 |
 | SEO/AEO | metadata, JSON-LD, sitemap, robots, llms.txt | Valid; 112 sitemap URLs |
 
 ## Not covered

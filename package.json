@@ -23,6 +23,7 @@
     "test:exchange": "node scripts/exchange-test.mjs",
     "test:smoke": "node scripts/api-smoke.mjs",
     "test:mobile": "node tests/e2e/mobile-check.mjs",
+    "test:workflows": "node scripts/verify-workflows.mjs",
     "audit:deps": "pnpm audit --audit-level=high",
     "db:generate": "pnpm --filter @dayshift/db generate",
     "db:migrate": "pnpm --filter @dayshift/db migrate:dev",

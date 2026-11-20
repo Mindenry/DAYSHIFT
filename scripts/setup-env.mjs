@@ -57,6 +57,7 @@ const files = {
     API_INTERNAL_URL: env.API_URL ?? "http://localhost:4000",
     NEXT_PUBLIC_ADMIN_URL: env.ADMIN_URL ?? "http://localhost:3001",
     NEXT_PUBLIC_SITE_URL: env.APP_URL ?? "http://localhost:3000",
+    WEB_INTERNAL_URL: env.APP_URL ?? "http://localhost:3000",
   },
   "tests/e2e/.env": {
     E2E_BASE_URL: env.APP_URL ?? "http://localhost:3000",
