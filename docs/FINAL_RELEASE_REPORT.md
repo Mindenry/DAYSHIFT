@@ -4,9 +4,9 @@
 **Date:** 20 November 2026
 **Host:** Windows, Docker Desktop, LAN `192.168.1.107`
 **Branch:** `main`
-**Release tag:** `v1.0.0` (unchanged; still points at the original import commit)
-
-> Git commit and remote details are recorded in [GITHUB_RELEASE.md](GITHUB_RELEASE.md) once the push is verified.
+**Release commit:** `0464a2d` — pushed to `origin/main`
+**Repository:** https://github.com/Mindenry/DAYSHIFT (private)
+**Release tag:** `v1.0.0` (unchanged; still points at the original import commit `4a48a7d`)
 
 ## 1. Outcome
 
@@ -99,9 +99,7 @@ The integration suite ran against `http://192.168.1.107:4000/api/v1` and the sto
 - The sandbox payment adapter still accepts no real card data.
 - Residual risks are listed in [SECURITY_AUDIT_REPORT.md](SECURITY_AUDIT_REPORT.md) and [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md).
 
-## 5. Data and history preservation
-
-- Existing PostgreSQL and Redis volumes were reused, not recreated.
+## 5. Data and history preservation- Existing PostgreSQL and Redis volumes were reused, not recreated.
 - No database reset, drop, truncate or destructive migration was run.
 - No seed reset was run.
 - No container image history, commit or tag was rewritten.

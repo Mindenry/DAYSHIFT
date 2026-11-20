@@ -84,11 +84,21 @@ The release is verified only when all of the following are true:
 
 ## Result
 
-Recorded in the follow-up documentation commit after the push completes:
+Verified after execution:
 
-- release commit: see the Git section of [FINAL_RELEASE_REPORT.md](FINAL_RELEASE_REPORT.md);
-- remote and upstream: `origin/main`;
-- tag: `v1.0.0` unchanged;
-- authentication: GitHub CLI as `Mindenry`.
+| Item | Value |
+| --- | --- |
+| Release commit | `0464a2d` — `chore(release): finalize DAYSHIFT LAN deployment and documentation` |
+| Branch | `main` |
+| Remote | `origin` → `https://github.com/Mindenry/DAYSHIFT.git` |
+| Upstream | `origin/main` |
+| Local head = remote head | yes (`0464a2d`) |
+| Tag | `v1.0.0` pushed unchanged; commit `4a48a7d` |
+| Repository visibility | private |
+| GitHub account | `Mindenry` |
+
+Authentication note: the initial push was rejected because the GitHub CLI OAuth token lacked the `workflow` scope required for `.github/workflows/ci.yml`. The scope was added through GitHub's device authorisation; the subsequent push and tag push succeeded. No history rewrite, force-push or amend was used.
+
+A follow-up documentation commit records these hashes; the GitHub Release itself is represented by the unchanged `v1.0.0` tag plus the release commit on `main`. No new tag was created.
 
 Do not force-push, rebase published history or move the tag. Future changes should be normal commits on `main`.
