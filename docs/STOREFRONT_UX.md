@@ -62,7 +62,25 @@ Type scale in practice: hero `clamp(3.1rem, 13vw, 4.8rem)` on phones and up to `
 ### Dialogs
 Mobile menu, search, filters and size guide all lock `body` scrolling, close on Escape, and use `role="dialog"` with `aria-modal`. Reuse this pattern for any new overlay, and render it outside transformed or filtered ancestors.
 
-## 5. Accessibility
+## 5. Motion
+
+Motion is deliberate and short; there are no scroll-triggered reveals, parallax or carousels.
+
+- **Hero:** image scales from 1.06 to 1 while fading in; copy fades up once on load.
+- **Mobile menu:** left drawer slides in over a fading backdrop; navigation items stagger in at 30ms intervals. It slides out before unmounting.
+- **Search:** full-screen panel fades and drops 12px into place.
+- **Filters:** mobile bottom sheet slides up over a fading backdrop.
+- **Dialogs:** size guide fades and scales from 0.97.
+- **Sticky bars:** product, cart and checkout bars slide up on mount.
+- **Buttons:** lift 1px on hover and compress to 0.985 on press.
+- **Cards:** product cards lift 1px and zoom their image; the cart badge pops when the count changes.
+- **Reduced motion:** every animation and transition collapses to 0.01ms with no delay.
+
+Overlays use `components/use-presence.ts`. It keeps the element mounted for the exit transition and waits **two animation frames** before switching to the open state, so the closed layout is painted first and the transition actually runs. The same file explains why a single `requestAnimationFrame` is not enough.
+
+Menu and search are rendered outside `<header>` because the header's `backdrop-filter` creates a containing block that traps `position: fixed` children.
+
+## 6. Accessibility
 
 - One `h1` per page; sections use `h2`/`h3` in order.
 - Visible focus ring (`:focus-visible`, 2px ink, 3px offset).
@@ -79,7 +97,7 @@ pnpm test:a11y
 pnpm test:mobile
 ```
 
-## 6. SEO and AEO
+## 7. SEO and AEO
 
 ### Metadata
 `app/layout.tsx` defines `metadataBase`, a title template, description, keywords, canonical types, Open Graph, Twitter card, robots directives, icons, theme colour and viewport-fit. Product, collection, category, collection index, support, track and content pages add their own canonical and share images.
@@ -116,7 +134,7 @@ When adding a page:
 
 When adding product data, extend the Product JSON-LD only if the API exposes the value; never invent ratings, reviews, shipping times or return terms.
 
-## 7. Verified responsive behaviour
+## 8. Verified responsive behaviour
 
 `tests/e2e/mobile-check.mjs` opens 11 routes at 390×844 and 320×700, checks:
 
@@ -127,7 +145,7 @@ When adding product data, extend the Product JSON-LD only if the API exposes the
 
 Latest result: **passed at both widths for all 11 routes**. Interactive checks also cover the menu, search, filters and size guide (scroll lock and close), and a full mobile checkout through the fixed submit bar to the sandbox payment page.
 
-## 8. Known constraints
+## 9. Known constraints
 
 - Product imagery is generated SVG studio art, not photography. Cards use a 3:4 frame; some art has generous internal padding.
 - Fonts are downloaded at build time by `next/font` and self-hosted by Next.js; the running app does not call Google Fonts.

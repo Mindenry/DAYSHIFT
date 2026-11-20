@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import type { Facets } from "./listing-view";
+import { usePresence } from "./use-presence";
 
 interface Props {
   facets: Facets;
@@ -20,6 +21,8 @@ function hiddenFields(params: Record<string, string | string[] | undefined>, exc
 
 export function ListingFilters({ facets, basePath, params, activeSort, sortOptions }: Props) {
   const [open, setOpen] = useState(false);
+  const { mounted, state } = usePresence(open, 240);
+  const isOpen = state === "open";
   const activeSize = typeof params.size === "string" ? params.size : "";
   const activeColor = typeof params.color === "string" ? params.color : "";
   const activeMin = typeof params.minPrice === "string" ? params.minPrice : "";
@@ -165,15 +168,34 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
         <div className="sticky top-28">{panel}</div>
       </div>
 
-      {open && (
-        <div className="fixed inset-0 z-50 bg-paper lg:hidden" role="dialog" aria-modal="true" aria-label="Filters">
-          <div className="flex items-center justify-between border-b border-line px-5 py-4">
-            <p className="overline">Filter & sort</p>
-            <button type="button" onClick={() => setOpen(false)} className="flex h-11 w-11 items-center justify-center" aria-label="Close filters">
-              <X className="h-5 w-5" />
-            </button>
+      {mounted && (
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Filters" aria-hidden={!isOpen}>
+          <button
+            type="button"
+            aria-label="Close filters"
+            onClick={() => setOpen(false)}
+            className={`absolute inset-0 bg-ink/45 backdrop-blur-[2px] transition-opacity duration-300 ${
+              isOpen ? "opacity-100" : "opacity-0"
+            }`}
+          />
+          <div
+            className={`absolute inset-x-0 bottom-0 flex max-h-[92dvh] flex-col bg-paper shadow-[0_-20px_60px_rgba(0,0,0,0.22)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              isOpen ? "translate-y-0" : "translate-y-full"
+            }`}
+          >
+            <div className="flex shrink-0 items-center justify-between border-b border-line px-5 py-4">
+              <p className="overline">Filter & sort</p>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="flex h-11 w-11 items-center justify-center transition-transform duration-150 active:scale-90"
+                aria-label="Close filters"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="overflow-y-auto overscroll-contain p-5 pb-8">{panel}</div>
           </div>
-          <div className="h-[calc(100%-65px)] overflow-y-auto p-5 pb-20">{panel}</div>
         </div>
       )}
     </>

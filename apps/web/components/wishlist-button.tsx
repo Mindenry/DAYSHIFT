@@ -58,7 +58,7 @@ export function WishlistButton({
       onClick={toggle}
       aria-label={saved ? `Remove ${productName} from wishlist` : `Save ${productName} to wishlist`}
       aria-pressed={saved}
-      className={`flex items-center justify-center border border-line bg-paper/85 backdrop-blur transition-colors hover:bg-paper ${
+      className={`flex items-center justify-center border border-line bg-paper/85 backdrop-blur transition duration-150 hover:bg-paper active:scale-90 ${
         large ? "h-12 w-12" : "h-10 w-10 sm:h-9 sm:w-9"
       }`}
     >

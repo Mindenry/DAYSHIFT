@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { clientApi, money } from "@/lib/api";
+import { usePresence } from "./use-presence";
 
 interface Suggestion {
   products: Array<{ id: string; name: string; slug: string; price: string; image: string | null }>;
@@ -19,6 +20,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
   const [recent, setRecent] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { mounted, state } = usePresence(open, 220);
 
   useEffect(() => {
     if (!open) return;
@@ -69,7 +71,8 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
     };
   }, [query, open]);
 
-  if (!open) return null;
+  if (!mounted) return null;
+  const isOpen = state === "open";
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -84,8 +87,20 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-paper" role="dialog" aria-modal="true" aria-label="Search">
-      <div className="wrap">
+    <div
+      className={`fixed inset-0 z-50 bg-paper transition-opacity duration-300 ${
+        isOpen ? "opacity-100" : "opacity-0"
+      }`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search"
+      aria-hidden={!isOpen}
+    >
+      <div
+        className={`wrap transition-transform duration-[320ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          isOpen ? "translate-y-0" : "-translate-y-3"
+        }`}
+      >
         <div className="flex h-20 items-center justify-between border-b border-line">
           <p className="overline">Search DAYSHIFT</p>
           <button type="button" onClick={onClose} className="inline-flex h-11 w-11 items-center justify-center" aria-label="Close search">

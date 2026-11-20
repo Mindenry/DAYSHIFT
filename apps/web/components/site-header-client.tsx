@@ -73,7 +73,7 @@ export function SiteHeaderClient({
 
           <button
             type="button"
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center lg:hidden"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center transition-transform duration-150 active:scale-90 lg:hidden"
             aria-label="Open menu"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
@@ -93,28 +93,28 @@ export function SiteHeaderClient({
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="inline-flex h-11 w-10 items-center justify-center transition-opacity hover:opacity-60 sm:w-11"
+              className="inline-flex h-11 w-10 items-center justify-center transition duration-150 hover:opacity-60 active:scale-90 sm:w-11"
               aria-label="Search"
             >
               <Search className="h-[19px] w-[19px]" />
             </button>
             <Link
               href={user ? "/account" : "/login"}
-              className="hidden h-11 w-11 items-center justify-center transition-opacity hover:opacity-60 min-[420px]:inline-flex"
+              className="hidden h-11 w-11 items-center justify-center transition duration-150 hover:opacity-60 active:scale-90 min-[420px]:inline-flex"
               aria-label={user ? "Your account" : "Sign in"}
             >
               <User className="h-[19px] w-[19px]" />
             </Link>
             <Link
               href="/account/wishlist"
-              className="hidden h-11 w-11 items-center justify-center transition-opacity hover:opacity-60 sm:inline-flex"
+              className="hidden h-11 w-11 items-center justify-center transition duration-150 hover:opacity-60 active:scale-90 sm:inline-flex"
               aria-label="Wishlist"
             >
               <Heart className="h-[19px] w-[19px]" />
             </Link>
             <Link
               href="/cart"
-              className="relative inline-flex h-11 w-10 items-center justify-center transition-opacity hover:opacity-60 sm:w-11"
+              className="relative inline-flex h-11 w-10 items-center justify-center transition duration-150 hover:opacity-60 active:scale-90 sm:w-11"
               aria-label="Shopping bag"
             >
               <ShoppingBag className="h-[19px] w-[19px]" />
@@ -126,7 +126,7 @@ export function SiteHeaderClient({
 
       {activeRoot && (activeRoot.children?.length ?? 0) > 0 && (
         <div
-          className="absolute inset-x-0 top-full hidden border-b border-line bg-paper lg:block"
+          className="absolute inset-x-0 top-full hidden border-b border-line bg-paper animate-fade lg:block"
           onMouseEnter={() => setMega(activeRoot.slug)}
           onMouseLeave={() => setMega(null)}
         >

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import type { ProductDetailDto } from "@dayshift/types";
 import { clientApi, money } from "@/lib/api";
 import { WishlistButton } from "./wishlist-button";
+import { usePresence } from "./use-presence";
 
 interface ChartShape {
   columns?: string[];
@@ -26,6 +27,8 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
   const [activeImage, setActiveImage] = useState(0);
   const [busy, setBusy] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const { mounted: sizeGuideMounted, state: sizeGuideState } = usePresence(sizeGuideOpen, 220);
+  const sizeGuideVisible = sizeGuideState === "open";
 
   const variantsForColor = useMemo(
     () => product.variants.filter((variant) => variant.color === color),
@@ -123,7 +126,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
 
       <div className="grid gap-8 lg:grid-cols-[1.12fr_0.88fr] lg:gap-16">
         {/* Gallery */}
-        <div>
+        <div className="animate-fade">
           <div className="relative aspect-[3/4] overflow-hidden bg-sand">
             {mainImage ? (
               <img
@@ -169,7 +172,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
         </div>
 
         {/* Info */}
-        <div className="lg:sticky lg:top-28 lg:self-start">
+        <div className="animate-fade-up lg:sticky lg:top-28 lg:self-start">
           <p className="overline text-muted">{product.brand?.name ?? "DAYSHIFT"}</p>
           <h1 className="mt-2 font-display text-[2.5rem] leading-[1.02] sm:text-5xl md:text-[3.4rem]">{product.name}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -359,7 +362,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
       </div>
 
       {/* Mobile purchase bar */}
-      <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur-md lg:hidden">
+      <div className="safe-bottom animate-slide-up fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur-md lg:hidden">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <div className="min-w-0 flex-1">
             <p className="truncate text-[10px] uppercase tracking-[0.14em] text-muted">
@@ -379,17 +382,24 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
         </div>
       </div>
 
-      {sizeGuideOpen && (
+      {sizeGuideMounted && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4"
+          className={`fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4 transition-opacity duration-200 ${
+            sizeGuideVisible ? "opacity-100" : "opacity-0"
+          }`}
           role="dialog"
           aria-modal="true"
           aria-label="Size guide"
+          aria-hidden={!sizeGuideVisible}
           onClick={(event) => {
             if (event.target === event.currentTarget) setSizeGuideOpen(false);
           }}
         >
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-paper p-6 md:p-8">
+          <div
+            className={`max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-paper p-6 shadow-2xl transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:p-8 ${
+              sizeGuideVisible ? "translate-y-0 scale-100 opacity-100" : "translate-y-2 scale-[0.97] opacity-0"
+            }`}
+          >
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="overline text-muted">Size guide</p>

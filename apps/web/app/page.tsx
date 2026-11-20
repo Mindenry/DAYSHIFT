@@ -131,7 +131,7 @@ export default async function HomePage() {
           <img
             src={hero?.imageUrl ?? "/images/editorial-01.jpg"}
             alt=""
-            className="h-full w-full object-cover"
+            className="h-full w-full animate-hero-image object-cover"
             fetchPriority="high"
             decoding="async"
           />
@@ -140,7 +140,7 @@ export default async function HomePage() {
 
         <div className="wrap relative">
           <div className="grid min-h-[88svh] items-stretch lg:min-h-[calc(100svh-116px)] lg:grid-cols-[0.95fr_1.05fr]">
-            <div className="relative z-10 flex flex-col justify-end pb-12 pt-28 text-paper lg:justify-center lg:py-24 lg:pr-10 lg:text-ink">
+            <div className="relative z-10 flex animate-fade-up flex-col justify-end pb-12 pt-28 text-paper lg:justify-center lg:py-24 lg:pr-10 lg:text-ink">
               <p className="overline text-paper/80 lg:text-muted">
                 {hero?.subtitle ?? "New season / 2026"}
               </p>
@@ -187,7 +187,7 @@ export default async function HomePage() {
               <img
                 src={hero?.imageUrl ?? "/images/editorial-01.jpg"}
                 alt="DAYSHIFT autumn studio collection"
-                className="absolute inset-0 h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full animate-hero-image object-cover"
                 fetchPriority="high"
                 decoding="async"
               />
@@ -278,7 +278,7 @@ export default async function HomePage() {
                 <Link
                   key={tile.slug}
                   href={`/c/${tile.slug}`}
-                  className="group relative aspect-square overflow-hidden bg-sand"
+                  className="group relative aspect-square overflow-hidden bg-sand transition-transform duration-200 active:scale-[0.99]"
                 >
                   <img
                     src={tile.image}
@@ -306,7 +306,7 @@ export default async function HomePage() {
               <Link
                 key={block.key}
                 href={block.ctaUrl ?? (index === 0 ? "/c/women" : "/c/men")}
-                className="group relative block aspect-[4/5] overflow-hidden bg-sand"
+                className="group relative block aspect-[4/5] overflow-hidden bg-sand transition-transform duration-200 active:scale-[0.995]"
               >
                 <img
                   src={block.imageUrl ?? (index === 0 ? "/images/editorial-03.jpg" : "/images/editorial-02.jpg")}

@@ -36,7 +36,7 @@ Dashboard with live commercial metrics, catalogue management (products, variants
 Server-authoritative pricing in integer cents, atomic inventory reservations with expiry, HMAC-signed payment webhooks with event idempotency, serialised refunds, a controlled order state machine, permission-guarded API, structured error envelope with request IDs, Swagger in development, BullMQ worker, and a Playwright/Axe quality suite.
 
 **Responsive and accessible**
-The storefront is designed mobile-first and verified from **320px** upward: no horizontal overflow, 44px touch targets, full-screen menu and search, sticky add-to-bag and checkout bars, and dialogs that lock background scroll and close on Escape. Axe reports zero serious or critical violations on six surfaces.
+The storefront is designed mobile-first and verified from **320px** upward: no horizontal overflow, 44px touch targets, full-screen menu and search, sticky add-to-bag and checkout bars, and dialogs that lock background scroll and close on Escape. Motion includes a sliding staggered menu, fades and lifts, with a full reduced-motion fallback. Axe reports zero serious or critical violations on six surfaces.
 
 **SEO and answer-engine ready**
 Per-page metadata and canonicals, Open Graph and Twitter cards, a 1200×630 social image, JSON-LD for Organization, WebSite/SearchAction, Product with offers and return policy, BreadcrumbList, ItemList and FAQPage, a dynamic 112-URL sitemap, AI-crawler-aware robots rules, and a generated `/llms.txt` summary. See [Storefront UX and SEO](docs/STOREFRONT_UX.md).

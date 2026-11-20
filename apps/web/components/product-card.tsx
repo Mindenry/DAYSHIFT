@@ -16,7 +16,7 @@ export function ProductCard({
   const colors = product.colors.slice(0, 3);
 
   return (
-    <article className={`group relative flex flex-col ${className}`}>
+    <article className={`group relative flex flex-col transition-transform duration-300 ease-out md:hover:-translate-y-1 ${className}`}>
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-sand">
           {product.primaryImage ? (

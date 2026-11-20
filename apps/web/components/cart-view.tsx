@@ -308,7 +308,7 @@ export function CartView() {
     </div>
 
     {/* Mobile checkout bar */}
-    <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur-md lg:hidden">
+    <div className="safe-bottom animate-slide-up fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur-md lg:hidden">
       <div className="mx-auto flex max-w-3xl items-center gap-3">
         <div className="flex-1">
           <p className="text-[10px] uppercase tracking-[0.12em] text-muted">Total</p>
