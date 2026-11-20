@@ -1,0 +1,281 @@
+{
+  "classic-cotton-tee": {
+    "default": "/images/products/tee-white-hanger.jpg",
+    "colors": {
+      "Optic White": "/images/products/tee-white-hanger.jpg",
+      "Washed Black": "/images/products/sweat-black-hanger.jpg"
+    }
+  },
+  "the-everyday-oversized-tee": {
+    "default": "/images/products/tee-white-model.jpg",
+    "colors": {
+      "Optic White": "/images/products/tee-white-model.jpg",
+      "Washed Black": "/images/products/sweat-black-hanger.jpg"
+    }
+  },
+  "graphic-tee-day-off": {
+    "default": "/images/products/tee-graphic.jpg",
+    "colors": {
+      "Chalk": "/images/products/tee-graphic.jpg",
+      "Washed Black": "/images/products/tee-graphic.jpg"
+    }
+  },
+  "heavyweight-boxy-tee": {
+    "default": "/images/products/sweat-white.jpg",
+    "colors": {
+      "Stone": "/images/products/sweat-white.jpg",
+      "Washed Black": "/images/products/sweat-black-hanger.jpg"
+    }
+  },
+  "mens-everyday-tee": {
+    "default": "/images/products/tee-white-hanger.jpg",
+    "colors": {
+      "Optic White": "/images/products/tee-white-hanger.jpg",
+      "Washed Black": "/images/products/sweat-black-hanger.jpg"
+    }
+  },
+  "merino-crew-knit": {
+    "default": "/images/products/knit-cream.jpg",
+    "colors": {
+      "Black": "/images/products/hoodie-black.jpg",
+      "Cream": "/images/products/knit-cream.jpg"
+    }
+  },
+  "french-terry-sweatshirt": {
+    "default": "/images/products/sweat-white.jpg",
+    "colors": {
+      "Heather Grey": "/images/products/hoodie-grey.jpg",
+      "Oat": "/images/products/sweat-white.jpg"
+    }
+  },
+  "everyday-hoodie": {
+    "default": "/images/products/hoodie-grey.jpg",
+    "colors": {
+      "Heather Grey": "/images/products/hoodie-grey.jpg",
+      "Washed Black": "/images/products/hoodie-black.jpg"
+    }
+  },
+  "mens-fleece-hoodie": {
+    "default": "/images/products/hoodie-black.jpg",
+    "colors": {
+      "Black": "/images/products/hoodie-black.jpg",
+      "Heather Grey": "/images/products/hoodie-grey.jpg"
+    }
+  },
+  "mens-pique-polo": {
+    "default": "/images/products/shirts-folded.jpg",
+    "colors": {
+      "Navy": "/images/products/shirts-folded.jpg",
+      "Oat": "/images/products/sweat-white.jpg"
+    }
+  },
+  "linen-blend-blouse": {
+    "default": "/images/products/blouse-floral.jpg",
+    "colors": {
+      "Chalk": "/images/products/blouse-floral.jpg",
+      "Oat": "/images/products/blouse-floral.jpg"
+    }
+  },
+  "relaxed-linen-shirt": {
+    "default": "/images/products/shirt-white.jpg",
+    "colors": {
+      "Chalk": "/images/products/shirt-white.jpg",
+      "Oat": "/images/products/shirt-denim.jpg"
+    }
+  },
+  "poplin-oversized-shirt": {
+    "default": "/images/products/shirt-white.jpg",
+    "colors": {
+      "Chalk": "/images/products/shirt-white.jpg",
+      "Pale Blue": "/images/products/shirt-denim.jpg"
+    }
+  },
+  "mens-oxford-shirt": {
+    "default": "/images/products/shirts-folded.jpg",
+    "colors": {
+      "Light Blue": "/images/products/shirts-folded.jpg",
+      "White": "/images/products/shirt-white.jpg"
+    }
+  },
+  "ribbed-midi-dress": {
+    "default": "/images/products/dress-maroon.jpg",
+    "colors": {
+      "Black": "/images/products/dress-black.jpg",
+      "Oat": "/images/products/dress-maroon.jpg"
+    }
+  },
+  "silk-blend-slip-dress": {
+    "default": "/images/products/dress-blue.jpg",
+    "colors": {
+      "Black": "/images/products/dress-black.jpg",
+      "Stone": "/images/products/dress-blue.jpg"
+    }
+  },
+  "pleated-midi-skirt": {
+    "default": "/images/products/dress-denim.jpg",
+    "colors": {
+      "Black": "/images/products/dress-black.jpg",
+      "Stone": "/images/products/dress-denim.jpg"
+    }
+  },
+  "tailored-shorts": {
+    "default": "/images/products/shorts-denim.jpg",
+    "colors": {
+      "Black": "/images/products/shorts-denim.jpg",
+      "Oat": "/images/products/shorts-denim.jpg"
+    }
+  },
+  "wide-leg-trousers": {
+    "default": "/images/products/trousers-pink.jpg",
+    "colors": {
+      "Black": "/images/products/suit-charcoal.jpg",
+      "Taupe": "/images/products/trousers-pink.jpg"
+    }
+  },
+  "mens-relaxed-chino": {
+    "default": "/images/products/trousers-pink.jpg",
+    "colors": {
+      "Olive": "/images/products/trousers-pink.jpg",
+      "Sand": "/images/products/jeans-stack.jpg"
+    }
+  },
+  "unisex-track-pant": {
+    "default": "/images/products/pants-cargo.jpg",
+    "colors": {
+      "Black": "/images/products/pants-cargo.jpg",
+      "Heather Grey": "/images/products/trousers-pink.jpg"
+    }
+  },
+  "straight-leg-jeans": {
+    "default": "/images/products/jeans-stack.jpg",
+    "colors": {
+      "Indigo": "/images/products/jeans-stack.jpg",
+      "Washed Black": "/images/products/jeans-light.jpg"
+    }
+  },
+  "mens-straight-jeans": {
+    "default": "/images/products/jeans-light.jpg",
+    "colors": {
+      "Indigo": "/images/products/jeans-light.jpg",
+      "Washed Black": "/images/products/jeans-stack.jpg"
+    }
+  },
+  "mens-harrington-jacket": {
+    "default": "/images/products/jacket-tan.jpg",
+    "colors": {
+      "Black": "/images/products/jacket-black.jpg",
+      "Sand": "/images/products/jacket-tan.jpg"
+    }
+  },
+  "oversized-denim-jacket": {
+    "default": "/images/products/jacket-denim.jpg",
+    "colors": {
+      "Indigo": "/images/products/jacket-denim.jpg",
+      "Washed Black": "/images/products/jacket-denim.jpg"
+    }
+  },
+  "structured-blazer": {
+    "default": "/images/products/suit-charcoal.jpg",
+    "colors": {
+      "Black": "/images/products/suit-charcoal.jpg",
+      "Taupe": "/images/products/blazer-blue.jpg"
+    }
+  },
+  "suede-ankle-boot": {
+    "default": "/images/products/boots-brown.jpg",
+    "colors": {
+      "Black": "/images/products/boots-brown.jpg",
+      "Tan": "/images/products/boots-brown.jpg"
+    }
+  },
+  "suede-loafer": {
+    "default": "/images/products/shoes-brown.jpg",
+    "colors": {
+      "Black": "/images/products/shoes-brown.jpg",
+      "Tan": "/images/products/shoes-brown.jpg"
+    }
+  },
+  "classic-sneaker": {
+    "default": "/images/products/sneaker-white.jpg",
+    "colors": {
+      "Black": "/images/products/sneaker-color.jpg",
+      "White": "/images/products/sneaker-white.jpg"
+    }
+  },
+  "leather-sandal": {
+    "default": "/images/products/sandals-brown.jpg",
+    "colors": {
+      "Black": "/images/products/sandals-brown.jpg",
+      "Tan": "/images/products/sandals-brown.jpg"
+    }
+  },
+  "leather-tote": {
+    "default": "/images/products/bag-orange.jpg",
+    "colors": {
+      "Black": "/images/products/backpack-black.jpg",
+      "Tan": "/images/products/bag-orange.jpg"
+    }
+  },
+  "nylon-crossbody": {
+    "default": "/images/products/bag-orange.jpg",
+    "colors": {
+      "Black": "/images/products/bag-orange.jpg",
+      "Stone": "/images/products/bag-red.jpg"
+    }
+  },
+  "canvas-backpack": {
+    "default": "/images/products/backpack-black.jpg",
+    "colors": {
+      "Black": "/images/products/backpack-black.jpg",
+      "Stone": "/images/products/flatlay-accessories.jpg"
+    }
+  },
+  "cotton-baseball-cap": {
+    "default": "/images/products/cap-grey.jpg",
+    "colors": {
+      "Black": "/images/products/cap-grey.jpg",
+      "Stone": "/images/products/cap-beige.jpg"
+    }
+  },
+  "wool-felt-hat": {
+    "default": "/images/products/cap-beige.jpg",
+    "colors": {
+      "Black": "/images/products/cap-grey.jpg",
+      "Camel": "/images/products/cap-beige.jpg"
+    }
+  },
+  "acetate-sunglasses": {
+    "default": "/images/products/sunglasses-black.jpg",
+    "colors": {
+      "Black": "/images/products/sunglasses-black.jpg",
+      "Tortoise": "/images/products/sunglasses-round.jpg"
+    }
+  },
+  "leather-belt": {
+    "default": "/images/products/belt-brown.jpg",
+    "colors": {
+      "Black": "/images/products/belt-brown.jpg",
+      "Tan": "/images/products/belt-brown.jpg"
+    }
+  },
+  "bifold-wallet": {
+    "default": "/images/products/wallet-brown.jpg",
+    "colors": {
+      "Black": "/images/products/wallet-brown.jpg",
+      "Tan": "/images/products/wallet-brown.jpg"
+    }
+  },
+  "gold-hoop-earrings": {
+    "default": "/images/products/earrings-gold.jpg",
+    "colors": {
+      "Gold": "/images/products/earrings-gold.jpg"
+    }
+  },
+  "ribbed-sock-pack": {
+    "default": "/images/products/socks-print.jpg",
+    "colors": {
+      "Black": "/images/products/socks-print.jpg",
+      "White": "/images/products/socks-print.jpg"
+    }
+  }
+}

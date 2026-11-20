@@ -40,10 +40,10 @@ interface HomeContent {
 }
 
 const CATEGORY_TILES = [
-  { name: "Shoes", slug: "shoes", image: "/art/sneaker-white.svg" },
-  { name: "Bags", slug: "bags", image: "/art/bag-tan.svg" },
-  { name: "Accessories", slug: "accessories", image: "/art/sunglasses-black.svg" },
-  { name: "Essentials", slug: "unisex-essentials", image: "/art/tee-optic-white.svg" },
+  { name: "Shoes", slug: "shoes", image: "/images/products/sneaker-white.jpg" },
+  { name: "Bags", slug: "bags", image: "/images/products/bag-orange.jpg" },
+  { name: "Accessories", slug: "accessories", image: "/images/products/sunglasses-round.jpg" },
+  { name: "Essentials", slug: "unisex-essentials", image: "/images/products/sweat-white.jpg" },
 ];
 
 const FAQS = [

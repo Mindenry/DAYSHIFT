@@ -7,9 +7,20 @@ import {
   PERMISSION_KEYS,
   type PermissionKey,
 } from "@dayshift/config";
+import demoPhotos from "./demo-photos.json";
 
 const prisma = new PrismaClient();
 const d = (value: number) => new Prisma.Decimal(value.toFixed(2));
+
+const DEMO_PHOTOS = demoPhotos as Record<
+  string,
+  { default?: string; colors?: Record<string, string> }
+>;
+
+function photoFor(slug: string, color: string, fallback: string): string {
+  const entry = DEMO_PHOTOS[slug];
+  return entry?.colors?.[color] ?? entry?.default ?? fallback;
+}
 
 const IMG = {
   hero: "/art/tee-oat.svg",
@@ -1452,7 +1463,7 @@ async function main() {
         collections: { create: collectionSlugs.filter((s) => collectionIds.has(s)).map((s, i) => ({ collectionId: collectionIds.get(s)!, position: i })) },
         images: {
           create: def.colors.map((color, i) => ({
-            url: color.image ?? artFor(artType, color.name),
+            url: photoFor(def.slug, color.name, color.image ?? artFor(artType, color.name)),
             alt: `${def.name} in ${color.name}`,
             color: color.name,
             position: i,
@@ -1476,7 +1487,7 @@ async function main() {
             colorHex: color.hex,
             priceOverride: priceOverride ? d(priceOverride) : null,
             position: ci * 100 + si,
-            imageUrl: color.image ?? artFor(artType, color.name),
+            imageUrl: photoFor(def.slug, color.name, color.image ?? artFor(artType, color.name)),
           },
         });
         variantIds.set(`${def.slug}|${color.name}|${size}`, variant.id);

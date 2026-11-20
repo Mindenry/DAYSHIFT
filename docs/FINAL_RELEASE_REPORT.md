@@ -109,7 +109,7 @@ The integration suite ran against `http://192.168.1.107:4000/api/v1` and the sto
 
 - A physical Mac was not available. macOS instructions are documented; cross-device sign-in, checkout and admin flows from macOS remain **pending verification**.
 - Payments, shipping and email are sandbox/local.
-- Product images are generated, not real merchandise.
+- Product photography is licensed stand-in imagery from Unsplash (see [IMAGE_CREDITS.md](IMAGE_CREDITS.md)), not photographs of the actual catalogue.
 - No MFA, CSP, multi-currency, tax engine, upload pipeline or real providers.
 - The design targets a single host; there is no load balancer, CDN, managed database or observability stack.
 - CI YAML is validated locally and has not run on GitHub.
@@ -130,6 +130,7 @@ Run the documented macOS checklist from a physical Mac and record the result in 
 After the LAN release, the customer storefront was upgraded without changing the audited commerce backend:
 
 - Self-hosted Bodoni Moda and Manrope typography (`@fontsource-variable`), refined palette and spacing.
+- Replaced placeholder SVG product art with 43 licensed stand-in product photographs (Unsplash and Pexels), mapped per product and colour. Sources and licences are documented in [IMAGE_CREDITS.md](IMAGE_CREDITS.md).
 - Mobile-first hero with full-bleed imagery, service strip, category tiles and FAQ.
 - Rebuilt product cards, product detail with sticky mobile add-to-bag, cart free-delivery progress and sticky checkout, checkout with a fixed mobile submit bar, and a two-column account navigation.
 - Fixed a real mobile defect: the menu and search overlays were rendered inside the header's `backdrop-filter` containing block and appeared transparent; they now render outside the header.

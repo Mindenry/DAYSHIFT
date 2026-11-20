@@ -117,7 +117,7 @@ No production deployment was performed and no paid infrastructure or credentials
 ## 13. Known limitations
 
 - Payments are simulated; no real card processing.
-- Product imagery is generated illustration/Unsplash demo photography, not real inventory photography.
+- Product photography is licensed stand-in imagery (Unsplash), not real inventory photography.
 - Content editing and purchase-order creation lack dedicated UI.
 - Exchange and reservation-expiry flows are implemented but not fully automated end to end.
 - No MFA, upload scanning, multi-currency or jurisdiction-aware tax.

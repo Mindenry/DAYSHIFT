@@ -82,9 +82,9 @@ export function SiteFooter() {
           </div>
         </div>
         <p className="mt-4 max-w-3xl text-[11px] leading-relaxed text-muted">
-          Demonstration storefront. Product imagery is illustrative studio art generated for this
-          project, not photographs of real inventory. Sandbox payments are simulated locally and no
-          money is processed.
+          Demonstration storefront. Product photography is licensed stand-in imagery from Unsplash,
+          not photographs of the actual demo inventory. Sandbox payments are simulated locally and no
+          money is processed. Image credits are listed in docs/IMAGE_CREDITS.md.
         </p>
       </div>
     </footer>

@@ -28,6 +28,7 @@
     "db:migrate": "pnpm --filter @dayshift/db migrate:dev",
     "db:deploy": "pnpm --filter @dayshift/db migrate:deploy",
     "db:seed": "pnpm --filter @dayshift/db seed",
+    "db:photos": "node scripts/apply-demo-photos.mjs",
     "db:studio": "pnpm --filter @dayshift/db studio",
     "db:backup": "node scripts/db-backup.mjs",
     "db:restore": "node scripts/db-restore.mjs",

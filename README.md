@@ -4,7 +4,7 @@
 
 DAYSHIFT is a full-stack fashion commerce platform: a customer storefront, a staff operations portal, a modular commerce API, transactional inventory, sandbox payments, background jobs and an auditable returns/refund/exchange workflow.
 
-It is a working reference implementation built as a production-shaped monorepo. It is not a live shop: payments are simulated, product imagery is generated studio art, and email is written to local files.
+It is a working reference implementation built as a production-shaped monorepo. It is not a live shop: payments are simulated, product photography is licensed stand-in imagery from Unsplash, and email is written to local files.
 
 > **Status:** portfolio/demo ready, running on a Windows LAN at `http://192.168.1.107:3000`. Not production ready — see [Production readiness](docs/PRODUCTION_READINESS.md) and the [independent audit](docs/INDEPENDENT_AUDIT_REPORT.md).
 
@@ -256,7 +256,7 @@ All six scripts were executed against the running stack during this release. Res
 ## Known limitations
 
 - Payments, shipping and email are sandbox/local adapters; no real provider is integrated.
-- Product imagery is generated studio art, not photographs of real inventory.
+- Product photography is licensed stand-in imagery from Unsplash, not photographs of the actual demo inventory. See [image credits](docs/IMAGE_CREDITS.md).
 - Single currency (USD) and a flat tax estimate; no jurisdiction engine.
 - No MFA, CSP, file uploads, multi-currency or fraud engine.
 - Loyalty is not reversed on refunds and coupon usage is not restored on cancellation — policy decision pending.
@@ -275,6 +275,7 @@ These are tracked in [Production readiness](docs/PRODUCTION_READINESS.md).
 - [LAN deployment](docs/LAN_DEPLOYMENT.md)
 - [Docker deployment](docs/DOCKER_DEPLOYMENT.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Image credits and licences](docs/IMAGE_CREDITS.md)
 - [Storefront UX, responsive rules and SEO/AEO](docs/STOREFRONT_UX.md)
 - [API reference](docs/API.md)
 - [Database](docs/DATABASE.md)
@@ -300,4 +301,4 @@ These are tracked in [Production readiness](docs/PRODUCTION_READINESS.md).
 | Release tag | `v1.0.0` preserved |
 | Production readiness | Not production ready; see the readiness document |
 
-Demonstration project. Third-party editorial photographs are used under the Unsplash License (see [ENVIRONMENT.md](docs/ENVIRONMENT.md)). Studio illustrations are original generated assets.
+Demonstration project. Third-party photography is used under the [Unsplash License](https://unsplash.com/license); sources are listed in [IMAGE_CREDITS.md](docs/IMAGE_CREDITS.md).

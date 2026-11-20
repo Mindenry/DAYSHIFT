@@ -105,7 +105,7 @@ pnpm test:mobile
 ### Metadata
 `app/layout.tsx` defines `metadataBase`, a title template, description, keywords, canonical types, Open Graph, Twitter card, robots directives, icons, theme colour and viewport-fit. Product, collection, category, collection index, support, track and content pages add their own canonical and share images.
 
-The default social image is `public/og-default.png` (1200×630), captured from the running storefront. Product pages use their raster image when available and fall back to the default for SVG studio art.
+The default social image is `public/og-default.png` (1200×630), captured from the running storefront. Product pages use their product photograph when available and fall back to the default for any remaining SVG artwork.
 
 ### Structured data
 Validated JSON-LD blocks rendered server-side:
@@ -150,7 +150,7 @@ Latest result: **passed at both widths for all 11 routes**. Interactive checks a
 
 ## 9. Known constraints
 
-- Product imagery is generated SVG studio art, not photography. Cards use a 3:4 frame; some art has generous internal padding.
+- Product photography is licensed stand-in imagery from Unsplash, not the actual demo inventory. See [IMAGE_CREDITS.md](IMAGE_CREDITS.md).
 - Fonts ship inside the `@fontsource-variable` packages and are served by Next.js; the running app never calls Google Fonts, and Docker builds do not need font network access.
 - The demo uses a sandbox payment provider and local email files.
 - Canonical and social URLs use `NEXT_PUBLIC_SITE_URL`, currently the LAN address. Set it to the public HTTPS domain before launch.
