@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-label="OVERSIZED TEE in washed black">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#F2EDE4"/>
+      <stop offset="1" stop-color="#E4DCCD"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.05"/></feComponentTransfer>
+    </filter>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#2A2724" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#2A2724" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".24"/>
+      <stop offset=".55" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <rect width="900" height="1200" filter="url(#grain)" opacity=".7"/>
+  <rect x="52" y="52" width="796" height="1096" fill="none" stroke="#2A2724" stroke-opacity=".16"/>
+  <ellipse cx="450" cy="960" rx="260" ry="58" fill="url(#shadow)"/><filter id="drop"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#201e1b" flood-opacity="0.22"/></filter>
+  <g>
+    
+        <path d="M322 396 L248 436 L214 560 L300 596 L330 512 L330 898 Q330 914 346 914 L554 914 Q570 914 570 898 L570 512 L600 596 L686 560 L652 436 L578 396 Q556 424 450 424 Q344 424 322 396 Z" fill="#22211F" stroke="rgba(26,25,23,.78)" stroke-width="2.5"/>
+        <path d="M322 396 Q344 424 450 424 Q556 424 578 396" fill="none" stroke="#080705" stroke-width="2"/>
+        <path d="M382 402 Q450 452 518 402" fill="none" stroke="#080705" stroke-width="3" opacity=".8"/>
+        <path d="M330 520 C330 650 328 790 334 900" stroke="rgba(32,30,27,.09)" stroke-width="26" fill="none"/>
+        <path d="M570 520 C570 650 572 790 566 900" stroke="rgba(32,30,27,.09)" stroke-width="22" fill="none"/>
+        <path d="M386 700 C410 720 490 720 514 700" stroke="rgba(32,30,27,.28)" stroke-width="2" fill="none"/>
+        
+        
+        
+      
+    <path d="M300 420 C420 450 560 450 660 420 L660 940 L300 940 Z" fill="url(#sheen)" opacity=".25" style="mix-blend-mode:screen"/>
+  </g>
+  <text x="88" y="1112" font-family="Helvetica, Arial, sans-serif" font-size="17" letter-spacing="5" fill="#2A2724" fill-opacity=".62">DAYSHIFT</text>
+  <text x="812" y="1112" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="13" letter-spacing="3" fill="#2A2724" fill-opacity=".5">OVERSIZED TEE</text>
+  <text x="88" y="88" font-family="Helvetica, Arial, sans-serif" font-size="12" letter-spacing="4" fill="#2A2724" fill-opacity=".45">STUDIO / 02</text>
+</svg>

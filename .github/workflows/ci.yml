@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: dayshift
+          POSTGRES_PASSWORD: dayshift
+          POSTGRES_DB: dayshift
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U dayshift -d dayshift"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://dayshift:dayshift@localhost:5432/dayshift?schema=public
+      REDIS_URL: redis://localhost:6379
+      SESSION_SECRET: ci-session-secret-not-for-production
+      PAYMENT_SANDBOX_SECRET: ci-sandbox-secret
+      MAIL_MODE: file
+      APP_URL: http://localhost:3000
+      ADMIN_URL: http://localhost:3001
+      API_URL: http://localhost:4000
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      API_INTERNAL_URL: http://localhost:4000
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @dayshift/db generate
+      - run: pnpm build:packages
+      - run: pnpm --filter @dayshift/db exec prisma migrate deploy
+        working-directory: packages/db
+        env:
+          DATABASE_URL: postgresql://dayshift:dayshift@localhost:5432/dayshift?schema=public
+      - run: pnpm db:seed
+      - run: pnpm typecheck
+      - run: pnpm --filter @dayshift/api test
+      - run: pnpm --filter @dayshift/api build
+      - run: pnpm --filter @dayshift/worker build
+      - run: pnpm --filter @dayshift/web build
+      - run: pnpm --filter @dayshift/admin build
+      - name: Start services for integration and E2E
+        run: |
+          node apps/api/dist/main.js > api.log 2>&1 &
+          pnpm --filter @dayshift/web start > web.log 2>&1 &
+          pnpm --filter @dayshift/admin start > admin.log 2>&1 &
+          node apps/worker/dist/main.js > worker.log 2>&1 &
+          npx wait-on http://localhost:4000/api/v1/health http://localhost:3000 http://localhost:3001/login --timeout 120000
+      - name: Integration suite
+        run: node scripts/integration-test.mjs
+      - name: Install Playwright browser
+        run: pnpm --filter @dayshift/e2e exec playwright install --with-deps chromium
+      - name: End-to-end tests
+        run: pnpm --filter @dayshift/e2e test
+      - name: Failure logs
+        if: failure()
+        run: |
+          tail -100 api.log web.log admin.log worker.log || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: tests/e2e/playwright-report
+          retention-days: 7
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.34.9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --audit-level=high
+        continue-on-error: true

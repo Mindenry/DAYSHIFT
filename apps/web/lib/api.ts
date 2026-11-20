@@ -1,0 +1,70 @@
+const API_BASE = process.env.API_INTERNAL_URL ?? "http://localhost:4000";
+
+export class ApiError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly code: string,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+interface FetchOptions {
+  cookie?: string;
+  revalidate?: number | false;
+  tags?: string[];
+}
+
+export async function apiGet<T>(path: string, options: FetchOptions = {}): Promise<T | null> {
+  const response = await fetch(`${API_BASE}/api/v1${path}`, {
+    headers: options.cookie ? { cookie: options.cookie } : undefined,
+    next:
+      options.revalidate === false
+        ? { revalidate: 0 }
+        : { revalidate: options.revalidate ?? 30, tags: options.tags },
+    cache: options.revalidate === false ? "no-store" : undefined,
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as { message?: string } | null;
+    throw new ApiError(response.status, "API_ERROR", body?.message ?? "Request failed");
+  }
+  const body = (await response.json()) as { data: T };
+  return body.data;
+}
+
+export async function apiGetOrThrow<T>(path: string, options: FetchOptions = {}): Promise<T> {
+  const data = await apiGet<T>(path, options);
+  if (data === null) throw new ApiError(404, "NOT_FOUND", "Not found");
+  return data;
+}
+
+/** Browser-side call through the same-origin /api rewrite (cookies flow). */
+export async function clientApi<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`/api/v1${path}`, {
+    ...init,
+    headers: {
+      "content-type": "application/json",
+      ...(init?.headers ?? {}),
+    },
+    credentials: "same-origin",
+  });
+  const body = await response.json().catch(() => null);
+  if (!response.ok) {
+    const message = Array.isArray(body?.message)
+      ? body.message.join(". ")
+      : body?.message ?? "Something went wrong.";
+    throw new ApiError(response.status, body?.code ?? "ERROR", message);
+  }
+  return body?.data as T;
+}
+
+export function money(value: string | number | null | undefined) {
+  const amount = Number(value ?? 0);
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  }).format(Number.isFinite(amount) ? amount : 0);
+}

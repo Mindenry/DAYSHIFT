@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-label="PLEATED SKIRT in tortoise">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#F2EDE4"/>
+      <stop offset="1" stop-color="#E4DCCD"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.05"/></feComponentTransfer>
+    </filter>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#2A2724" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#2A2724" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".24"/>
+      <stop offset=".55" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <rect width="900" height="1200" filter="url(#grain)" opacity=".7"/>
+  <rect x="52" y="52" width="796" height="1096" fill="none" stroke="#2A2724" stroke-opacity=".16"/>
+  <ellipse cx="450" cy="960" rx="260" ry="58" fill="url(#shadow)"/><filter id="drop"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#201e1b" flood-opacity="0.22"/></filter>
+  <g>
+    
+        <path d="M354 380 L546 380 L596 900 Q450 930 304 900 Z" fill="#6B4A2F" stroke="rgba(26,25,23,.78)" stroke-width="2.5"/>
+        <path d="M354 380 L340 410 H560 L546 380" fill="#513015" opacity=".35" stroke="rgba(26,25,23,.78)" stroke-width="2"/>
+        <path d="M360 410 L310 905" stroke="rgba(32,30,27,.28)" stroke-width="1.4"/><path d="M382 410 L345 905" stroke="rgba(32,30,27,.28)" stroke-width="1.4"/><path d="M404 410 L380 905" stroke="rgba(32,30,27,.28)" stroke-width="1.4"/><path d="M426 410 L415 905" stroke="rgba(32,30,27,.28)" stroke-width="1.4"/><path d="M448 410 L450 905" stroke="rgba(32,30,27,.28)" stroke-width="1.4"/><path d="M470 410 L485 905" stroke="rgba(32,30,27,.28)" stroke-width="1.4"/><path d="M492 410 L520 905" stroke="rgba(32,30,27,.28)" stroke-width="1.4"/><path d="M514 410 L555 905" stroke="rgba(32,30,27,.28)" stroke-width="1.4"/><path d="M536 410 L590 905" stroke="rgba(32,30,27,.28)" stroke-width="1.4"/>
+        <path d="M400 420 C390 620 380 780 372 890" stroke="rgba(32,30,27,.09)" stroke-width="16" fill="none"/>
+        <path d="M500 420 C510 620 520 780 528 890" stroke="rgba(32,30,27,.09)" stroke-width="16" fill="none"/>
+      
+    <path d="M300 420 C420 450 560 450 660 420 L660 940 L300 940 Z" fill="url(#sheen)" opacity=".25" style="mix-blend-mode:screen"/>
+  </g>
+  <text x="88" y="1112" font-family="Helvetica, Arial, sans-serif" font-size="17" letter-spacing="5" fill="#2A2724" fill-opacity=".62">DAYSHIFT</text>
+  <text x="812" y="1112" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="13" letter-spacing="3" fill="#2A2724" fill-opacity=".5">PLEATED SKIRT</text>
+  <text x="88" y="88" font-family="Helvetica, Arial, sans-serif" font-size="12" letter-spacing="4" fill="#2A2724" fill-opacity=".45">STUDIO / 19</text>
+</svg>

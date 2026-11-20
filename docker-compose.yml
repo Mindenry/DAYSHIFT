@@ -1,0 +1,130 @@
+name: dayshift
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: dayshift-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dayshift
+      POSTGRES_PASSWORD: dayshift
+      POSTGRES_DB: dayshift
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dayshift -d dayshift"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: dayshift-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: infrastructure/docker/api.Dockerfile
+    container_name: dayshift-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://dayshift:dayshift@postgres:5432/dayshift?schema=public
+      REDIS_URL: redis://redis:6379
+      SESSION_SECRET: ${SESSION_SECRET:-change-me-in-production}
+      PAYMENT_SANDBOX_SECRET: ${PAYMENT_SANDBOX_SECRET:-sandbox-secret-change-me}
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      ADMIN_URL: ${ADMIN_URL:-http://localhost:3001}
+      MAIL_MODE: ${MAIL_MODE:-file}
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4000/api/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  worker:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: infrastructure/docker/worker.Dockerfile
+    container_name: dayshift-worker
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://dayshift:dayshift@postgres:5432/dayshift?schema=public
+      REDIS_URL: redis://redis:6379
+      SESSION_SECRET: ${SESSION_SECRET:-change-me-in-production}
+      PAYMENT_SANDBOX_SECRET: ${PAYMENT_SANDBOX_SECRET:-sandbox-secret-change-me}
+      MAIL_MODE: ${MAIL_MODE:-file}
+    depends_on:
+      api:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: infrastructure/docker/web.Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000
+    container_name: dayshift-web
+    restart: unless-stopped
+    environment:
+      API_INTERNAL_URL: http://api:4000
+      APP_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_started
+
+  admin:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: infrastructure/docker/admin.Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000
+    container_name: dayshift-admin
+    restart: unless-stopped
+    environment:
+      API_INTERNAL_URL: http://api:4000
+      APP_URL: http://localhost:3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  postgres-data:
+  redis-data:

@@ -1,0 +1,151 @@
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
+import { IsEmail, IsOptional, IsString, MaxLength } from "class-validator";
+import { PrismaService } from "../../prisma/prisma.module";
+import { Public } from "../../common/decorators";
+import { productInclude, toProductCard } from "../catalog/catalog.mapper";
+import { AppError } from "../../common/app-error";
+
+class NewsletterDto {
+  @IsEmail() @MaxLength(254) email!: string;
+  @IsOptional() @IsString() @MaxLength(40) source?: string;
+}
+
+@ApiTags("content")
+@Public()
+@Controller("content")
+export class ContentController {
+  constructor(private readonly prisma: PrismaService) {}
+
+  private async blocks(keys: string[]) {
+    const now = new Date();
+    const rows = await this.prisma.contentBlock.findMany({
+      where: {
+        key: { in: keys },
+        status: "PUBLISHED",
+        AND: [
+          { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+          { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+        ],
+      },
+      orderBy: { position: "asc" },
+    });
+    return Object.fromEntries(rows.map((row) => [row.key, row]));
+  }
+
+  @Get("home")
+  async home() {
+    const [blocks, navigation, categories, collections, featured, newArrivals, bestSellers] =
+      await Promise.all([
+        this.blocks([
+          "home.hero",
+          "home.editorial.women",
+          "home.editorial.men",
+          "home.campaign.seasonal",
+          "announcement.bar",
+        ]),
+        this.prisma.navigationItem.findMany({
+          where: { isActive: true, parentId: null },
+          orderBy: { position: "asc" },
+          include: { children: { orderBy: { position: "asc" } } },
+        }),
+        this.prisma.category.findMany({
+          where: { isActive: true, parentId: null },
+          orderBy: { position: "asc" },
+          select: { id: true, name: true, slug: true, imageUrl: true },
+        }),
+        this.prisma.collection.findMany({
+          where: {
+            isActive: true,
+            OR: [{ endsAt: null }, { endsAt: { gte: new Date() } }],
+          },
+          orderBy: { position: "asc" },
+          select: { id: true, name: true, slug: true, description: true, imageUrl: true, type: true },
+        }),
+        this.prisma.product.findMany({
+          where: { status: "ACTIVE", visibility: "PUBLIC", isFeatured: true },
+          include: productInclude,
+          take: 8,
+          orderBy: { publishedAt: "desc" },
+        }),
+        this.prisma.product.findMany({
+          where: { status: "ACTIVE", visibility: "PUBLIC" },
+          include: productInclude,
+          take: 8,
+          orderBy: { publishedAt: "desc" },
+        }),
+        this.prisma.product.findMany({
+          where: {
+            status: "ACTIVE",
+            visibility: "PUBLIC",
+            collections: { some: { collection: { slug: "best-sellers" } } },
+          },
+          include: productInclude,
+          take: 8,
+        }),
+      ]);
+
+    return {
+      hero: blocks["home.hero"] ?? null,
+      announcement: blocks["announcement.bar"] ?? null,
+      editorial: [blocks["home.editorial.women"], blocks["home.editorial.men"]].filter(Boolean),
+      campaign: blocks["home.campaign.seasonal"] ?? null,
+      navigation,
+      categories,
+      collections,
+      featured: featured.map(toProductCard),
+      newArrivals: newArrivals.map(toProductCard),
+      bestSellers: bestSellers.map(toProductCard),
+    };
+  }
+
+  @Get("pages/:key")
+  async page(@Param("key") key: string) {
+    const block = await this.prisma.contentBlock.findUnique({ where: { key } });
+    if (!block || block.status !== "PUBLISHED") throw AppError.notFound("Page not found");
+    return block;
+  }
+
+  @Get("navigation")
+  async navigation() {
+    return this.prisma.navigationItem.findMany({
+      where: { isActive: true, parentId: null },
+      orderBy: { position: "asc" },
+      include: { children: { orderBy: { position: "asc" } } },
+    });
+  }
+
+  @Get("settings")
+  async publicSettings() {
+    const rows = await this.prisma.setting.findMany({
+      where: { key: { in: ["store", "shipping", "returns", "loyalty", "tax"] } },
+    });
+    return Object.fromEntries(rows.map((row) => [row.key, row.value]));
+  }
+
+  @Get("sitemap")
+  async sitemap() {
+    const [products, categories, collections] = await Promise.all([
+      this.prisma.product.findMany({
+        where: { status: "ACTIVE", visibility: "PUBLIC" },
+        select: { slug: true, updatedAt: true },
+      }),
+      this.prisma.category.findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } }),
+      this.prisma.collection.findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } }),
+    ]);
+    return { products, categories, collections };
+  }
+
+  @Throttle({ default: { limit: 6, ttl: 60_000 } })
+  @Post("newsletter")
+  async newsletter(@Body() dto: NewsletterDto) {
+    const email = dto.email.trim().toLowerCase();
+    await this.prisma.newsletterSubscriber.upsert({
+      where: { email },
+      update: { unsubscribedAt: null, confirmedAt: new Date() },
+      create: { email, source: dto.source ?? "homepage", confirmedAt: new Date() },
+    });
+    return { subscribed: true };
+  }
+}

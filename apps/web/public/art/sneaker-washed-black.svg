@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-label="LEATHER SNEAKER in washed black">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#F2EDE4"/>
+      <stop offset="1" stop-color="#E4DCCD"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.05"/></feComponentTransfer>
+    </filter>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#2A2724" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#2A2724" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".24"/>
+      <stop offset=".55" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <rect width="900" height="1200" filter="url(#grain)" opacity=".7"/>
+  <rect x="52" y="52" width="796" height="1096" fill="none" stroke="#2A2724" stroke-opacity=".16"/>
+  <ellipse cx="450" cy="960" rx="260" ry="58" fill="url(#shadow)"/><filter id="drop"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#201e1b" flood-opacity="0.22"/></filter>
+  <g>
+    
+        <path d="M250 760 Q250 700 300 680 L350 660 L380 560 Q390 520 430 528 L470 540 Q520 560 550 620 L600 680 Q660 700 676 750 Q680 790 640 800 L300 800 Q250 790 250 760 Z" fill="#22211F" stroke="rgba(26,25,23,.78)" stroke-width="2.5"/>
+        <path d="M250 780 Q450 816 676 780" stroke="rgba(26,25,23,.78)" stroke-width="2" fill="none"/>
+        <path d="M250 792 Q450 826 676 792" stroke="rgba(32,30,27,.28)" stroke-width="8" fill="none"/>
+        <path d="M380 560 Q450 610 550 620" fill="none" stroke="rgba(26,25,23,.78)" stroke-width="2"/>
+        <path d="M400 570 L430 602" stroke="rgba(26,25,23,.78)" stroke-width="2.5"/><path d="M424 580 L454 612" stroke="rgba(26,25,23,.78)" stroke-width="2.5"/><path d="M448 590 L478 622" stroke="rgba(26,25,23,.78)" stroke-width="2.5"/><path d="M472 600 L502 632" stroke="rgba(26,25,23,.78)" stroke-width="2.5"/><path d="M496 610 L526 642" stroke="rgba(26,25,23,.78)" stroke-width="2.5"/>
+        <path d="M620 700 Q660 720 668 760" fill="none" stroke="rgba(32,30,27,.28)" stroke-width="2"/>
+        <path d="M320 760 Q480 786 620 760" fill="none" stroke="rgba(32,30,27,.09)" stroke-width="14"/>
+      
+    <path d="M300 420 C420 450 560 450 660 420 L660 940 L300 940 Z" fill="url(#sheen)" opacity=".25" style="mix-blend-mode:screen"/>
+  </g>
+  <text x="88" y="1112" font-family="Helvetica, Arial, sans-serif" font-size="17" letter-spacing="5" fill="#2A2724" fill-opacity=".62">DAYSHIFT</text>
+  <text x="812" y="1112" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="13" letter-spacing="3" fill="#2A2724" fill-opacity=".5">LEATHER SNEAKER</text>
+  <text x="88" y="88" font-family="Helvetica, Arial, sans-serif" font-size="12" letter-spacing="4" fill="#2A2724" fill-opacity=".45">STUDIO / 02</text>
+</svg>

@@ -1,0 +1,234 @@
+import Link from "next/link";
+import type { ProductCardDto } from "@dayshift/types";
+import { ProductCard } from "./product-card";
+import { ListingFilters } from "./listing-filters";
+
+export interface Facets {
+  sizes: Array<{ name: string; count: number }>;
+  colors: Array<{ name: string; hex: string | null; count: number }>;
+  price: { min: number; max: number };
+}
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  basePath: string;
+  products: ProductCardDto[];
+  facets: Facets;
+  total: number;
+  page: number;
+  pageSize: number;
+  params: Record<string, string | string[] | undefined>;
+  breadcrumbs?: Array<{ name: string; href: string }>;
+  emptyMessage?: string;
+  titleLevel?: "h1" | "h2";
+}
+
+function buildQuery(params: Record<string, string | string[] | undefined>, overrides: Record<string, string | undefined>) {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (key === "page") continue;
+    if (Array.isArray(value)) value.forEach((v) => v && search.append(key, v));
+    else if (value) search.set(key, value);
+  }
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value === undefined) search.delete(key);
+    else search.set(key, value);
+  }
+  return search.toString();
+}
+
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest" },
+  { value: "popular", label: "Most loved" },
+  { value: "price-asc", label: "Price: low to high" },
+  { value: "price-desc", label: "Price: high to low" },
+  { value: "rating", label: "Top rated" },
+];
+
+export function ListingView({
+  eyebrow,
+  title,
+  description,
+  imageUrl,
+  basePath,
+  products,
+  facets,
+  total,
+  page,
+  pageSize,
+  params,
+  breadcrumbs,
+  emptyMessage,
+  titleLevel = "h1",
+}: Props) {
+  const activeSize = typeof params.size === "string" ? params.size : "";
+  const activeColor = typeof params.color === "string" ? params.color : "";
+  const activeSort = typeof params.sort === "string" ? params.sort : "newest";
+  const activeMin = typeof params.minPrice === "string" ? params.minPrice : "";
+  const activeMax = typeof params.maxPrice === "string" ? params.maxPrice : "";
+  const activeStock = params.inStock === "true";
+  const hasFilters = !!(activeSize || activeColor || activeMin || activeMax || activeStock || params.q);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  const chips = [
+    activeSize && { label: `Size ${activeSize}`, key: "size" },
+    activeColor && { label: activeColor, key: "color" },
+    activeMin && { label: `From $${activeMin}`, key: "minPrice" },
+    activeMax && { label: `To $${activeMax}`, key: "maxPrice" },
+    activeStock && { label: "In stock", key: "inStock" },
+    typeof params.q === "string" && params.q && { label: `“${params.q}”`, key: "q" },
+  ].filter(Boolean) as Array<{ label: string; key: string }>;
+
+  return (
+    <div>
+      <div className="border-b border-line">
+        <div className="wrap py-10 md:py-14">
+          {breadcrumbs && breadcrumbs.length > 0 && (
+            <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-muted">
+              <Link href="/" className="link-underline">Home</Link>
+              {breadcrumbs.map((crumb) => (
+                <span key={crumb.href} className="flex items-center gap-2">
+                  <span aria-hidden>/</span>
+                  <Link href={crumb.href} className="link-underline">{crumb.name}</Link>
+                </span>
+              ))}
+            </nav>
+          )}
+          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <p className="overline text-muted">{eyebrow}</p>
+              {titleLevel === "h1" ? (
+                <h1 className="mt-3 font-display text-5xl leading-[0.95] md:text-7xl">{title}</h1>
+              ) : (
+                <h2 className="mt-3 font-display text-4xl leading-[0.95] md:text-5xl">{title}</h2>
+              )}
+              {description && <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted">{description}</p>}
+            </div>
+            {imageUrl && (
+              <div className="hidden h-32 w-56 overflow-hidden bg-sand lg:block">
+                { }
+                <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="wrap py-8 md:py-12">
+        <div className="grid gap-10 lg:grid-cols-[240px_1fr] lg:gap-14">
+          <aside>
+            <ListingFilters
+              facets={facets}
+              basePath={basePath}
+              params={params}
+              activeSort={activeSort}
+              sortOptions={SORT_OPTIONS}
+            />
+          </aside>
+
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
+              <p className="text-sm text-muted">
+                {total} {total === 1 ? "piece" : "pieces"}
+              </p>
+              <div className="hidden items-center gap-3 sm:flex">
+                <label htmlFor="sort-top" className="overline text-muted">Sort</label>
+                <form method="get" action={basePath} className="contents">
+                  {Object.entries(params).map(([key, value]) =>
+                    key !== "sort" && key !== "page" && typeof value === "string" ? (
+                      <input key={key} type="hidden" name={key} value={value} />
+                    ) : null,
+                  )}
+                  <select
+                    id="sort-top"
+                    name="sort"
+                    defaultValue={activeSort}
+                    className="border-0 border-b border-line bg-transparent py-1 text-xs uppercase tracking-[0.12em] focus:border-ink focus:outline-none"
+                  >
+                    {SORT_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <button type="submit" className="overline underline underline-offset-4">Apply</button>
+                </form>
+              </div>
+            </div>
+
+            {chips.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 py-4">
+                {chips.map((chip) => (
+                  <Link
+                    key={chip.key}
+                    href={`${basePath}?${buildQuery(params, { [chip.key]: undefined, page: undefined })}`}
+                    className="inline-flex items-center gap-2 border border-line bg-paper px-3 py-1.5 text-[11px] uppercase tracking-[0.1em] hover:border-ink"
+                  >
+                    {chip.label} <span aria-hidden>×</span>
+                  </Link>
+                ))}
+                <Link href={basePath} className="px-2 text-[11px] uppercase tracking-[0.1em] underline">
+                  Clear all
+                </Link>
+              </div>
+            )}
+
+            {products.length === 0 ? (
+              <div className="py-24 text-center">
+                <h2 className="font-display text-3xl">Nothing here yet.</h2>
+                <p className="mx-auto mt-3 max-w-md text-sm text-muted">
+                  {emptyMessage ?? "Try removing a filter or exploring another part of the collection."}
+                </p>
+                <Link href={basePath} className="btn btn-outline mt-8">Clear filters</Link>
+              </div>
+            ) : (
+              <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-6 xl:grid-cols-3">
+                {products.map((product, index) => (
+                  <ProductCard key={product.id} product={product} priority={index < 3} />
+                ))}
+              </div>
+            )}
+
+            {totalPages > 1 && (
+              <nav aria-label="Pagination" className="mt-16 flex items-center justify-center gap-2">
+                {page > 1 && (
+                  <Link
+                    href={`${basePath}?${buildQuery(params, { page: String(page - 1) })}`}
+                    className="border border-line px-4 py-2 text-xs uppercase tracking-[0.12em] hover:border-ink"
+                  >
+                    Previous
+                  </Link>
+                )}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((n) => n === 1 || n === totalPages || Math.abs(n - page) <= 1)
+                  .map((n, index, arr) => (
+                    <span key={n} className="flex items-center gap-2">
+                      {index > 0 && arr[index - 1] !== n - 1 && <span className="px-1 text-muted">…</span>}
+                      <Link
+                        href={`${basePath}?${buildQuery(params, { page: String(n) })}`}
+                        aria-current={n === page ? "page" : undefined}
+                        className={`flex h-10 w-10 items-center justify-center border text-xs ${
+                          n === page ? "border-ink bg-ink text-paper" : "border-line hover:border-ink"
+                        }`}
+                      >
+                        {n}
+                      </Link>
+                    </span>
+                  ))}
+                {page < totalPages && (
+                  <Link
+                    href={`${basePath}?${buildQuery(params, { page: String(page + 1) })}`}
+                    className="border border-line px-4 py-2 text-xs uppercase tracking-[0.12em] hover:border-ink"
+                  >
+                    Next
+                  </Link>
+                )}
+              </nav>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
