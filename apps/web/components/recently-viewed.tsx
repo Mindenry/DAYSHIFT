@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { money } from "@/lib/api";
+import { useI18n } from "@/lib/i18n-client";
 
 interface RecentItem {
   id: string;
@@ -15,6 +16,7 @@ interface RecentItem {
 const KEY = "ds-recently-viewed";
 
 export function RecentlyViewed({ current }: { current: RecentItem }) {
+  const { t } = useI18n();
   const [items, setItems] = useState<RecentItem[]>([]);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export function RecentlyViewed({ current }: { current: RecentItem }) {
   return (
     <section className="border-t border-line py-14">
       <div className="wrap">
-        <p className="overline text-muted">Recently viewed</p>
+        <p className="overline text-muted">{t("Recently viewed")}</p>
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
           {items.map((item) => (
             <Link key={item.id} href={`/products/${item.slug}`} className="group flex gap-3">

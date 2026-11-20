@@ -5,6 +5,7 @@ import { X, Search } from "lucide-react";
 import Link from "next/link";
 import type { CategorySummary } from "@dayshift/types";
 import { usePresence } from "./use-presence";
+import { LocaleSwitcher, useI18n } from "@/lib/i18n-client";
 
 interface Props {
   open: boolean;
@@ -15,6 +16,7 @@ interface Props {
 
 export function MobileMenu({ open, onClose, roots, user }: Props) {
   const { mounted, state } = usePresence(open, 260);
+  const { t } = useI18n();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -31,10 +33,10 @@ export function MobileMenu({ open, onClose, roots, user }: Props) {
   const isOpen = state === "open";
 
   return (
-    <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden={!isOpen}>
+    <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label={t("Menu")} aria-hidden={!isOpen}>
       <button
         type="button"
-        aria-label="Close menu"
+        aria-label={t("Close menu")}
         onClick={onClose}
         className={`absolute inset-0 bg-ink/45 backdrop-blur-[2px] transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0"
@@ -60,7 +62,7 @@ export function MobileMenu({ open, onClose, roots, user }: Props) {
         </div>
 
         <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-16">
-          <nav aria-label="Mobile primary" className="divide-y divide-line">
+          <nav aria-label={t("Menu")} className="divide-y divide-line">
             {roots.map((root, index) => (
               <details
                 key={root.slug}
@@ -77,7 +79,7 @@ export function MobileMenu({ open, onClose, roots, user }: Props) {
                     onClick={onClose}
                     className="flex min-h-10 items-center text-sm uppercase tracking-[0.14em]"
                   >
-                    Shop all
+                    {t("Shop all")}
                   </Link>
                   {root.children?.map((child) => (
                     <Link
@@ -96,9 +98,9 @@ export function MobileMenu({ open, onClose, roots, user }: Props) {
 
           <div className="mt-6 grid gap-1">
             {[
-              { href: "/collections/new-arrivals", label: "New arrivals" },
-              { href: "/collections/best-sellers", label: "Best sellers" },
-              { href: "/collections/sale", label: "Sale", sale: true },
+              { href: "/collections/new-arrivals", label: t("New arrivals") },
+              { href: "/collections/best-sellers", label: t("Best sellers") },
+              { href: "/collections/sale", label: t("Sale"), sale: true },
             ].map((item, index) => (
               <Link
                 key={item.href}
@@ -121,35 +123,36 @@ export function MobileMenu({ open, onClose, roots, user }: Props) {
               onClick={onClose}
               className="flex min-h-11 w-full items-center gap-3 text-left text-sm uppercase tracking-[0.14em]"
             >
-              <Search className="h-4 w-4" /> Search
+              <Search className="h-4 w-4" /> {t("Search")}
             </Link>
             <Link
               href={user ? "/account" : "/login"}
               onClick={onClose}
               className="flex min-h-11 items-center text-sm uppercase tracking-[0.14em]"
             >
-              {user ? `Account — ${user.firstName}` : "Sign in / register"}
+              {user ? t("Account — {name}", { name: user.firstName }) : t("Sign in / register")}
             </Link>
             <Link
               href="/account/wishlist"
               onClick={onClose}
               className="flex min-h-11 items-center text-sm uppercase tracking-[0.14em]"
             >
-              Wishlist
+              {t("Wishlist")}
             </Link>
             <Link
               href="/cart"
               onClick={onClose}
               className="flex min-h-11 items-center text-sm uppercase tracking-[0.14em]"
             >
-              Shopping bag
+              {t("Shopping bag")}
             </Link>
+            <div className="mt-3"><LocaleSwitcher compact /></div>
             <Link
               href="/support"
               onClick={onClose}
               className="flex min-h-11 items-center text-sm uppercase tracking-[0.14em]"
             >
-              Customer care
+              {t("Customer care")}
             </Link>
           </div>
         </div>

@@ -24,7 +24,7 @@ test.describe("Customer purchase journey", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Everyday");
 
     await page.goto("/collections/new-arrivals");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("New Arrivals");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("สินค้าใหม่");
 
     await page.goto(`/products/${product.slug}`);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(product.name);
@@ -54,7 +54,7 @@ test.describe("Customer purchase journey", () => {
     await page.getByRole("button", { name: /continue to payment/i }).click();
     await page.waitForURL("**/checkout/payment**");
 
-    await page.getByRole("button", { name: /^Pay \$/ }).click();
+    await page.getByRole("button", { name: /^Pay / }).click();
     await page.waitForURL("**/checkout/confirmation**");
 
     await expect(page.getByText(/Thank you,/)).toBeVisible({ timeout: 20_000 });
@@ -75,8 +75,8 @@ test.describe("Customer purchase journey", () => {
   });
 
   test("search returns relevant products", async ({ page }) => {
-    await page.goto("/search?q=linen");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("linen");
-    await expect(page.getByText("Relaxed Linen Shirt").first()).toBeVisible();
+    await page.goto("/search?q=" + encodeURIComponent("ลินิน"));
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("ลินิน");
+    await expect(page.getByText("เสื้อเชิ้ตผ้าลินินทรงหลวม").first()).toBeVisible();
   });
 });

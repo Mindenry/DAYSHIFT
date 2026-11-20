@@ -32,7 +32,7 @@ const body = `# DAYSHIFT
 - Returns: 30 days from delivery, free, unworn with tags. Final-sale items are excluded.
 - Exchanges: available for another size or colour from the account order page.
 - Payment: this demonstration store uses a simulated sandbox provider. No real card data is accepted and no money is processed.
-- Currency: USD. Tax is a flat estimate, not jurisdiction-specific.
+- Currency: THB (Thai baht). Prices include 7% VAT; delivery is ฿50 and free over ฿1,500.
 
 ## Demo notice
 

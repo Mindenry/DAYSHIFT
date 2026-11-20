@@ -2,7 +2,7 @@
 
 **Everyday style. Your way.**
 
-DAYSHIFT is a full-stack fashion commerce platform: a customer storefront, a staff operations portal, a modular commerce API, transactional inventory, sandbox payments, background jobs and an auditable returns/refund/exchange workflow.
+DAYSHIFT is a full-stack Thai fashion commerce platform: a customer storefront, a staff operations portal, a modular commerce API, transactional inventory, sandbox payments, background jobs and an auditable returns/refund/exchange workflow.
 
 It is a working reference implementation built as a production-shaped monorepo. It is not a live shop: payments are simulated, product photography is licensed stand-in imagery from Unsplash, and email is written to local files.
 
@@ -15,19 +15,18 @@ It is a working reference implementation built as a production-shaped monorepo. 
 | Storefront | Admin portal |
 | --- | --- |
 | ![DAYSHIFT storefront home](docs/screenshots/storefront-home.png) | ![DAYSHIFT admin dashboard](docs/screenshots/admin-dashboard-en.png) |
-
 | Product detail | Mobile storefront |
 | --- | --- |
 | ![Product detail page](docs/screenshots/storefront-product.png) | ![Mobile home page](docs/screenshots/storefront-mobile.png) |
 
-All screenshots are captured from the running application at `192.168.1.107`. Additional views: [listing](docs/screenshots/storefront-listing.png), [cart](docs/screenshots/storefront-cart.png), [mobile product](docs/screenshots/storefront-mobile-product.png), [admin orders](docs/screenshots/admin-orders-en.png), [admin inventory](docs/screenshots/admin-inventory-en.png), [admin dashboard in Thai](docs/screenshots/admin-dashboard-th.png).
+All screenshots are captured from the running application at `192.168.1.107`. Additional views: [listing](docs/screenshots/storefront-listing.png), [cart](docs/screenshots/storefront-cart.png), [mobile product](docs/screenshots/storefront-mobile-product.png), [Thai storefront](docs/screenshots/storefront-home-th.png), [admin orders](docs/screenshots/admin-orders-en.png), [admin inventory](docs/screenshots/admin-inventory-en.png), [admin dashboard in Thai](docs/screenshots/admin-dashboard-th.png).
 
 ---
 
 ## Features
 
 **Storefront**
-Editorial home and collection pages, category/collection/search listings with URL-driven filters and sorting, product detail with colour and size variants, cart and wishlist, guest or account checkout, sandbox payment, order tracking, account dashboard, returns and exchanges, addresses, loyalty balance and support tickets.
+Editorial home and collection pages, category/collection/search listings with URL-driven filters and sorting, product detail with colour and size variants, cart and wishlist, guest or account checkout, sandbox payment, order tracking, account dashboard, returns and exchanges, addresses, loyalty balance and support tickets. Prices are in Thai baht with 7% VAT, delivery is ฿50 (free over ฿1,500) and the whole interface switches between **Thai and English** from the header or footer.
 
 **Operations portal**
 Dashboard with live commercial metrics, catalogue management (products, variants, categories, collections, brands), multi-warehouse stock with transfers and movement history, suppliers and purchase orders, order fulfilment and shipments, returns and refunds, customers, support tickets, reviews, coupons, promotions, loyalty, staff and role permissions, audit log, sales reports, settings and system health.
@@ -260,7 +259,7 @@ All six scripts were executed against the running stack during this release. Res
 
 - Payments, shipping and email are sandbox/local adapters; no real provider is integrated.
 - Product photography is licensed stand-in imagery from Unsplash, not photographs of the actual demo inventory. See [image credits](docs/IMAGE_CREDITS.md).
-- Single currency (USD) and a flat tax estimate; no jurisdiction engine.
+- Single currency (THB) with a flat 7% VAT estimate; no multi-currency or jurisdiction engine.
 - No MFA, CSP, file uploads, multi-currency or fraud engine.
 - Loyalty is not reversed on refunds and coupon usage is not restored on cancellation — policy decision pending.
 - Cash on delivery has no "cash collected" action.

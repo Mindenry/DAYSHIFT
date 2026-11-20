@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, RotateCcw, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { apiGet } from "@/lib/api";
+import { getI18n } from "@/lib/i18n";
 import { ProductCard } from "@/components/product-card";
 import { ParallaxLayer } from "@/components/parallax-layer";
 import { serializeJsonLd } from "@dayshift/config";
@@ -14,7 +15,7 @@ const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").repla
 export const metadata: Metadata = {
   title: "DAYSHIFT — Considered clothing for everyday life",
   description:
-    "Shop contemporary clothing, shoes, bags and accessories for women and men. Small-run pieces, free delivery over $150 and 30-day returns.",
+    "Shop contemporary Thai clothing, shoes, bags and accessories for women and men. Small-run pieces in THB, free delivery over ฿1,500 and 30-day returns.",
   alternates: { canonical: "/" },
 };
 
@@ -46,7 +47,7 @@ const CATEGORY_TILES = [
   { name: "Essentials", slug: "unisex-essentials", image: "/images/products/sweat-white.jpg" },
 ];
 
-const FAQS = [
+const FAQ_KEYS = [
   {
     question: "How long does delivery take?",
     answer:
@@ -80,12 +81,14 @@ const FAQS = [
 ];
 
 export default async function HomePage() {
+  const { t } = await getI18n();
+  const FAQS = FAQ_KEYS.map((entry) => ({ question: t(entry.question), answer: t(entry.answer) }));
   const content = await apiGet<HomeContent>("/content/home", { revalidate: 30 });
   if (!content) {
     return (
       <div className="wrap py-32">
-        <h1 className="font-display text-5xl">The studio is being prepared.</h1>
-        <p className="mt-4 text-muted">Please check back in a moment.</p>
+        <h1 className="font-display text-5xl">{t("The studio is being prepared.")}</h1>
+        <p className="mt-4 text-muted">{t("Please check back in a moment.")}</p>
       </div>
     );
   }
@@ -99,7 +102,7 @@ export default async function HomePage() {
     ? {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        name: "New arrivals",
+        name: t("New arrivals"),
         itemListElement: newArrivals.map((product, index) => ({
           "@type": "ListItem",
           position: index + 1,
@@ -143,46 +146,46 @@ export default async function HomePage() {
           <div className="grid min-h-[88svh] items-stretch lg:min-h-[calc(100svh-116px)] lg:grid-cols-[0.95fr_1.05fr]">
             <div className="relative z-10 flex animate-fade-up flex-col justify-end pb-12 pt-28 text-paper lg:justify-center lg:py-24 lg:pr-10 lg:text-ink">
               <p className="overline text-paper/80 lg:text-muted">
-                {hero?.subtitle ?? "New season / 2026"}
+                {hero?.subtitle ?? t("New season / 2026")}
               </p>
               <h1 className="mt-5 font-display text-[clamp(3.1rem,13vw,4.8rem)] leading-[0.92] tracking-[-0.03em] text-paper lg:text-[clamp(4.2rem,6.4vw,7rem)] lg:text-ink">
                 <span className="hero-line" style={{ "--i": "80ms" } as React.CSSProperties}>
-                  Everyday style.
+                  {t("Everyday style.")}
                 </span>
                 <span className="hero-line italic" style={{ "--i": "220ms" } as React.CSSProperties}>
-                  Your way.
+                  {t("Your way.")}
                 </span>
               </h1>
               <p className="mt-6 max-w-md text-[15px] leading-relaxed text-paper/85 lg:mt-8 lg:text-ink-soft">
                 {hero?.body ??
-                  "Considered clothing and accessories for the days that make up a life. Made in small runs, built to be worn."}
+                  t("Considered clothing and accessories for the days that make up a life. Made in small runs, built to be worn.")}
               </p>
               <div className="mt-8 flex flex-col gap-2.5 sm:flex-row lg:mt-10 lg:gap-3">
                 <Link
                   href={hero?.ctaUrl ?? "/collections/new-arrivals"}
                   className="btn border-paper bg-paper text-ink hover:bg-transparent hover:text-paper lg:border-ink lg:bg-ink lg:text-paper lg:hover:bg-paper lg:hover:text-ink"
                 >
-                  {hero?.ctaLabel ?? "Shop new arrivals"}
+                  {hero?.ctaLabel ?? t("Shop new arrivals")}
                 </Link>
                 <Link
                   href="/collections/seasonal-2026"
                   className="btn border-paper/50 text-paper hover:border-paper lg:border-ink lg:text-ink lg:hover:bg-ink lg:hover:text-paper"
                 >
-                  The seasonal edit
+                  {t("The seasonal edit")}
                 </Link>
               </div>
               <dl className="mt-9 grid max-w-md grid-cols-3 gap-4 border-t border-paper/25 pt-5 lg:mt-12 lg:border-line lg:pt-6">
                 <div>
-                  <dt className="overline !text-[9px] text-paper/65 lg:text-muted">Delivery</dt>
-                  <dd className="mt-1 text-xs text-paper/90 lg:text-ink">Free over $150</dd>
+                  <dt className="overline !text-[9px] text-paper/65 lg:text-muted">{t("Delivery")}</dt>
+                  <dd className="mt-1 text-xs text-paper/90 lg:text-ink">{t("Free over ฿1,500")}</dd>
                 </div>
                 <div>
-                  <dt className="overline !text-[9px] text-paper/65 lg:text-muted">Returns</dt>
-                  <dd className="mt-1 text-xs text-paper/90 lg:text-ink">30 days, free</dd>
+                  <dt className="overline !text-[9px] text-paper/65 lg:text-muted">{t("Returns")}</dt>
+                  <dd className="mt-1 text-xs text-paper/90 lg:text-ink">{t("30 days, free")}</dd>
                 </div>
                 <div>
-                  <dt className="overline !text-[9px] text-paper/65 lg:text-muted">Made</dt>
-                  <dd className="mt-1 text-xs text-paper/90 lg:text-ink">Small runs</dd>
+                  <dt className="overline !text-[9px] text-paper/65 lg:text-muted">{t("Made")}</dt>
+                  <dd className="mt-1 text-xs text-paper/90 lg:text-ink">{t("Small runs")}</dd>
                 </div>
               </dl>
             </div>
@@ -191,7 +194,7 @@ export default async function HomePage() {
               <ParallaxLayer className="absolute inset-0">
                 <img
                   src={hero?.imageUrl ?? "/images/editorial-01.jpg"}
-                  alt="DAYSHIFT autumn studio collection"
+                  alt={t("DAYSHIFT autumn studio collection")}
                   className="h-full w-full animate-hero-image object-cover"
                   fetchPriority="high"
                   decoding="async"
@@ -199,14 +202,14 @@ export default async function HomePage() {
               </ParallaxLayer>
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 xl:p-8">
                 <span className="bg-paper/92 px-4 py-3 text-[10px] uppercase leading-relaxed tracking-[0.18em] backdrop-blur">
-                  The Autumn 2026
+                  {t("The Autumn 2026")}
                   <br />
-                  studio collection
+                  {t("studio collection")}
                 </span>
                 <Link
                   href="/collections/seasonal-2026"
                   className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-paper text-ink transition-transform hover:translate-x-1"
-                  aria-label="Explore the seasonal edit"
+                  aria-label={t("Explore the seasonal edit")}
                 >
                   <ArrowRight className="h-5 w-5" />
                 </Link>
@@ -217,13 +220,13 @@ export default async function HomePage() {
       </section>
 
       {/* Service strip */}
-      <section aria-label="Service promises" className="border-b border-line bg-paper-deep">
+      <section aria-label={t("Service promises")} className="border-b border-line bg-paper-deep">
         <div className="wrap grid grid-cols-2 gap-x-4 gap-y-5 py-6 sm:grid-cols-4 md:py-7">
           {[
-            { icon: Truck, title: "Free delivery", body: "Orders over $150" },
-            { icon: RotateCcw, title: "30-day returns", body: "Free and easy" },
-            { icon: ShieldCheck, title: "Secure checkout", body: "Sandbox payment" },
-            { icon: Sparkles, title: "Small runs", body: "Made to be worn" },
+            { icon: Truck, title: t("Free delivery"), body: t("On orders over ฿1,500") },
+            { icon: RotateCcw, title: t("30-day returns"), body: t("Free returns, no questions") },
+            { icon: ShieldCheck, title: t("Secure payment"), body: t("Sandbox checkout in this demo") },
+            { icon: Sparkles, title: t("Made in small runs"), body: t("Considered materials and construction") },
           ].map((item) => (
             <div key={item.title} className="flex items-start gap-3">
               <item.icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
@@ -241,11 +244,11 @@ export default async function HomePage() {
         <div className="wrap">
           <div className="flex items-end justify-between gap-8 border-b border-line pb-5" data-reveal>
             <div>
-              <p className="overline text-muted">Just landed</p>
-              <h2 id="new-arrivals" className="mt-2 font-display text-3xl md:text-5xl">New arrivals</h2>
+              <p className="overline text-muted">{t("Just landed")}</p>
+              <h2 id="new-arrivals" className="mt-2 font-display text-3xl md:text-5xl">{t("New arrivals")}</h2>
             </div>
             <Link href="/collections/new-arrivals" className="link-underline overline hidden shrink-0 sm:inline-flex">
-              View all
+              {t("View all")}
             </Link>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 min-[360px]:gap-x-4 md:gap-x-6 md:gap-y-10 lg:grid-cols-4">
@@ -255,7 +258,7 @@ export default async function HomePage() {
           </div>
           <div className="mt-8 sm:hidden">
             <Link href="/collections/new-arrivals" className="btn btn-outline w-full">
-              View all new arrivals
+              {t("View all new arrivals")}
             </Link>
           </div>
         </div>
@@ -266,17 +269,16 @@ export default async function HomePage() {
         <div className="wrap">
           <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
             <div className="lg:sticky lg:top-28 lg:self-start" data-reveal>
-              <p className="overline text-muted">Shop by category</p>
+              <p className="overline text-muted">{t("Shop by category")}</p>
               <h2 id="shop-by-category" className="mt-3 font-display text-3xl leading-tight md:text-5xl">
-                The pieces that
-                <br className="hidden md:block" /> finish the look.
+                {t("The pieces that")}
+                <br className="hidden md:block" /> {t("finish the look.")}
               </h2>
               <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted">
-                Footwear, bags and the small things that make a wardrobe feel like your own.
-                Considered materials, honest construction.
+                {t("Footwear, bags and the small things that make a wardrobe feel like your own. Considered materials, honest construction.")}
               </p>
               <Link href="/c/accessories" className="btn btn-outline mt-7">
-                Shop accessories
+                {t("Shop accessories")}
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-3 md:gap-5">
@@ -290,13 +292,13 @@ export default async function HomePage() {
                 >
                   <img
                     src={tile.image}
-                    alt={tile.name}
+                    alt={t(tile.name)}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                     loading="lazy"
                     decoding="async"
                   />
                   <span className="absolute bottom-3 left-3 bg-paper/92 px-3 py-2 text-[10px] uppercase tracking-[0.16em] backdrop-blur md:bottom-4 md:left-4">
-                    {tile.name}
+                    {t(tile.name)}
                   </span>
                 </Link>
               ))}
@@ -308,7 +310,7 @@ export default async function HomePage() {
       {/* Editorial split */}
       <section aria-labelledby="editorial" className="py-16 md:py-24">
         <div className="wrap">
-          <h2 id="editorial" className="sr-only">Editorial collections</h2>
+          <h2 id="editorial" className="sr-only">{t("Editorial collections")}</h2>
           <div className="grid gap-3 md:grid-cols-2 md:gap-5">
             {content.editorial.slice(0, 2).map((block, index) => (
               <Link
@@ -329,13 +331,13 @@ export default async function HomePage() {
                 <div className="absolute inset-x-0 bottom-0 p-5 text-paper md:p-10">
                   <p className="overline !text-[10px] text-paper/70">{block.subtitle ?? (index === 0 ? "Women" : "Men")}</p>
                   <h3 className="mt-2 max-w-sm font-display text-2xl leading-tight md:text-4xl">
-                    {block.title ?? (index === 0 ? "The soft tailoring edit" : "Built for the everyday")}
+                    {block.title ?? t(index === 0 ? "The soft tailoring edit" : "Built for the everyday")}
                   </h3>
                   <p className="mt-2 hidden max-w-xs text-sm leading-relaxed text-paper/80 sm:block">
                     {block.body}
                   </p>
                   <span className="mt-4 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] md:mt-6">
-                    {block.ctaLabel ?? "Explore"} <ArrowRight className="h-4 w-4" />
+                    {block.ctaLabel ?? t("Explore")} <ArrowRight className="h-4 w-4" />
                   </span>
                 </div>
               </Link>
@@ -348,13 +350,13 @@ export default async function HomePage() {
       <section aria-labelledby="seasonal-edit" className="border-y border-line">
         <div className="grid lg:grid-cols-2">
           <div className="order-2 flex flex-col justify-center bg-ink px-5 py-16 text-paper md:px-14 lg:order-1 lg:py-28" data-reveal>
-            <p className="overline text-paper/60">Autumn 2026</p>
+            <p className="overline text-paper/60">{t("Autumn 2026")}</p>
             <h2 id="seasonal-edit" className="mt-4 max-w-lg font-display text-4xl leading-[1.02] md:text-6xl">
               {content.campaign?.title ?? "The Seasonal Edit"}
             </h2>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/70">
               {content.campaign?.body ??
-                "Layer up in brushed cotton, fine merino and softened denim. A considered edit for the season ahead."}
+                t("Layer up in brushed cotton, fine merino and softened denim. A considered edit for the season ahead.")}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -364,14 +366,14 @@ export default async function HomePage() {
                 {content.campaign?.ctaLabel ?? "Explore the edit"}
               </Link>
               <Link href="/collections/new-arrivals" className="btn border-paper/40 text-paper hover:border-paper">
-                New arrivals
+                {t("New arrivals")}
               </Link>
             </div>
           </div>
           <div className="relative order-1 min-h-[46vh] bg-sand lg:order-2 lg:min-h-[70vh]" data-reveal>
             <img
               src={content.campaign?.imageUrl ?? "/art/dress-stone.svg"}
-              alt="The seasonal edit"
+              alt={t("The seasonal edit")}
               className="absolute inset-0 h-full w-full object-cover"
               loading="lazy"
               decoding="async"
@@ -385,8 +387,8 @@ export default async function HomePage() {
         <div className="wrap">
           <div className="flex items-end justify-between gap-8 border-b border-line pb-5" data-reveal>
             <div>
-              <p className="overline text-muted">The ones you come back for</p>
-              <h2 id="best-sellers" className="mt-2 font-display text-3xl md:text-5xl">Best sellers</h2>
+              <p className="overline text-muted">{t("The ones you come back for")}</p>
+              <h2 id="best-sellers" className="mt-2 font-display text-3xl md:text-5xl">{t("Best sellers")}</h2>
             </div>
             <Link href="/collections/best-sellers" className="link-underline overline hidden shrink-0 sm:inline-flex">
               View all
@@ -399,7 +401,7 @@ export default async function HomePage() {
           </div>
           <div className="mt-8 sm:hidden">
             <Link href="/collections/best-sellers" className="btn btn-outline w-full">
-              View all best sellers
+              {t("View all best sellers")}
             </Link>
           </div>
         </div>
@@ -409,13 +411,13 @@ export default async function HomePage() {
       <section aria-labelledby="faq" className="border-y border-line bg-paper-deep py-16 md:py-24">
         <div className="wrap grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
           <div data-reveal>
-            <p className="overline text-muted">Before you order</p>
-            <h2 id="faq" className="mt-3 font-display text-3xl md:text-4xl">Questions, answered.</h2>
+            <p className="overline text-muted">{t("Before you order")}</p>
+            <h2 id="faq" className="mt-3 font-display text-3xl md:text-4xl">{t("Questions, answered.")}</h2>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-              Delivery, returns and sizing in plain language. Still unsure? Customer care replies within one working day.
+              {t("Delivery, returns and sizing in plain language. Still unsure? Customer care replies within one working day.")}
             </p>
             <Link href="/support" className="link-underline overline mt-6 inline-flex">
-              Contact customer care
+              {t("Contact customer care")}
             </Link>
           </div>
           <div className="divide-y divide-line border-y border-line" data-reveal style={{ "--reveal-delay": "120ms" } as React.CSSProperties}>
@@ -435,18 +437,17 @@ export default async function HomePage() {
       {/* Closing statement */}
       <section className="py-20 md:py-32">
         <div className="wrap text-center" data-reveal>
-          <p className="overline text-muted">The DAYSHIFT note</p>
+          <p className="overline text-muted">{t("The DAYSHIFT note")}</p>
           <h2 className="mx-auto mt-5 max-w-4xl font-display text-[clamp(2.5rem,7vw,6rem)] leading-[0.98] tracking-[-0.02em]">
-            Built for the days that
+            {t("Built for the days that")}
             <br />
-            make up a life.
+            {t("make up a life.")}
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-muted">
-            A wardrobe should work as hard as you do. Pieces designed to be worn often,
-            cared for properly and kept for years.
+            {t("A wardrobe should work as hard as you do. Pieces designed to be worn often, cared for properly and kept for years.")}
           </p>
           <Link href="/about" className="btn btn-outline mt-8">
-            Read our story
+            {t("Read our story")}
           </Link>
         </div>
       </section>

@@ -9,6 +9,7 @@ import type { ProductDetailDto } from "@dayshift/types";
 import { clientApi, money } from "@/lib/api";
 import { WishlistButton } from "./wishlist-button";
 import { usePresence } from "./use-presence";
+import { useI18n } from "@/lib/i18n-client";
 
 interface ChartShape {
   columns?: string[];
@@ -17,6 +18,7 @@ interface ChartShape {
 
 export function ProductExperience({ product }: { product: ProductDetailDto }) {
   const router = useRouter();
+  const { t } = useI18n();
   const colors = product.colors.length ? product.colors : [{ name: "Default", hex: null }];
   const firstAvailable = product.variants.find((variant) => variant.inStock);
   const [color, setColor] = useState(firstAvailable?.color ?? colors[0]?.name ?? "");
@@ -60,11 +62,11 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
 
   const add = async (goToCheckout: boolean) => {
     if (!selectedVariant) {
-      toast("Choose a size first");
+      toast(t("Choose a size first"));
       return;
     }
     if (!canBuy) {
-      toast.error("That size and colour is out of stock");
+      toast.error(t("That size and colour is out of stock"));
       return;
     }
     setBusy(true);
@@ -77,13 +79,13 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
       if (goToCheckout) {
         router.push("/checkout");
       } else {
-        toast(`${product.name} added to your bag`, {
-          action: { label: "View bag", onClick: () => router.push("/cart") },
+        toast(t("{name} added to your bag", { name: product.name }), {
+          action: { label: t("View bag"), onClick: () => router.push("/cart") },
         });
         router.refresh();
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not add to bag");
+      toast.error(error instanceof Error ? error.message : t("Could not add to bag"));
     } finally {
       setBusy(false);
     }
@@ -108,10 +110,10 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
   return (
     <div className="wrap">
       <nav
-        aria-label="Breadcrumb"
+        aria-label={t("Breadcrumb")}
         className="no-scrollbar flex items-center gap-2 overflow-x-auto whitespace-nowrap py-5 text-[10px] uppercase tracking-[0.14em] text-muted md:py-6"
       >
-        <Link href="/" className="link-underline shrink-0">Home</Link>
+        <Link href="/" className="link-underline shrink-0">{t("Home")}</Link>
         {product.categories[0] && (
           <>
             <span aria-hidden className="text-line">/</span>
@@ -138,12 +140,12 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
               />
             ) : (
               <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.2em] text-muted">
-                Image coming soon
+                {t("Image coming soon")}
               </div>
             )}
             <div className="absolute left-3 top-3 flex flex-col gap-1">
-              {onSale && <span className="bg-paper px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-sale">Sale</span>}
-              {product.isNew && <span className="bg-paper px-2 py-1 text-[10px] uppercase tracking-[0.16em]">New</span>}
+              {onSale && <span className="bg-paper px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-sale">{t("Sale")}</span>}
+              {product.isNew && <span className="bg-paper px-2 py-1 text-[10px] uppercase tracking-[0.16em]">{t("New")}</span>}
             </div>
             {images.length > 1 && (
               <span className="absolute bottom-3 right-3 bg-paper/90 px-2 py-1 text-[10px] tracking-[0.1em] text-muted">
@@ -161,7 +163,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
                   className={`relative aspect-[3/4] overflow-hidden bg-sand ${
                     activeImage === index ? "ring-1 ring-ink ring-offset-2 ring-offset-paper" : "opacity-80 hover:opacity-100"
                   }`}
-                  aria-label={`View image ${index + 1}`}
+                  aria-label={t("View image {number}", { number: index + 1 })}
                   aria-pressed={activeImage === index}
                 >
                   <img src={image.url} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
@@ -180,7 +182,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
             {onSale && <p className="text-sm text-muted line-through">{money(compareAt)}</p>}
             {product.rating.count > 0 && (
               <a href="#reviews" className="border-l border-line pl-3 text-xs text-muted underline underline-offset-4">
-                {product.rating.average.toFixed(1)} · {product.rating.count} {product.rating.count === 1 ? "review" : "reviews"}
+                {product.rating.average.toFixed(1)} · {product.rating.count} {product.rating.count === 1 ? t("review") : t("reviews")}
               </a>
             )}
           </div>
@@ -189,7 +191,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
           {/* Colour */}
           <div className="mt-8">
             <div className="flex items-baseline justify-between">
-              <p className="overline">Colour</p>
+              <p className="overline">{t("Colour")}</p>
               <p className="text-xs text-muted">{color}</p>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -216,13 +218,13 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
           {/* Size */}
           <div className="mt-7">
             <div className="flex items-baseline justify-between">
-              <p className="overline">Size</p>
+              <p className="overline">{t("Size")}</p>
               <button
                 type="button"
                 onClick={() => setSizeGuideOpen(true)}
                 className="inline-flex items-center gap-1.5 text-xs text-muted underline underline-offset-4"
               >
-                <Ruler className="h-3.5 w-3.5" /> Size & fit
+                <Ruler className="h-3.5 w-3.5" /> {t("Size & fit")}
               </button>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -252,10 +254,10 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
             {selectedVariant && (
               <p className={`mt-3 text-xs ${canBuy ? "text-muted" : "text-sale"}`}>
                 {!canBuy
-                  ? "Out of stock in this size"
+                  ? t("Out of stock in this size")
                   : selectedVariant.availableStock <= 3
-                    ? `Low stock — ${selectedVariant.availableStock} left`
-                    : "In stock, ready to ship"}
+                    ? t("Low stock — {count} left", { count: selectedVariant.availableStock })
+                    : t("In stock, ready to ship")}
               </p>
             )}
             {product.fitNotes && <p className="mt-2 text-xs leading-relaxed text-muted">{product.fitNotes}</p>}
@@ -263,12 +265,12 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
 
           {/* Quantity + actions */}
           <div className="mt-7 flex items-stretch gap-3">
-            <div className="flex items-center border border-line" aria-label="Quantity">
+            <div className="flex items-center border border-line" aria-label={t("Quantity")}>
               <button
                 type="button"
                 onClick={() => setQuantity((current) => Math.max(1, current - 1))}
                 className="flex h-12 w-11 items-center justify-center hover:bg-sand"
-                aria-label="Decrease quantity"
+                aria-label={t("Decrease quantity")}
                 disabled={quantity <= 1}
               >
                 <Minus className="h-3.5 w-3.5" />
@@ -280,7 +282,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
                 type="button"
                 onClick={() => setQuantity((current) => Math.min(maxQuantity, current + 1))}
                 className="flex h-12 w-11 items-center justify-center hover:bg-sand"
-                aria-label="Increase quantity"
+                aria-label={t("Increase quantity")}
                 disabled={quantity >= maxQuantity}
               >
                 <Plus className="h-3.5 w-3.5" />
@@ -292,7 +294,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
               disabled={!canBuy || busy}
               className="btn btn-primary flex-1"
             >
-              {busy ? "Adding…" : canBuy ? "Add to bag" : "Sold out"}
+              {busy ? t("Adding…") : canBuy ? t("Add to bag") : t("Sold out")}
             </button>
             <WishlistButton
               productId={product.id}
@@ -307,19 +309,19 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
             disabled={!canBuy || busy}
             className="btn btn-outline mt-2 w-full"
           >
-            Buy now
+            {t("Buy now")}
           </button>
 
           <div className="mt-6 space-y-2 border-t border-line pt-5 text-xs text-muted">
-            <p className="flex items-center gap-2"><Truck className="h-4 w-4" /> Free standard delivery over $150 · 3–5 business days</p>
-            <p className="flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> 30-day free returns. Secure sandbox checkout.</p>
+            <p className="flex items-center gap-2"><Truck className="h-4 w-4" /> {t("Free standard delivery over ฿1,500 · 2–4 business days")}</p>
+            <p className="flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> {t("30-day free returns. Secure sandbox checkout.")}</p>
           </div>
 
           {/* Details */}
           <div className="mt-8 border-t border-line">
             <details className="group border-b border-line py-4" open>
               <summary className="flex cursor-pointer list-none items-center justify-between font-display text-lg">
-                Description <span className="text-xl text-muted transition-transform group-open:rotate-45">+</span>
+                {t("Description")} <span className="text-xl text-muted transition-transform group-open:rotate-45">+</span>
               </summary>
               <div className="mt-3 space-y-3 text-sm leading-relaxed text-muted">
                 <p>{product.description}</p>
@@ -332,7 +334,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
             </details>
             <details className="group border-b border-line py-4">
               <summary className="flex cursor-pointer list-none items-center justify-between font-display text-lg">
-                Materials & care <span className="text-xl text-muted transition-transform group-open:rotate-45">+</span>
+                {t("Materials & care")} <span className="text-xl text-muted transition-transform group-open:rotate-45">+</span>
               </summary>
               <div className="mt-3 space-y-2 text-sm leading-relaxed text-muted">
                 <p>{product.material}</p>
@@ -341,20 +343,20 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
             </details>
             <details className="group border-b border-line py-4">
               <summary className="flex cursor-pointer list-none items-center justify-between font-display text-lg">
-                Delivery & returns <span className="text-xl text-muted transition-transform group-open:rotate-45">+</span>
+                {t("Delivery & returns")} <span className="text-xl text-muted transition-transform group-open:rotate-45">+</span>
               </summary>
               <div className="mt-3 space-y-2 text-sm leading-relaxed text-muted">
-                <p>Standard delivery is complimentary over $150, otherwise $7.95. Express delivery is available at checkout.</p>
-                <p>Returns are free within 30 days of delivery. Items must be unworn with tags attached. Final sale pieces are not returnable.</p>
+                <p>{t("Standard delivery is free over ฿1,500, otherwise ฿50. Express delivery is available at checkout.")}</p>
+                <p>{t("Returns are free within 30 days of delivery. Items must be unworn with tags attached. Final sale pieces are not returnable.")}</p>
               </div>
             </details>
             <details className="group border-b border-line py-4">
               <summary className="flex cursor-pointer list-none items-center justify-between font-display text-lg">
-                Fit & sizing <span className="text-xl text-muted transition-transform group-open:rotate-45">+</span>
+                {t("Fit & sizing")} <span className="text-xl text-muted transition-transform group-open:rotate-45">+</span>
               </summary>
               <div className="mt-3 space-y-2 text-sm leading-relaxed text-muted">
                 <p>{product.fitNotes}</p>
-                <p>SKU {product.sku}{selectedVariant ? ` · ${selectedVariant.sku}` : ""}</p>
+                <p>{t("SKU")} {product.sku}{selectedVariant ? ` · ${selectedVariant.sku}` : ""}</p>
               </div>
             </details>
           </div>
@@ -389,7 +391,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
           }`}
           role="dialog"
           aria-modal="true"
-          aria-label="Size guide"
+          aria-label={t("Size guide")}
           aria-hidden={!sizeGuideVisible}
           onClick={(event) => {
             if (event.target === event.currentTarget) setSizeGuideOpen(false);
@@ -402,10 +404,10 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="overline text-muted">Size guide</p>
-                <h2 className="mt-2 font-display text-3xl">{product.sizeGuide?.name ?? "Size & fit"}</h2>
+                <p className="overline text-muted">{t("Size guide")}</p>
+                <h2 className="mt-2 font-display text-3xl">{product.sizeGuide?.name ?? t("Size & fit")}</h2>
               </div>
-              <button type="button" onClick={() => setSizeGuideOpen(false)} className="flex h-11 w-11 items-center justify-center" aria-label="Close size guide">
+              <button type="button" onClick={() => setSizeGuideOpen(false)} className="flex h-11 w-11 items-center justify-center" aria-label={t("Close size guide")}>
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -431,10 +433,10 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
                 </table>
               </div>
             ) : (
-              <p className="mt-4 text-sm text-muted">This piece is one size. See the fit notes for measurements.</p>
+              <p className="mt-4 text-sm text-muted">{t("This piece is one size. See the fit notes for measurements.")}</p>
             )}
             {product.sizeGuide?.notes && <p className="mt-4 text-xs leading-relaxed text-muted">{product.sizeGuide.notes}</p>}
-            <p className="mt-4 text-xs text-muted">Measurements are in centimetres unless stated. Between sizes? Take the larger size for a relaxed fit.</p>
+            <p className="mt-4 text-xs text-muted">{t("Measurements are in centimetres unless stated. Between sizes? Take the larger size for a relaxed fit.")}</p>
           </div>
         </div>
       )}

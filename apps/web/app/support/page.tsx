@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
+import { getI18n } from "@/lib/i18n";
 import { serializeJsonLd } from "@dayshift/config";
 
 export const metadata: Metadata = {
@@ -39,10 +40,12 @@ const FAQS = [
 
 export default async function SupportPage() {
   const session = await getSession();
+  const { t } = await getI18n();
+  const faqs = FAQS.map((faq) => ({ question: t(faq.question), answer: t(faq.answer) }));
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQS.map((faq) => ({
+    mainEntity: faqs.map((faq) => ({
       "@type": "Question",
       name: faq.question,
       acceptedAnswer: { "@type": "Answer", text: faq.answer },
@@ -53,25 +56,24 @@ export default async function SupportPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqLd) }} />
       <div className="wrap py-12 md:py-20">
         <div className="max-w-2xl">
-          <p className="overline text-muted">Customer care</p>
-          <h1 className="mt-2 font-display text-5xl leading-tight md:text-7xl">We&apos;re here to help.</h1>
+          <p className="overline text-muted">{t("Customer care")}</p>
+          <h1 className="mt-2 font-display text-5xl leading-tight md:text-7xl">{t("We are here to help.")}</h1>
           <p className="mt-5 text-sm leading-relaxed text-muted">
-            Questions about a piece, an order or a return? Our team is small, knowledgeable and
-            answers within one business day.
+            {t("Questions about a piece, an order or a return? Our team is small, knowledgeable and answers within one business day.")}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={session ? "/account/support" : "/login?next=/account/support"} className="btn btn-primary">
-              {session ? "Message customer care" : "Sign in to message us"}
+              {session ? t("Message customer care") : t("Sign in to message us")}
             </Link>
-            <Link href="/track" className="btn btn-outline">Track an order</Link>
+            <Link href="/track" className="btn btn-outline">{t("Track an order")}</Link>
           </div>
         </div>
 
         <div className="mt-16 grid gap-12 lg:grid-cols-[1.3fr_0.7fr]">
           <section>
-            <h2 className="border-b border-line pb-3 font-display text-3xl">Common questions</h2>
+            <h2 className="border-b border-line pb-3 font-display text-3xl">{t("Common questions")}</h2>
             <div className="mt-2 divide-y divide-line">
-              {FAQS.map((faq) => (
+              {faqs.map((faq) => (
                 <details key={faq.question} className="group py-5">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-xl">
                     {faq.question}
@@ -84,20 +86,20 @@ export default async function SupportPage() {
           </section>
           <aside className="space-y-6">
             <div className="border border-line p-6">
-              <p className="overline text-muted">Contact</p>
+              <p className="overline text-muted">{t("Contact")}</p>
               <p className="mt-4 text-sm">hello@dayshift.example</p>
-              <p className="mt-1 text-sm text-muted">Monday–Friday, 9am–6pm ET</p>
+              <p className="mt-1 text-sm text-muted">{t("Monday–Friday, 9am–6pm ICT")}</p>
               <p className="mt-4 text-xs leading-relaxed text-muted">
-                Addresses and phone contacts are demonstration data. No real customer data is processed.
+                {t("Addresses and phone contacts are demonstration data. No real customer data is processed.")}
               </p>
             </div>
             <div className="border border-line p-6">
-              <p className="overline text-muted">Quick links</p>
+              <p className="overline text-muted">{t("Quick links")}</p>
               <ul className="mt-4 space-y-2 text-sm">
-                <li><Link href="/help/delivery-returns" className="link-underline">Delivery & returns</Link></li>
-                <li><Link href="/help/size-guide" className="link-underline">Size guide</Link></li>
-                <li><Link href="/help/care" className="link-underline">Care guide</Link></li>
-                <li><Link href="/track" className="link-underline">Order tracking</Link></li>
+                <li><Link href="/help/delivery-returns" className="link-underline">{t("Delivery & returns")}</Link></li>
+                <li><Link href="/help/size-guide" className="link-underline">{t("Size guide")}</Link></li>
+                <li><Link href="/help/care" className="link-underline">{t("Care guide")}</Link></li>
+                <li><Link href="/track" className="link-underline">{t("Order tracking")}</Link></li>
               </ul>
             </div>
           </aside>

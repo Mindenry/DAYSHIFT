@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import type { ProductCardDto } from "@dayshift/types";
 import { money } from "@/lib/api";
 import { WishlistButton } from "./wishlist-button";
+import { useI18n } from "@/lib/i18n-client";
 
 export function ProductCard({
   product,
@@ -14,6 +17,7 @@ export function ProductCard({
   revealDelay?: number;
   className?: string;
 }) {
+  const { t } = useI18n();
   const onSale = product.compareAtPrice && Number(product.compareAtPrice) > Number(product.price);
   const colors = product.colors.slice(0, 3);
 
@@ -36,7 +40,7 @@ export function ProductCard({
             />
           ) : (
             <div className="flex h-full items-center justify-center text-[10px] uppercase tracking-[0.18em] text-muted">
-              Image coming soon
+              {t("Image coming soon")}
             </div>
           )}
           {product.secondaryImage && product.secondaryImage !== product.primaryImage && (
@@ -51,13 +55,13 @@ export function ProductCard({
           )}
           <div className="absolute left-2.5 top-2.5 flex flex-col gap-1">
             {onSale && (
-              <span className="bg-paper px-2 py-1 text-[9px] uppercase tracking-[0.16em] text-sale">Sale</span>
+              <span className="bg-paper px-2 py-1 text-[9px] uppercase tracking-[0.16em] text-sale">{t("Sale")}</span>
             )}
             {product.isNew && !onSale && (
-              <span className="bg-paper px-2 py-1 text-[9px] uppercase tracking-[0.16em]">New</span>
+              <span className="bg-paper px-2 py-1 text-[9px] uppercase tracking-[0.16em]">{t("New")}</span>
             )}
             {!product.inStock && (
-              <span className="bg-paper px-2 py-1 text-[9px] uppercase tracking-[0.16em] text-muted">Sold out</span>
+              <span className="bg-paper px-2 py-1 text-[9px] uppercase tracking-[0.16em] text-muted">{t("Sold out")}</span>
             )}
           </div>
         </div>

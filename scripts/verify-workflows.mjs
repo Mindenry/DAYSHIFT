@@ -209,7 +209,7 @@ check("order delivered and returnable", delivered.status === "DELIVERED" && deli
 // IDOR: another customer must not read the order
 await other.ok("/auth/login", {
   method: "POST",
-  body: JSON.stringify({ email: "james@example.com", password: "Customer1234!Pass" }),
+  body: JSON.stringify({ email: "jirawat@example.com", password: "Customer1234!Pass" }),
 });
 const idor = await other.call(`/orders/${orderNumber}`);
 check("another customer cannot read the order", idor.status === 404, `status ${idor.status}`);

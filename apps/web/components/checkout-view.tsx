@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Lock, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { clientApi, money } from "@/lib/api";
+import { useI18n } from "@/lib/i18n-client";
 
 /**
  * `crypto.randomUUID` is restricted to secure contexts, so it is undefined when
@@ -71,16 +72,18 @@ interface Config {
 }
 
 const COUNTRIES = [
+  ["TH", "Thailand"],
+  ["LA", "Laos"],
+  ["MY", "Malaysia"],
+  ["SG", "Singapore"],
+  ["VN", "Vietnam"],
+  ["CN", "China"],
+  ["JP", "Japan"],
   ["US", "United States"],
-  ["CA", "Canada"],
   ["GB", "United Kingdom"],
   ["AU", "Australia"],
   ["DE", "Germany"],
   ["FR", "France"],
-  ["IT", "Italy"],
-  ["ES", "Spain"],
-  ["NL", "Netherlands"],
-  ["SE", "Sweden"],
 ];
 
 interface Props {
@@ -88,6 +91,7 @@ interface Props {
 }
 
 export function CheckoutView({ user }: Props) {
+  const { t } = useI18n();
   const router = useRouter();
   const [cart, setCart] = useState<Cart | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -105,7 +109,7 @@ export function CheckoutView({ user }: Props) {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [country, setCountry] = useState("US");
+  const [country, setCountry] = useState("TH");
   const [phone, setPhone] = useState(user?.phone ?? "");
   const [shippingMethod, setShippingMethod] = useState("standard");
   const [paymentMethod, setPaymentMethod] = useState("SANDBOX_CARD");
@@ -134,7 +138,7 @@ export function CheckoutView({ user }: Props) {
         });
         setQuote(quoteData);
       } catch (loadError) {
-        setError(loadError instanceof Error ? loadError.message : "Could not load checkout");
+        setError(loadError instanceof Error ? loadError.message : t("Could not load checkout"));
       } finally {
         setLoading(false);
       }
@@ -172,7 +176,7 @@ export function CheckoutView({ user }: Props) {
   const placeOrder = async (event: React.FormEvent) => {
     event.preventDefault();
     if (requiredErrors.length) {
-      setError("Please complete the required delivery details.");
+      setError(t("Please complete the required delivery details."));
       return;
     }
     setPlacing(true);
@@ -217,7 +221,7 @@ export function CheckoutView({ user }: Props) {
         );
       }
     } catch (placeError) {
-      setError(placeError instanceof Error ? placeError.message : "Could not place order");
+      setError(placeError instanceof Error ? placeError.message : t("Could not place order"));
       setPlacing(false);
     }
   };
@@ -239,15 +243,15 @@ export function CheckoutView({ user }: Props) {
         <section>
           <div className="flex items-baseline gap-3 border-b border-line pb-3">
             <span className="font-display text-2xl text-stone">01</span>
-            <h2 className="font-display text-2xl">Contact</h2>
+            <h2 className="font-display text-2xl">{t("Contact")}</h2>
           </div>
           <div className="mt-5">
-            <label htmlFor="email" className="label">Email address</label>
+            <label htmlFor="email" className="label">{t("Email address")}</label>
             <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="field" autoComplete="email" />
-            <p className="mt-2 text-xs text-muted">Order confirmation and tracking updates are sent here.</p>
+            <p className="mt-2 text-xs text-muted">{t("Order confirmation and tracking updates are sent here.")}</p>
             {!user && (
               <p className="mt-3 text-xs text-muted">
-                Have an account? <Link href="/login?next=/checkout" className="underline">Sign in</Link> for faster checkout.
+                {t("Have an account?")} <Link href="/login?next=/checkout" className="underline">{t("Sign in")}</Link> {t("for faster checkout.")}
               </p>
             )}
           </div>
@@ -256,52 +260,52 @@ export function CheckoutView({ user }: Props) {
         <section>
           <div className="flex items-baseline gap-3 border-b border-line pb-3">
             <span className="font-display text-2xl text-stone">02</span>
-            <h2 className="font-display text-2xl">Delivery address</h2>
+            <h2 className="font-display text-2xl">{t("Delivery address")}</h2>
           </div>
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="firstName" className="label">First name</label>
+              <label htmlFor="firstName" className="label">{t("First name")}</label>
               <input id="firstName" required value={firstName} onChange={(e) => setFirstName(e.target.value)} className="field" autoComplete="given-name" />
             </div>
             <div>
-              <label htmlFor="lastName" className="label">Last name</label>
+              <label htmlFor="lastName" className="label">{t("Last name")}</label>
               <input id="lastName" required value={lastName} onChange={(e) => setLastName(e.target.value)} className="field" autoComplete="family-name" />
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="line1" className="label">Address</label>
-              <input id="line1" required value={line1} onChange={(e) => setLine1(e.target.value)} className="field" autoComplete="address-line1" placeholder="Street and number" />
+              <label htmlFor="line1" className="label">{t("Address")}</label>
+              <input id="line1" required value={line1} onChange={(e) => setLine1(e.target.value)} className="field" autoComplete="address-line1" placeholder={t("Street and number")} />
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="line2" className="label">Apartment, suite (optional)</label>
+              <label htmlFor="line2" className="label">{t("Apartment, suite (optional)")}</label>
               <input id="line2" value={line2} onChange={(e) => setLine2(e.target.value)} className="field" autoComplete="address-line2" />
             </div>
             <div>
-              <label htmlFor="city" className="label">City</label>
+              <label htmlFor="city" className="label">{t("District / city")}</label>
               <input id="city" required value={city} onChange={(e) => setCity(e.target.value)} className="field" autoComplete="address-level2" />
             </div>
             <div>
-              <label htmlFor="state" className="label">State / region</label>
+              <label htmlFor="state" className="label">{t("Province")}</label>
               <input id="state" value={state} onChange={(e) => setState(e.target.value)} className="field" autoComplete="address-level1" />
             </div>
             <div>
-              <label htmlFor="postalCode" className="label">Postal code</label>
+              <label htmlFor="postalCode" className="label">{t("Postal code")}</label>
               <input id="postalCode" required value={postalCode} onChange={(e) => setPostalCode(e.target.value)} className="field" autoComplete="postal-code" />
             </div>
             <div>
-              <label htmlFor="country" className="label">Country</label>
+              <label htmlFor="country" className="label">{t("Country")}</label>
               <select id="country" value={country} onChange={(e) => setCountry(e.target.value)} className="field" autoComplete="country">
-                {COUNTRIES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
+                {COUNTRIES.map(([code, label]) => <option key={code} value={code}>{t(label)}</option>)}
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="phone" className="label">Phone (for delivery updates)</label>
+              <label htmlFor="phone" className="label">{t("Phone (for delivery updates)")}</label>
               <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="field" autoComplete="tel" />
             </div>
           </div>
           {user && (
             <label className="mt-4 flex items-center gap-3 text-sm">
               <input type="checkbox" checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} className="h-4 w-4 accent-[#1a1917]" />
-              Save this address to my account
+              {t("Save this address to my account")}
             </label>
           )}
         </section>
@@ -309,7 +313,7 @@ export function CheckoutView({ user }: Props) {
         <section>
           <div className="flex items-baseline gap-3 border-b border-line pb-3">
             <span className="font-display text-2xl text-stone">03</span>
-            <h2 className="font-display text-2xl">Delivery method</h2>
+            <h2 className="font-display text-2xl">{t("Delivery method")}</h2>
           </div>
           <div className="mt-5 space-y-3">
             {quote?.shippingOptions.map((option) => (
@@ -324,11 +328,11 @@ export function CheckoutView({ user }: Props) {
                     className="h-4 w-4 accent-[#1a1917]"
                   />
                   <span>
-                    <span className="block text-sm">{option.label}</span>
-                    <span className="block text-xs text-muted">{option.description}</span>
+                    <span className="block text-sm">{t(option.label)}</span>
+                    <span className="block text-xs text-muted">{t(option.description)}</span>
                   </span>
                 </span>
-                <span className="text-sm">{Number(option.price) === 0 || (option.freeOver && Number(quote.subtotal) >= Number(option.freeOver)) ? "Free" : money(option.price)}</span>
+                <span className="text-sm">{Number(option.price) === 0 || (option.freeOver && Number(quote.subtotal) >= Number(option.freeOver)) ? t("Free") : money(option.price)}</span>
               </label>
             ))}
           </div>
@@ -337,7 +341,7 @@ export function CheckoutView({ user }: Props) {
         <section>
           <div className="flex items-baseline gap-3 border-b border-line pb-3">
             <span className="font-display text-2xl text-stone">04</span>
-            <h2 className="font-display text-2xl">Payment</h2>
+            <h2 className="font-display text-2xl">{t("Payment")}</h2>
           </div>
           <div className="mt-5 space-y-3">
             {config?.paymentMethods.filter((method) => method.enabled).map((method) => (
@@ -354,27 +358,27 @@ export function CheckoutView({ user }: Props) {
                   <span className="block text-sm">{method.label}</span>
                   <span className="block text-xs text-muted">
                     {method.code === "SANDBOX_CARD"
-                      ? "Simulated card payment. You'll confirm on the next screen. No real money moves."
-                      : "Pay in cash when your order is delivered."}
+                      ? t("Simulated card payment. You will confirm on the next screen. No real money moves.")
+                      : t("Pay in cash when your order is delivered.")}
                   </span>
                 </span>
               </label>
             ))}
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs text-muted">
-            <Lock className="h-3.5 w-3.5" /> Sandbox environment — do not enter real card details.
+            <Lock className="h-3.5 w-3.5" /> {t("Sandbox environment — do not enter real card details.")}
           </div>
         </section>
 
         <section>
-          <label htmlFor="customerNote" className="label">Order note (optional)</label>
-          <textarea id="customerNote" value={customerNote} onChange={(e) => setCustomerNote(e.target.value)} rows={3} maxLength={500} className="field resize-y" placeholder="Delivery instructions or a gift note" />
+          <label htmlFor="customerNote" className="label">{t("Order note (optional)")}</label>
+          <textarea id="customerNote" value={customerNote} onChange={(e) => setCustomerNote(e.target.value)} rows={3} maxLength={500} className="field resize-y" placeholder={t("Delivery instructions or a gift note")} />
         </section>
       </div>
 
       <aside className="lg:sticky lg:top-28 lg:self-start">
         <div className="border border-line p-6">
-          <p className="overline">Your order</p>
+          <p className="overline">{t("Your order")}</p>
           <ul className="mt-5 space-y-4 border-b border-line pb-5">
             {quote?.items.map((item) => (
               <li key={item.cartItemId} className="flex gap-3">
@@ -386,35 +390,35 @@ export function CheckoutView({ user }: Props) {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm leading-snug">{item.name}</p>
-                  <p className="mt-0.5 text-xs text-muted">{item.color} {item.size && `· ${item.size}`} · Qty {item.quantity}</p>
+                  <p className="mt-0.5 text-xs text-muted">{item.color} {item.size && `· ${item.size}`} · {t("Qty")} {item.quantity}</p>
                 </div>
                 <p className="text-sm">{money(item.lineTotal)}</p>
               </li>
             ))}
           </ul>
           <dl className="mt-4 space-y-2 text-sm">
-            <div className="flex justify-between"><dt>Subtotal</dt><dd>{money(quote?.subtotal)}</dd></div>
+            <div className="flex justify-between"><dt>{t("Subtotal")}</dt><dd>{money(quote?.subtotal)}</dd></div>
             {Number(quote?.discountTotal ?? 0) > 0 && (
-              <div className="flex justify-between text-sale"><dt>Discount {quote?.coupon?.code && `(${quote.coupon.code})`}</dt><dd>−{money(quote?.discountTotal)}</dd></div>
+              <div className="flex justify-between text-sale"><dt>{t("Discount")} {quote?.coupon?.code && `(${quote.coupon.code})`}</dt><dd>−{money(quote?.discountTotal)}</dd></div>
             )}
-            <div className="flex justify-between"><dt>Delivery</dt><dd>{Number(quote?.shippingTotal ?? 0) === 0 ? "Free" : money(quote?.shippingTotal)}</dd></div>
-            <div className="flex justify-between"><dt>Tax</dt><dd>{money(quote?.taxTotal)}</dd></div>
-            <div className="flex justify-between border-t border-line pt-3 text-base font-medium"><dt>Total</dt><dd>{money(quote?.total)}</dd></div>
+            <div className="flex justify-between"><dt>{t("Delivery")}</dt><dd>{Number(quote?.shippingTotal ?? 0) === 0 ? t("Free") : money(quote?.shippingTotal)}</dd></div>
+            <div className="flex justify-between"><dt>{t("Tax")}</dt><dd>{money(quote?.taxTotal)}</dd></div>
+            <div className="flex justify-between border-t border-line pt-3 text-base font-medium"><dt>{t("Total")}</dt><dd>{money(quote?.total)}</dd></div>
           </dl>
           <button type="submit" disabled={placing || !quote || requiredErrors.length > 0} className="btn btn-primary mt-6 w-full">
-            {placing ? "Placing order…" : paymentMethod === "CASH_ON_DELIVERY" ? "Place order" : `Continue to payment · ${money(quote?.total)}`}
+            {placing ? t("Placing order…") : paymentMethod === "CASH_ON_DELIVERY" ? t("Place order") : `${t("Continue to payment")} · ${money(quote?.total)}`}
           </button>
           <p className="mt-3 flex items-center justify-center gap-2 text-[11px] text-muted">
-            <Truck className="h-3.5 w-3.5" /> Delivery in 3–5 business days
+            <Truck className="h-3.5 w-3.5" /> {t("Delivery in 2–4 business days")}
           </p>
-          <Link href="/cart" className="mt-4 block text-center text-xs underline">Return to bag</Link>
+          <Link href="/cart" className="mt-4 block text-center text-xs underline">{t("Return to bag")}</Link>
         </div>
       </aside>
 
       <div className="safe-bottom animate-slide-up fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur-md lg:hidden">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <div className="flex-1">
-            <p className="text-[10px] uppercase tracking-[0.12em] text-muted">Total</p>
+            <p className="text-[10px] uppercase tracking-[0.12em] text-muted">{t("Total")}</p>
             <p className="text-sm">{money(quote?.total)}</p>
           </div>
           <button
@@ -423,7 +427,7 @@ export function CheckoutView({ user }: Props) {
             disabled={placing || !quote || requiredErrors.length > 0}
             className="btn btn-primary min-w-[10.5rem]"
           >
-            {placing ? "Placing…" : paymentMethod === "CASH_ON_DELIVERY" ? "Place order" : "Continue"}
+            {placing ? t("Placing…") : paymentMethod === "CASH_ON_DELIVERY" ? t("Place order") : t("Continue")}
           </button>
         </div>
       </div>

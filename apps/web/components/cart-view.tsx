@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Minus, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { clientApi, money } from "@/lib/api";
+import { useI18n } from "@/lib/i18n-client";
 
 interface CartLine {
   id: string;
@@ -37,6 +38,7 @@ interface Cart {
 }
 
 export function CartView() {
+  const { t } = useI18n();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyLine, setBusyLine] = useState<string | null>(null);
@@ -50,7 +52,7 @@ export function CartView() {
       setCart(data);
       setCode(data.couponCode ?? "");
     } catch {
-      toast.error("Could not load your bag");
+      toast.error(t("Could not load your bag"));
     } finally {
       setLoading(false);
     }
@@ -71,7 +73,7 @@ export function CartView() {
       setCart(data);
       window.dispatchEvent(new Event("cart:updated"));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not update quantity");
+      toast.error(error instanceof Error ? error.message : t("Could not update quantity"));
     } finally {
       setBusyLine(null);
     }
@@ -83,9 +85,9 @@ export function CartView() {
       const data = await clientApi<Cart>(`/cart/items/${lineId}`, { method: "DELETE" });
       setCart(data);
       window.dispatchEvent(new Event("cart:updated"));
-      toast(`${name} removed from your bag`);
+      toast(t("{name} removed from your bag", { name }));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not remove item");
+      toast.error(error instanceof Error ? error.message : t("Could not remove item"));
     } finally {
       setBusyLine(null);
     }
@@ -101,10 +103,10 @@ export function CartView() {
         body: JSON.stringify({ code: code.trim() }),
       });
       setCart(data);
-      toast.success(`Code ${code.trim().toUpperCase()} applied`);
+      toast.success(t("Code {code} applied", { code: code.trim().toUpperCase() }));
       setCouponError(null);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "That code could not be applied";
+      const message = error instanceof Error ? error.message : t("That code could not be applied");
       setCouponError(message);
       toast.error(message);
     } finally {
@@ -118,9 +120,9 @@ export function CartView() {
       const data = await clientApi<Cart>("/cart/coupon", { method: "DELETE" });
       setCart(data);
       setCode("");
-      toast("Discount code removed");
+      toast(t("Discount code removed"));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not remove code");
+      toast.error(error instanceof Error ? error.message : t("Could not remove code"));
     } finally {
       setCouponBusy(false);
     }
@@ -140,19 +142,19 @@ export function CartView() {
   if (!cart || cart.lines.length === 0) {
     return (
       <div className="py-24 text-center md:py-32">
-        <h2 className="font-display text-4xl">Your bag is empty.</h2>
+        <h2 className="font-display text-4xl">{t("Your bag is empty.")}</h2>
         <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
-          Start with the new arrivals, or revisit a piece you saved.
+          {t("Start with the new arrivals, or revisit a piece you saved.")}
         </p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link href="/collections/new-arrivals" className="btn btn-primary">Shop new arrivals</Link>
-          <Link href="/account/wishlist" className="btn btn-outline">View wishlist</Link>
+          <Link href="/collections/new-arrivals" className="btn btn-primary">{t("Shop new arrivals")}</Link>
+          <Link href="/account/wishlist" className="btn btn-outline">{t("View wishlist")}</Link>
         </div>
       </div>
     );
   }
 
-  const freeShippingThreshold = 150;
+  const freeShippingThreshold = 1500;
   const subtotalValue = Number(cart.subtotal);
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotalValue);
   const shippingProgress = Math.min(100, Math.round((subtotalValue / freeShippingThreshold) * 100));
@@ -165,8 +167,8 @@ export function CartView() {
           <div className="flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.12em]">
             <span>
               {remainingForFreeShipping === 0
-                ? "Your order ships free"
-                : `${money(remainingForFreeShipping)} away from free delivery`}
+                ? t("Your order ships free")
+                : t("{amount} away from free delivery", { amount: money(remainingForFreeShipping) })}
             </span>
             <span className="text-muted">{shippingProgress}%</span>
           </div>
@@ -200,7 +202,7 @@ export function CartView() {
                       {line.color} {line.size && `· ${line.size}`}
                     </p>
                     <p className="mt-0.5 hidden text-[10px] uppercase tracking-[0.1em] text-muted/70 sm:block">{line.variantSku}</p>
-                    {!line.inStock && <p className="mt-2 text-xs text-sale">Only {line.availableStock} available — adjust quantity</p>}
+                    {!line.inStock && <p className="mt-2 text-xs text-sale">{t("Only {count} available — adjust quantity", { count: line.availableStock })}</p>}
                   </div>
                   <p className="shrink-0 text-sm">{money(line.lineTotal)}</p>
                 </div>
@@ -211,7 +213,7 @@ export function CartView() {
                       onClick={() => updateQuantity(line.id, line.quantity - 1)}
                       disabled={line.quantity <= 1 || busyLine === line.id}
                       className="flex h-11 w-10 items-center justify-center hover:bg-sand disabled:opacity-40"
-                      aria-label={`Decrease quantity of ${line.productName}`}
+                      aria-label={t("Decrease quantity of {name}", { name: line.productName })}
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
@@ -221,7 +223,7 @@ export function CartView() {
                       onClick={() => updateQuantity(line.id, line.quantity + 1)}
                       disabled={line.quantity >= Math.min(10, line.availableStock) || busyLine === line.id}
                       className="flex h-11 w-10 items-center justify-center hover:bg-sand disabled:opacity-40"
-                      aria-label={`Increase quantity of ${line.productName}`}
+                      aria-label={t("Increase quantity of {name}", { name: line.productName })}
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
@@ -232,7 +234,7 @@ export function CartView() {
                     disabled={busyLine === line.id}
                     className="inline-flex min-h-11 items-center gap-1 px-2 text-[10px] uppercase tracking-[0.1em] text-muted hover:text-ink"
                   >
-                    <X className="h-3.5 w-3.5" /> Remove
+                    <X className="h-3.5 w-3.5" /> {t("Remove")}
                   </button>
                 </div>
               </div>
@@ -240,23 +242,23 @@ export function CartView() {
           ))}
         </ul>
         <div className="mt-6">
-          <Link href="/collections/new-arrivals" className="overline link-underline">Continue shopping</Link>
+          <Link href="/collections/new-arrivals" className="overline link-underline">{t("Continue shopping")}</Link>
         </div>
       </div>
 
       <aside className="lg:sticky lg:top-28 lg:self-start">
         <div className="border border-line p-5 sm:p-6">
-          <p className="overline">Order summary</p>
+          <p className="overline">{t("Order summary")}</p>
           <dl className="mt-5 space-y-3 text-sm">
-            <div className="flex justify-between"><dt>Subtotal</dt><dd>{money(cart.subtotal)}</dd></div>
+            <div className="flex justify-between"><dt>{t("Subtotal")}</dt><dd>{money(cart.subtotal)}</dd></div>
             {Number(cart.discountTotal) > 0 && (
-              <div className="flex justify-between text-sale"><dt>Discount</dt><dd>−{money(cart.discountTotal)}</dd></div>
+              <div className="flex justify-between text-sale"><dt>{t("Discount")}</dt><dd>−{money(cart.discountTotal)}</dd></div>
             )}
-            <div className="flex justify-between text-muted"><dt>Shipping estimate</dt><dd>{Number(cart.shippingEstimate) === 0 ? "Free" : money(cart.shippingEstimate)}</dd></div>
-            <div className="flex justify-between text-muted"><dt>Estimated tax</dt><dd>{money(cart.taxEstimate)}</dd></div>
-            <div className="flex justify-between border-t border-line pt-4 text-base font-medium"><dt>Total</dt><dd>{money(cart.totalEstimate)}</dd></div>
+            <div className="flex justify-between text-muted"><dt>{t("Shipping estimate")}</dt><dd>{Number(cart.shippingEstimate) === 0 ? t("Free") : money(cart.shippingEstimate)}</dd></div>
+            <div className="flex justify-between text-muted"><dt>{t("Estimated tax")}</dt><dd>{money(cart.taxEstimate)}</dd></div>
+            <div className="flex justify-between border-t border-line pt-4 text-base font-medium"><dt>{t("Total")}</dt><dd>{money(cart.totalEstimate)}</dd></div>
           </dl>
-          <p className="mt-3 text-[11px] leading-relaxed text-muted">Tax and delivery are confirmed at checkout. Prices are in USD.</p>
+          <p className="mt-3 text-[11px] leading-relaxed text-muted">{t("Tax and delivery are confirmed at checkout. Prices are in THB, including 7% VAT.")}</p>
 
           <div className="mt-6 border-t border-line pt-5">
             {cart.coupon?.valid ? (
@@ -267,25 +269,25 @@ export function CartView() {
                 </div>
                 <div className="text-right">
                   <p className="text-sale">−{money(cart.coupon.amount)}</p>
-                  <button type="button" onClick={removeCoupon} disabled={couponBusy} className="min-h-11 px-1 text-[11px] underline">Remove</button>
+                  <button type="button" onClick={removeCoupon} disabled={couponBusy} className="min-h-11 px-1 text-[11px] underline">{t("Remove")}</button>
                 </div>
               </div>
             ) : (
               <form onSubmit={applyCoupon}>
-                <label htmlFor="coupon" className="label">Discount code</label>
+                <label htmlFor="coupon" className="label">{t("Discount code")}</label>
                 <div className="flex gap-2">
                   <input
                     id="coupon"
                     value={code}
                     onChange={(event) => setCode(event.target.value.toUpperCase())}
-                    placeholder="Enter code"
+                    placeholder={t("Enter code")}
                     className="field !min-h-11 flex-1 text-xs uppercase tracking-[0.12em]"
                   />
                   <button type="submit" disabled={couponBusy || !code.trim()} className="btn btn-outline !min-h-11 !px-4">
-                    {couponBusy ? "…" : "Apply"}
+                    {couponBusy ? "…" : t("Apply")}
                   </button>
                 </div>
-                <p className="mt-2 text-[11px] text-muted">Try WELCOME10 or DAYSHIFT15.</p>
+                <p className="mt-2 text-[11px] text-muted">{t("Try WELCOME10 or DAYSHIFT15.")}</p>
                 {couponError && (
                   <p role="alert" className="mt-2 text-[11px] text-sale">{couponError}</p>
                 )}
@@ -294,15 +296,15 @@ export function CartView() {
           </div>
 
           <Link href="/checkout" className="btn btn-primary mt-6 hidden w-full lg:flex">
-            Checkout · {money(cart.totalEstimate)}
+            {t("Checkout")} · {money(cart.totalEstimate)}
           </Link>
-          <p className="mt-3 hidden text-center text-[11px] text-muted lg:block">Secure sandbox checkout · No real payment</p>
+          <p className="mt-3 hidden text-center text-[11px] text-muted lg:block">{t("Secure sandbox checkout · No real payment")}</p>
         </div>
 
         <div className="mt-6 space-y-2 border border-line p-5 text-xs text-muted">
-          <p>Complimentary delivery over $150.</p>
-          <p>30-day free returns on unworn pieces.</p>
-          <p>Need help? <Link href="/support" className="underline">Contact customer care</Link>.</p>
+          <p>{t("Complimentary delivery over ฿1,500.")}</p>
+          <p>{t("30-day free returns on unworn pieces.")}</p>
+          <p>{t("Need help?")} <Link href="/support" className="underline">{t("Contact customer care")}</Link>.</p>
         </div>
       </aside>
     </div>
@@ -311,11 +313,11 @@ export function CartView() {
     <div className="safe-bottom animate-slide-up fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur-md lg:hidden">
       <div className="mx-auto flex max-w-3xl items-center gap-3">
         <div className="flex-1">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-muted">Total</p>
+          <p className="text-[10px] uppercase tracking-[0.12em] text-muted">{t("Total")}</p>
           <p className="text-sm">{money(cart.totalEstimate)}</p>
         </div>
         <Link href="/checkout" className="btn btn-primary min-w-[10rem]">
-          Checkout
+          {t("Checkout")}
         </Link>
       </div>
     </div>

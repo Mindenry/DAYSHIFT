@@ -18,7 +18,7 @@ const pages = [
   ["category", "/c/women"],
   ["product", "/products/the-everyday-oversized-tee"],
   ["cart", "/cart"],
-  ["search", "/search?q=linen"],
+  ["search", "/search?q=" + encodeURIComponent("ลินิน")],
   ["login", "/login"],
   ["support", "/support"],
   ["track", "/track"],

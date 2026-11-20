@@ -4,6 +4,7 @@ import { apiGet } from "@/lib/api";
 import { ListingView, type Facets } from "@/components/listing-view";
 import type { ProductCardDto } from "@dayshift/types";
 import { SearchBox } from "./search-box";
+import { getI18n } from "@/lib/i18n";
 
 interface ProductsResponse {
   items: ProductCardDto[];
@@ -25,19 +26,20 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const query = await searchParams;
   const rawQ = query.q;
   const q = typeof rawQ === "string" ? rawQ.trim() : "";
+  const { t } = await getI18n();
 
   if (!q) {
     return (
       <div className="wrap py-20 md:py-28">
-        <p className="overline text-muted">Search</p>
+        <p className="overline text-muted">{t("Search")}</p>
         <h1 className="mt-3 max-w-3xl font-display text-5xl leading-tight md:text-7xl">
-          What are you looking for?
+          {t("What are you looking for?")}
         </h1>
         <div className="mt-10 max-w-xl">
           <SearchBox initial="" />
         </div>
         <div className="mt-12 flex flex-wrap gap-2">
-          {["Linen shirt", "Oversized tee", "Straight jeans", "Leather tote", "Merino knit", "Sneakers"].map((term) => (
+          {["เสื้อลินิน", "เสื้อยืดโอเวอร์ไซซ์", "กางเกงยีนส์ขาตรง", "กระเป๋าโท้ต", "ไหมพรมเมอริโน", "รองเท้าผ้าใบ"].map((term) => (
             <Link
               key={term}
               href={`/search?q=${encodeURIComponent(term)}`}
@@ -67,8 +69,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   if (!products || !facets) {
     return (
       <div className="wrap py-24 text-center">
-        <h1 className="font-display text-4xl">Search is unavailable</h1>
-        <p className="mt-3 text-sm text-muted">Please try again in a moment.</p>
+        <h1 className="font-display text-4xl">{t("Search is unavailable")}</h1>
+        <p className="mt-3 text-sm text-muted">{t("Please try again in a moment.")}</p>
       </div>
     );
   }
@@ -77,7 +79,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     <div>
       <div className="border-b border-line">
         <div className="wrap py-10">
-          <p className="overline text-muted">Search results</p>
+          <p className="overline text-muted">{t("Search results")}</p>
           <h1 className="mt-2 font-display text-4xl md:text-6xl">“{q}”</h1>
           <div className="mt-6 max-w-xl">
             <SearchBox initial={q} />
@@ -86,7 +88,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       </div>
       <ListingView
         eyebrow="Search"
-        title={`${products.meta.total} ${products.meta.total === 1 ? "result" : "results"}`}
+        title={`${products.meta.total} ${products.meta.total === 1 ? t("result") : t("results")}`}
         titleLevel="h2"
         basePath="/search"
         products={products.items}
@@ -95,7 +97,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         page={products.meta.page}
         pageSize={products.meta.pageSize}
         params={{ ...query, q }}
-        emptyMessage={`We couldn't find anything for “${q}”. Try a different term, a category or a SKU.`}
+        emptyMessage={t("We could not find anything for that search. Try a different term, a category or a SKU.")}
       />
     </div>
   );

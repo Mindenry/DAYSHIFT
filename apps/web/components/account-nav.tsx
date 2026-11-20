@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useI18n } from "@/lib/i18n-client";
 
 const links = [
   { href: "/account", label: "Overview" },
@@ -16,9 +17,10 @@ const links = [
 
 export function AccountNav() {
   const pathname = usePathname();
+  const { t } = useI18n();
   return (
     <nav
-      aria-label="Account"
+      aria-label={t("Account")}
       className="grid grid-cols-2 gap-2 border-b border-line pb-5 lg:flex lg:flex-col lg:gap-0 lg:border-b-0 lg:pb-0"
     >
       {links.map((link) => {
@@ -37,7 +39,7 @@ export function AccountNav() {
                 : "border-line text-muted hover:border-ink hover:text-ink lg:border-line"
             }`}
           >
-            {link.label}
+            {t(link.label)}
           </Link>
         );
       })}

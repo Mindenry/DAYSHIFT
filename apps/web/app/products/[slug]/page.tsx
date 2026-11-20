@@ -6,6 +6,7 @@ import Link from "next/link";
 import { apiGet } from "@/lib/api";
 import { stripBrandSuffix } from "@/lib/seo";
 import { getSession } from "@/lib/session";
+import { getI18n } from "@/lib/i18n";
 import type { ProductDetailDto } from "@dayshift/types";
 import { ProductExperience } from "@/components/product-experience";
 import { ProductCard } from "@/components/product-card";
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 function Stars({ rating, className = "" }: { rating: number; className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-0.5 ${className}`} role="img" aria-label={`${rating} out of 5 stars`}>
+    <span className={`inline-flex items-center gap-0.5 ${className}`} role="img" aria-label={`${rating} / 5`}>
       {[1, 2, 3, 4, 5].map((star) => (
         <span key={star} aria-hidden className={star <= Math.round(rating) ? "text-ink" : "text-line"}>★</span>
       ))}
@@ -57,6 +58,7 @@ function Stars({ rating, className = "" }: { rating: number; className?: string 
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const { t, locale } = await getI18n();
   const [product, session] = await Promise.all([
     apiGet<Product>(`/products/${slug}`, { revalidate: 30 }),
     getSession(),
@@ -98,7 +100,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       },
       shippingDetails: {
         "@type": "OfferShippingDetails",
-        shippingRate: { "@type": "MonetaryAmount", value: "7.95", currency: "USD" },
+        shippingRate: { "@type": "MonetaryAmount", value: "50", currency: "THB" },
         shippingDestination: { "@type": "DefinedRegion", addressCountry: "US" },
         deliveryTime: {
           "@type": "ShippingDeliveryTime",
@@ -161,15 +163,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <div className="wrap">
           <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
-              <p className="overline text-muted">Reviews</p>
-              <h2 className="mt-2 font-display text-4xl">Worn & reviewed</h2>
+              <p className="overline text-muted">{t("Reviews")}</p>
+              <h2 className="mt-2 font-display text-4xl">{t("Worn & reviewed")}</h2>
               {product.rating.count > 0 ? (
                 <>
                   <div className="mt-6 flex items-end gap-4">
                     <span className="font-display text-6xl">{product.rating.average.toFixed(1)}</span>
                     <div className="pb-2">
                       <Stars rating={product.rating.average} className="text-lg" />
-                      <p className="mt-1 text-xs text-muted">{product.rating.count} verified reviews</p>
+                      <p className="mt-1 text-xs text-muted">{product.rating.count} {t("verified reviews")}</p>
                     </div>
                   </div>
                   <div className="mt-6 max-w-sm space-y-2">
@@ -189,15 +191,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   </div>
                 </>
               ) : (
-                <p className="mt-4 text-sm text-muted">No reviews yet. Be the first to share your thoughts.</p>
+                <p className="mt-4 text-sm text-muted">{t("No reviews yet. Be the first to share your thoughts.")}</p>
               )}
               <div className="mt-8">
                 {session ? (
                   <ReviewForm productId={product.id} productName={product.name} />
                 ) : (
                   <div className="border border-line p-5">
-                    <p className="text-sm text-muted">Purchased this piece? Sign in to leave a review.</p>
-                    <Link href={`/login?next=/products/${product.slug}`} className="btn btn-outline mt-4">Sign in</Link>
+                    <p className="text-sm text-muted">{t("Purchased this piece? Sign in to leave a review.")}</p>
+                    <Link href={`/login?next=/products/${product.slug}`} className="btn btn-outline mt-4">{t("Sign in")}</Link>
                   </div>
                 )}
               </div>
@@ -205,7 +207,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <div>
               {reviews.length === 0 ? (
                 <div className="flex h-full min-h-40 items-center justify-center border border-dashed border-line p-8 text-center text-sm text-muted">
-                  Reviews from verified customers will appear here.
+                  {t("Reviews from verified customers will appear here.")}
                 </div>
               ) : (
                 <ul className="divide-y divide-line">
@@ -215,11 +217,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         <Stars rating={review.rating} />
                         {review.isVerifiedPurchase && (
                           <span className="border border-line px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] text-muted">
-                            Verified purchase
+                            {t("Verified purchase")}
                           </span>
                         )}
                         <span className="text-xs text-muted">
-                          {new Date(review.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                          {new Date(review.createdAt).toLocaleDateString(locale === "th" ? "th-TH" : "en-US", { month: "short", year: "numeric" })}
                         </span>
                       </div>
                       {review.title && <h3 className="mt-3 font-display text-xl">{review.title}</h3>}
@@ -242,11 +244,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div className="wrap">
             <div className="flex items-end justify-between">
               <div>
-                <p className="overline text-muted">Complete the look</p>
-                <h2 className="mt-2 font-display text-4xl">Wear it with</h2>
+                <p className="overline text-muted">{t("Complete the look")}</p>
+                <h2 className="mt-2 font-display text-4xl">{t("Wear it with")}</h2>
               </div>
               <Link href={`/c/${product.categories[0]?.slug ?? "women"}`} className="overline link-underline hidden sm:inline-flex">
-                More from {product.categories[0]?.name ?? "the collection"}
+                {t("More from {name}", { name: product.categories[0]?.name ?? t("the collection") })}
               </Link>
             </div>
             <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-6 lg:grid-cols-4">

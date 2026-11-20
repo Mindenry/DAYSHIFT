@@ -3,6 +3,7 @@ import type { ProductCardDto } from "@dayshift/types";
 import { serializeJsonLd } from "@dayshift/config";
 import { ProductCard } from "./product-card";
 import { ListingFilters } from "./listing-filters";
+import { getI18n } from "@/lib/i18n";
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
@@ -43,15 +44,7 @@ function buildQuery(params: Record<string, string | string[] | undefined>, overr
   return search.toString();
 }
 
-const SORT_OPTIONS = [
-  { value: "newest", label: "Newest" },
-  { value: "popular", label: "Most loved" },
-  { value: "price-asc", label: "Price: low to high" },
-  { value: "price-desc", label: "Price: high to low" },
-  { value: "rating", label: "Top rated" },
-];
-
-export function ListingView({
+export async function ListingView({
   eyebrow,
   title,
   description,
@@ -67,6 +60,14 @@ export function ListingView({
   emptyMessage,
   titleLevel = "h1",
 }: Props) {
+  const { t } = await getI18n();
+  const SORT_OPTIONS = [
+    { value: "newest", label: t("Newest") },
+    { value: "popular", label: t("Most loved") },
+    { value: "price-asc", label: t("Price: low to high") },
+    { value: "price-desc", label: t("Price: high to low") },
+    { value: "rating", label: t("Top rated") },
+  ];
   const activeSize = typeof params.size === "string" ? params.size : "";
   const activeColor = typeof params.color === "string" ? params.color : "";
   const activeSort = typeof params.sort === "string" ? params.sort : "newest";
@@ -77,11 +78,11 @@ export function ListingView({
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   const chips = [
-    activeSize && { label: `Size ${activeSize}`, key: "size" },
+    activeSize && { label: `${t("Size")} ${activeSize}`, key: "size" },
     activeColor && { label: activeColor, key: "color" },
-    activeMin && { label: `From $${activeMin}`, key: "minPrice" },
-    activeMax && { label: `To $${activeMax}`, key: "maxPrice" },
-    activeStock && { label: "In stock", key: "inStock" },
+    activeMin && { label: `${t("From")} ฿${activeMin}`, key: "minPrice" },
+    activeMax && { label: `${t("To")} ฿${activeMax}`, key: "maxPrice" },
+    activeStock && { label: t("In stock"), key: "inStock" },
     typeof params.q === "string" && params.q && { label: `“${params.q}”`, key: "q" },
   ].filter(Boolean) as Array<{ label: string; key: string }>;
 
@@ -130,8 +131,8 @@ export function ListingView({
       <div className="border-b border-line">
         <div className="wrap py-10 md:py-14">
           {breadcrumbs && breadcrumbs.length > 0 && (
-            <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-muted">
-              <Link href="/" className="link-underline">Home</Link>
+            <nav aria-label={t("Breadcrumb")} className="mb-6 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-muted">
+              <Link href="/" className="link-underline">{t("Home")}</Link>
               {breadcrumbs.map((crumb) => (
                 <span key={crumb.href} className="flex items-center gap-2">
                   <span aria-hidden>/</span>
@@ -175,10 +176,10 @@ export function ListingView({
           <div>
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
               <p className="text-sm text-muted">
-                {total} {total === 1 ? "piece" : "pieces"}
+                {total} {total === 1 ? t("piece") : t("pieces")}
               </p>
               <div className="hidden items-center gap-3 sm:flex">
-                <label htmlFor="sort-top" className="overline text-muted">Sort</label>
+                <label htmlFor="sort-top" className="overline text-muted">{t("Sort")}</label>
                 <form method="get" action={basePath} className="contents">
                   {Object.entries(params).map(([key, value]) =>
                     key !== "sort" && key !== "page" && typeof value === "string" ? (
@@ -195,7 +196,7 @@ export function ListingView({
                       <option key={option.value} value={option.value}>{option.label}</option>
                     ))}
                   </select>
-                  <button type="submit" className="overline underline underline-offset-4">Apply</button>
+                  <button type="submit" className="overline underline underline-offset-4">{t("Apply")}</button>
                 </form>
               </div>
             </div>
@@ -212,18 +213,18 @@ export function ListingView({
                   </Link>
                 ))}
                 <Link href={basePath} className="px-2 text-[11px] uppercase tracking-[0.1em] underline">
-                  Clear all
+                  {t("Clear all")}
                 </Link>
               </div>
             )}
 
             {products.length === 0 ? (
               <div className="py-24 text-center">
-                <h2 className="font-display text-3xl">Nothing here yet.</h2>
+                <h2 className="font-display text-3xl">{t("Nothing here yet.")}</h2>
                 <p className="mx-auto mt-3 max-w-md text-sm text-muted">
-                  {emptyMessage ?? "Try removing a filter or exploring another part of the collection."}
+                  {emptyMessage ?? t("Try removing a filter or exploring another part of the collection.")}
                 </p>
-                <Link href={basePath} className="btn btn-outline mt-8">Clear filters</Link>
+                <Link href={basePath} className="btn btn-outline mt-8">{t("Clear filters")}</Link>
               </div>
             ) : (
               <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 min-[360px]:gap-x-4 md:gap-x-6 md:gap-y-10 xl:grid-cols-3">
@@ -234,13 +235,13 @@ export function ListingView({
             )}
 
             {totalPages > 1 && (
-              <nav aria-label="Pagination" className="mt-16 flex items-center justify-center gap-2">
+              <nav aria-label={t("Pagination")} className="mt-16 flex items-center justify-center gap-2">
                 {page > 1 && (
                   <Link
                     href={`${basePath}?${buildQuery(params, { page: String(page - 1) })}`}
                     className="border border-line px-4 py-2 text-xs uppercase tracking-[0.12em] hover:border-ink"
                   >
-                    Previous
+                    {t("Previous")}
                   </Link>
                 )}
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -264,7 +265,7 @@ export function ListingView({
                     href={`${basePath}?${buildQuery(params, { page: String(page + 1) })}`}
                     className="border border-line px-4 py-2 text-xs uppercase tracking-[0.12em] hover:border-ink"
                   >
-                    Next
+                    {t("Next")}
                   </Link>
                 )}
               </nav>

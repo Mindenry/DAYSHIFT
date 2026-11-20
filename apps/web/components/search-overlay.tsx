@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { clientApi, money } from "@/lib/api";
 import { usePresence } from "./use-presence";
+import { useI18n } from "@/lib/i18n-client";
 
 interface Suggestion {
   products: Array<{ id: string; name: string; slug: string; price: string; image: string | null }>;
@@ -21,6 +22,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { mounted, state } = usePresence(open, 220);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!open) return;
@@ -93,7 +95,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
       }`}
       role="dialog"
       aria-modal="true"
-      aria-label="Search"
+      aria-label={t("Search")}
       aria-hidden={!isOpen}
     >
       <div
@@ -102,8 +104,8 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
         }`}
       >
         <div className="flex h-20 items-center justify-between border-b border-line">
-          <p className="overline">Search DAYSHIFT</p>
-          <button type="button" onClick={onClose} className="inline-flex h-11 w-11 items-center justify-center" aria-label="Close search">
+          <p className="overline">{t("Search DAYSHIFT")}</p>
+          <button type="button" onClick={onClose} className="inline-flex h-11 w-11 items-center justify-center" aria-label={t("Close search")}>
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -113,9 +115,9 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search for a piece, a category or a SKU"
+            placeholder={t("Search for a piece, a category or a SKU")}
             className="w-full bg-transparent font-display text-2xl outline-none placeholder:text-stone md:text-4xl"
-            aria-label="Search products"
+            aria-label={t("Search products")}
           />
         </form>
 
@@ -123,7 +125,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
           <div>
             {data?.products?.length ? (
               <>
-                <p className="overline text-muted">Products</p>
+                <p className="overline text-muted">{t("Products")}</p>
                 <ul className="mt-4 divide-y divide-line">
                   {data.products.map((product) => (
                     <li key={product.id}>
@@ -144,7 +146,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                 {recent.length > 0 && (
                   <>
                     <div className="flex items-center justify-between">
-                      <p className="overline text-muted">Recent searches</p>
+                      <p className="overline text-muted">{t("Recent searches")}</p>
                       <button
                         type="button"
                         onClick={() => {
@@ -153,7 +155,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                         }}
                         className="min-h-11 px-1 text-[10px] uppercase tracking-[0.12em] text-muted underline underline-offset-4"
                       >
-                        Clear
+                        {t("Clear")}
                       </button>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-2">
@@ -170,9 +172,9 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                     </div>
                   </>
                 )}
-                <p className={`overline text-muted ${recent.length ? "mt-8" : ""}`}>Popular right now</p>
+                <p className={`overline text-muted ${recent.length ? "mt-8" : ""}`}>{t("Popular right now")}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {(data?.popular ?? ["Linen shirt", "Oversized tee", "Straight jeans", "Leather tote", "Merino knit"]).map((term) => (
+                  {(data?.popular ?? ["เสื้อลินิน", "เสื้อยืดโอเวอร์ไซซ์", "กางเกงยีนส์ขาตรง", "กระเป๋าโท้ต", "ไหมพรมเมอริโน"]).map((term) => (
                     <button
                       key={term}
                       type="button"
@@ -184,7 +186,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                   ))}
                 </div>
                 <p className="mt-10 max-w-md text-sm leading-relaxed text-muted">
-                  Search by product name, category or SKU. Try “DS-TEE-001” to find a specific style.
+                  {t("Search by product name, category or SKU. Try “DS-TEE-001” to find a specific style.")}
                 </p>
               </div>
             )}
@@ -192,7 +194,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
           <div className="space-y-8">
             {!!data?.categories?.length && (
               <div>
-                <p className="overline text-muted">Categories</p>
+                <p className="overline text-muted">{t("Categories")}</p>
                 <ul className="mt-3 space-y-2">
                   {data.categories.map((category) => (
                     <li key={category.id}>
@@ -206,7 +208,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
             )}
             {!!data?.collections?.length && (
               <div>
-                <p className="overline text-muted">Collections</p>
+                <p className="overline text-muted">{t("Collections")}</p>
                 <ul className="mt-3 space-y-2">
                   {data.collections.map((collection) => (
                     <li key={collection.id}>

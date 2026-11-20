@@ -106,7 +106,7 @@ export class PaymentsController {
       type: body.type,
       reference: body.reference,
       amountCents,
-      currency: body.currency ?? "USD",
+      currency: body.currency ?? "THB",
     });
     return { received: true, ...result };
   }

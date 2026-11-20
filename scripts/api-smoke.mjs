@@ -96,7 +96,7 @@ const paidOrder = await api(`/orders/${order.data.order.orderNumber}`);
 check("paid order readback", paidOrder.data.paymentStatus === "PAID", paidOrder.data.status);
 
 // Replay the webhook with the same id (idempotency)
-const webhookBody = JSON.stringify({ eventId: "smoke-dup-event", type: "payment.succeeded", reference: order.data.payment.reference, amountCents: Math.round(money(order.data.order.grandTotal) * 100), currency: "USD" });
+const webhookBody = JSON.stringify({ eventId: "smoke-dup-event", type: "payment.succeeded", reference: order.data.payment.reference, amountCents: Math.round(money(order.data.order.grandTotal) * 100), currency: "THB" });
 const { createHmac } = await import("node:crypto");
 const signature = createHmac("sha256", "dev-only-sandbox-payment-secret-9b1e7d").update(webhookBody).digest("hex");
 const w1 = await api("/payments/webhooks/sandbox", { method: "POST", body: webhookBody, headers: { "x-dayshift-signature": signature } });

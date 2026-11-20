@@ -3,6 +3,7 @@ import Link from "next/link";
 import { apiGet } from "@/lib/api";
 import { getCookieHeader } from "@/lib/session";
 import { NewTicketForm } from "@/components/support-forms";
+import { getI18n } from "@/lib/i18n";
 
 export const metadata: Metadata = { title: "Customer care", robots: { index: false } };
 
@@ -18,24 +19,24 @@ interface TicketSummary {
 
 export default async function AccountSupportPage() {
   const cookie = await getCookieHeader();
+  const { t } = await getI18n();
   const tickets = await apiGet<TicketSummary[]>("/support/tickets", { cookie, revalidate: 0 });
 
   return (
     <div>
       <div className="border-b border-line pb-6">
-        <p className="overline text-muted">Account</p>
-        <h1 className="mt-2 font-display text-4xl md:text-5xl">Customer care</h1>
+        <p className="overline text-muted">{t("Account")}</p>
+        <h1 className="mt-2 font-display text-4xl md:text-5xl">{t("Customer care")}</h1>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">
-          Questions about sizing, an order or a return? Send us a note and we&apos;ll reply by email.
-          Our team answers within one business day.
+          {t("Questions about sizing, an order or a return? Send us a note and we will reply by email. Our team answers within one business day.")}
         </p>
       </div>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
         <section>
-          <h2 className="border-b border-line pb-3 font-display text-2xl">Your conversations</h2>
+          <h2 className="border-b border-line pb-3 font-display text-2xl">{t("Your conversations")}</h2>
           {!tickets || tickets.length === 0 ? (
-            <p className="py-10 text-sm text-muted">No conversations yet.</p>
+            <p className="py-10 text-sm text-muted">{t("No conversations yet.")}</p>
           ) : (
             <ul className="divide-y divide-line">
               {tickets.map((ticket) => (
@@ -44,12 +45,12 @@ export default async function AccountSupportPage() {
                     <div>
                       <p className="font-display text-lg">{ticket.subject}</p>
                       <p className="mt-1 text-xs text-muted">
-                        {ticket.ticketNumber} · {ticket.messageCount} {ticket.messageCount === 1 ? "message" : "messages"} ·{" "}
+                        {ticket.ticketNumber} · {ticket.messageCount} {ticket.messageCount === 1 ? t("message") : t("messages")} ·{" "}
                         {new Date(ticket.updatedAt).toLocaleDateString()}
                       </p>
                     </div>
                     <span className="shrink-0 border border-line px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] text-muted">
-                      {ticket.status.replace(/_/g, " ").toLowerCase()}
+                      {t(ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1).replace(/_/g, " ").toLowerCase())}
                     </span>
                   </Link>
                 </li>
@@ -59,12 +60,12 @@ export default async function AccountSupportPage() {
         </section>
         <aside>
           <div className="border border-line p-6">
-            <p className="overline">New request</p>
+            <p className="overline">{t("New request")}</p>
             <NewTicketForm />
           </div>
           <div className="mt-4 border border-line p-5 text-xs leading-relaxed text-muted">
-            <p>Prefer email? Write to <span className="text-ink">hello@dayshift.example</span>.</p>
-            <p className="mt-2">For order-specific help, include your order number.</p>
+            <p>{t("Prefer email? Write to")} <span className="text-ink">hello@dayshift.example</span>.</p>
+            <p className="mt-2">{t("For order-specific help, include your order number.")}</p>
           </div>
         </aside>
       </div>

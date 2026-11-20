@@ -18,11 +18,12 @@ export function centsToDecimalString(cents: number): string {
   return `${sign}${Math.floor(abs / 100)}.${String(abs % 100).padStart(2, "0")}`;
 }
 
-export function formatMoney(cents: number, currency = "USD"): string {
-  return new Intl.NumberFormat("en-US", {
+export function formatMoney(cents: number, currency = "THB"): string {
+  return new Intl.NumberFormat("th-TH", {
     style: "currency",
     currency,
-    minimumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(cents / 100);
 }
 
@@ -31,21 +32,21 @@ export function applyPercentage(amountCents: number, percentage: number): number
 }
 
 export const COMMERCE = {
-  currency: "USD",
-  taxRate: 0.08,
+  currency: "THB",
+  taxRate: 0.07,
   shipping: {
     standard: {
       code: "standard",
       label: "Standard delivery",
-      description: "3–5 business days",
-      priceCents: 795,
-      freeOverCents: 15000,
+      description: "2–4 business days",
+      priceCents: 5000,
+      freeOverCents: 150000,
     },
     express: {
       code: "express",
       label: "Express delivery",
-      description: "1–2 business days",
-      priceCents: 1495,
+      description: "Next business day",
+      priceCents: 10000,
       freeOverCents: null as number | null,
     },
   },
@@ -53,9 +54,10 @@ export const COMMERCE = {
   maxQuantityPerItem: 10,
   reservationMinutes: 15,
   loyalty: {
-    pointsPerDollar: 1,
-    centsPerPoint: 5,
-    minRedeemPoints: 100,
+    // 0.05 points per baht = 1 point per ฿20; 1 point redeems for ฿1.
+    pointsPerDollar: 0.05,
+    centsPerPoint: 100,
+    minRedeemPoints: 500,
     tiers: [
       { tier: "BRONZE", threshold: 0 },
       { tier: "SILVER", threshold: 500 },

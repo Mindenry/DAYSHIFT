@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { clientApi } from "@/lib/api";
+import { useI18n } from "@/lib/i18n-client";
 
 async function completeSignIn(router: ReturnType<typeof useRouter>, next: string) {
   try {
@@ -18,6 +19,7 @@ async function completeSignIn(router: ReturnType<typeof useRouter>, next: string
 }
 
 export function LoginForm({ next }: { next: string }) {
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -35,31 +37,32 @@ export function LoginForm({ next }: { next: string }) {
             method: "POST",
             body: JSON.stringify({ email: data.get("email"), password: data.get("password") }),
           });
-          toast("Welcome back");
+          toast(t("Welcome back"));
           await completeSignIn(router, next);
         } catch (loginError) {
-          setError(loginError instanceof Error ? loginError.message : "Could not sign in.");
+          setError(loginError instanceof Error ? loginError.message : t("Could not sign in."));
           setBusy(false);
         }
       }}
     >
       {error && <div role="alert" className="border border-sale/40 bg-sale/5 p-3 text-sm text-sale">{error}</div>}
       <div>
-        <label htmlFor="login-email" className="label">Email</label>
+        <label htmlFor="login-email" className="label">{t("Email")}</label>
         <input id="login-email" name="email" type="email" required autoComplete="email" className="field" />
       </div>
       <div>
-        <label htmlFor="login-password" className="label">Password</label>
+        <label htmlFor="login-password" className="label">{t("Password")}</label>
         <input id="login-password" name="password" type="password" required autoComplete="current-password" className="field" />
       </div>
       <button type="submit" disabled={busy} className="btn btn-primary w-full">
-        {busy ? "Signing in…" : "Sign in"}
+        {busy ? t("Signing in…") : t("Sign in")}
       </button>
     </form>
   );
 }
 
 export function RegisterForm({ next }: { next: string }) {
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -83,10 +86,10 @@ export function RegisterForm({ next }: { next: string }) {
               marketingOptIn: data.get("marketingOptIn") === "on",
             }),
           });
-          toast("Your account is ready");
+          toast(t("Your account is ready"));
           await completeSignIn(router, next);
         } catch (registerError) {
-          setError(registerError instanceof Error ? registerError.message : "Could not create account.");
+          setError(registerError instanceof Error ? registerError.message : t("Could not create account."));
           setBusy(false);
         }
       }}
@@ -94,39 +97,40 @@ export function RegisterForm({ next }: { next: string }) {
       {error && <div role="alert" className="border border-sale/40 bg-sale/5 p-3 text-sm text-sale">{error}</div>}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="firstName" className="label">First name</label>
+          <label htmlFor="firstName" className="label">{t("First name")}</label>
           <input id="firstName" name="firstName" required autoComplete="given-name" className="field" />
         </div>
         <div>
-          <label htmlFor="lastName" className="label">Last name</label>
+          <label htmlFor="lastName" className="label">{t("Last name")}</label>
           <input id="lastName" name="lastName" required autoComplete="family-name" className="field" />
         </div>
       </div>
       <div>
-        <label htmlFor="register-email" className="label">Email</label>
+        <label htmlFor="register-email" className="label">{t("Email")}</label>
         <input id="register-email" name="email" type="email" required autoComplete="email" className="field" />
       </div>
       <div>
-        <label htmlFor="register-password" className="label">Password</label>
+        <label htmlFor="register-password" className="label">{t("Password")}</label>
         <input id="register-password" name="password" type="password" required minLength={10} autoComplete="new-password" className="field" />
-        <p className="mt-1.5 text-[11px] text-muted">At least 10 characters with upper and lower case letters and a number.</p>
+        <p className="mt-1.5 text-[11px] text-muted">{t("At least 10 characters with upper and lower case letters and a number.")}</p>
       </div>
       <label className="flex items-start gap-3 pt-1 text-xs text-muted">
         <input type="checkbox" name="marketingOptIn" className="mt-0.5 h-4 w-4 accent-[#1a1917]" />
-        Send me the DAYSHIFT note — new arrivals and studio news. Unsubscribe anytime.
+        {t("Send me the DAYSHIFT note — new arrivals and studio news. Unsubscribe anytime.")}
       </label>
       <label className="flex items-start gap-3 text-xs text-muted">
         <input type="checkbox" required className="mt-0.5 h-4 w-4 accent-[#1a1917]" />
-        I agree to the <Link href="/legal/terms" className="underline">terms</Link> and <Link href="/legal/privacy" className="underline">privacy policy</Link>.
+        {t("I agree to the")} <Link href="/legal/terms" className="underline">{t("terms")}</Link> {t("and")} <Link href="/legal/privacy" className="underline">{t("privacy policy")}</Link>.
       </label>
       <button type="submit" disabled={busy} className="btn btn-primary w-full">
-        {busy ? "Creating account…" : "Create account"}
+        {busy ? t("Creating account…") : t("Create account")}
       </button>
     </form>
   );
 }
 
 export function ForgotPasswordForm() {
+  const { t } = useI18n();
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,8 +138,7 @@ export function ForgotPasswordForm() {
   if (sent) {
     return (
       <div className="mt-6 border border-line p-5 text-sm leading-relaxed text-muted">
-        If an account exists for that email, a reset link is on its way. In local development, open
-        the latest message in <code className="text-ink">apps/worker/.mail</code>.
+        {t("If an account exists for that email, a reset link is on its way.")}
       </div>
     );
   }
@@ -155,22 +158,23 @@ export function ForgotPasswordForm() {
           });
           setSent(true);
         } catch (forgotError) {
-          setError(forgotError instanceof Error ? forgotError.message : "Could not send reset link.");
+          setError(forgotError instanceof Error ? forgotError.message : t("Could not send reset link."));
           setBusy(false);
         }
       }}
     >
       {error && <div role="alert" className="border border-sale/40 bg-sale/5 p-3 text-sm text-sale">{error}</div>}
       <div>
-        <label htmlFor="forgot-email" className="label">Email</label>
+        <label htmlFor="forgot-email" className="label">{t("Email")}</label>
         <input id="forgot-email" name="email" type="email" required className="field" />
       </div>
-      <button type="submit" disabled={busy} className="btn btn-primary w-full">{busy ? "Sending…" : "Send reset link"}</button>
+      <button type="submit" disabled={busy} className="btn btn-primary w-full">{busy ? t("Sending…") : t("Send reset link")}</button>
     </form>
   );
 }
 
 export function ResetPasswordForm({ token }: { token: string }) {
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -188,27 +192,28 @@ export function ResetPasswordForm({ token }: { token: string }) {
             method: "POST",
             body: JSON.stringify({ token, password: data.get("password") }),
           });
-          toast("Password updated. Sign in with your new password.");
+          toast(t("Password updated. Sign in with your new password."));
           router.push("/login");
         } catch (resetError) {
-          setError(resetError instanceof Error ? resetError.message : "Could not reset password.");
+          setError(resetError instanceof Error ? resetError.message : t("Could not reset password."));
           setBusy(false);
         }
       }}
     >
       {error && <div role="alert" className="border border-sale/40 bg-sale/5 p-3 text-sm text-sale">{error}</div>}
       <div>
-        <label htmlFor="reset-password" className="label">New password</label>
+        <label htmlFor="reset-password" className="label">{t("New password")}</label>
         <input id="reset-password" name="password" type="password" required minLength={10} className="field" />
-        <p className="mt-1.5 text-[11px] text-muted">At least 10 characters with upper and lower case letters and a number.</p>
+        <p className="mt-1.5 text-[11px] text-muted">{t("At least 10 characters with upper and lower case letters and a number.")}</p>
       </div>
-      <button type="submit" disabled={busy} className="btn btn-primary w-full">{busy ? "Updating…" : "Update password"}</button>
-      <Link href="/login" className="block text-center text-xs underline">Back to sign in</Link>
+      <button type="submit" disabled={busy} className="btn btn-primary w-full">{busy ? t("Updating…") : t("Update password")}</button>
+      <Link href="/login" className="block text-center text-xs underline">{t("Back to sign in")}</Link>
     </form>
   );
 }
 
 export function SignOutButton() {
+  const { t } = useI18n();
   const router = useRouter();
   return (
     <button
@@ -224,7 +229,7 @@ export function SignOutButton() {
       }}
       className="inline-flex min-h-11 items-center text-left text-sm text-muted underline underline-offset-4 hover:text-ink"
     >
-      Sign out
+      {t("Sign out")}
     </button>
   );
 }

@@ -6,8 +6,8 @@ const escapeHtml = (value: unknown) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
-export function money(cents: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(cents / 100);
+export function money(cents: number, currency = "THB") {
+  return new Intl.NumberFormat("th-TH", { style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(cents / 100);
 }
 
 function layout(title: string, body: string) {

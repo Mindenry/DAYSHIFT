@@ -21,11 +21,11 @@ export function SettingsForm({ initial }: { initial: Settings }) {
   const router = useRouter();
   const { t } = useI18n();
   const [store, setStore] = useState({ name: "", tagline: "", email: "", phone: "", address: "", ...(initial.store ?? {}) });
-  const [tax, setTax] = useState({ rate: 0.08, inclusive: false, label: "Estimated sales tax", ...(initial.tax ?? {}) });
-  const [shipping, setShipping] = useState({ standardPrice: 7.95, standardFreeOver: 150, expressPrice: 14.95, ...(initial.shipping ?? {}) });
+  const [tax, setTax] = useState({ rate: 0.07, inclusive: true, label: "VAT 7%", ...(initial.tax ?? {}) });
+  const [shipping, setShipping] = useState({ standardPrice: 50, standardFreeOver: 1500, expressPrice: 100, ...(initial.shipping ?? {}) });
   const [returns, setReturns] = useState({ windowDays: 30, freeReturns: true, finalSaleReturnable: false, ...(initial.returns ?? {}) });
-  const [loyalty, setLoyalty] = useState({ pointsPerDollar: 1, centsPerPoint: 5, minRedeemPoints: 100, earnOnShipping: false, ...(initial.loyalty ?? {}) });
-  const [payments, setPayments] = useState({ provider: "sandbox", currency: "USD", cashOnDelivery: true, ...(initial.payments ?? {}) });
+  const [loyalty, setLoyalty] = useState({ pointsPerDollar: 0.05, centsPerPoint: 100, minRedeemPoints: 500, earnOnShipping: false, ...(initial.loyalty ?? {}) });
+  const [payments, setPayments] = useState({ provider: "sandbox", currency: "THB", cashOnDelivery: true, ...(initial.payments ?? {}) });
   const [features, setFeatures] = useState({ guestCheckout: true, reviewsRequirePurchase: true, wishlistForGuests: false, ...(initial.features ?? {}) });
   const [notifications, setNotifications] = useState({ orderEmails: true, marketingEmails: true, lowStockAlerts: true, ...(initial.notifications ?? {}) });
   const [busy, setBusy] = useState(false);
@@ -90,8 +90,8 @@ export function SettingsForm({ initial }: { initial: Settings }) {
         <section className="panel p-5">
           <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Loyalty")}</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <div><label className="label" htmlFor="loy-points">{t("Points / $")}</label><input id="loy-points" type="number" className="field" value={loyalty.pointsPerDollar} onChange={(e) => setLoyalty({ ...loyalty, pointsPerDollar: Number(e.target.value) })} /></div>
-            <div><label className="label" htmlFor="loy-cent">{t("Cents / point")}</label><input id="loy-cent" type="number" className="field" value={loyalty.centsPerPoint} onChange={(e) => setLoyalty({ ...loyalty, centsPerPoint: Number(e.target.value) })} /></div>
+            <div><label className="label" htmlFor="loy-points">{t("Points per ฿100")}</label><input id="loy-points" type="number" step="0.1" className="field" value={loyalty.pointsPerDollar * 100} onChange={(e) => setLoyalty({ ...loyalty, pointsPerDollar: Number(e.target.value) / 100 })} /></div>
+            <div><label className="label" htmlFor="loy-cent">{t("Satang per point")}</label><input id="loy-cent" type="number" className="field" value={loyalty.centsPerPoint} onChange={(e) => setLoyalty({ ...loyalty, centsPerPoint: Number(e.target.value) })} /></div>
             <div><label className="label" htmlFor="loy-min">{t("Min redeem")}</label><input id="loy-min" type="number" className="field" value={loyalty.minRedeemPoints} onChange={(e) => setLoyalty({ ...loyalty, minRedeemPoints: Number(e.target.value) })} /></div>
           </div>
         </section>

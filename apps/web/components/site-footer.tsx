@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { NewsletterForm } from "./newsletter-form";
+import { LocaleSwitcher, useI18n } from "@/lib/i18n-client";
 
 const columns = [
   {
@@ -36,6 +39,7 @@ const columns = [
 ];
 
 export function SiteFooter() {
+  const { t } = useI18n();
   return (
     <footer className="mt-24 border-t border-line bg-paper-deep">
       <div className="wrap py-16">
@@ -43,13 +47,12 @@ export function SiteFooter() {
           <div>
             <p className="font-display text-4xl tracking-[0.14em]">DAYSHIFT</p>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-              Considered clothing and accessories for the days that make up a life.
-              Made in small runs, built to be worn.
+              {t("Considered clothing and accessories for the days that make up a life. Made in small runs, built to be worn.")}
             </p>
             <div className="mt-8 max-w-md">
-              <p className="overline mb-3">The DAYSHIFT note</p>
+              <p className="overline mb-3">{t("The DAYSHIFT note")}</p>
               <p className="mb-4 text-sm text-muted">
-                New arrivals, studio notes and early access. No noise.
+                {t("New arrivals, studio notes and early access. No noise.")}
               </p>
               <NewsletterForm />
             </div>
@@ -57,12 +60,12 @@ export function SiteFooter() {
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             {columns.map((column) => (
               <div key={column.title}>
-                <p className="overline text-muted">{column.title}</p>
+                <p className="overline text-muted">{t(column.title)}</p>
                 <ul className="mt-2 space-y-0.5 sm:mt-4 sm:space-y-2.5">
                   {column.links.map((link) => (
                     <li key={link.href}>
                       <Link href={link.href} className="link-underline inline-flex min-h-10 items-center text-sm sm:min-h-0">
-                        {link.label}
+                        {t(link.label)}
                       </Link>
                     </li>
                   ))}
@@ -73,18 +76,17 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-16 flex flex-col gap-4 border-t border-line pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} DAYSHIFT. All rights reserved.</p>
-          <div className="flex flex-wrap gap-5">
-            <Link href="/legal/privacy" className="link-underline">Privacy</Link>
-            <Link href="/legal/terms" className="link-underline">Terms</Link>
-            <Link href="/legal/cookies" className="link-underline">Cookies</Link>
-            <Link href="/legal/accessibility" className="link-underline">Accessibility</Link>
+          <p>© {new Date().getFullYear()} DAYSHIFT. {t("All rights reserved.")}</p>
+          <div className="flex flex-wrap items-center gap-5">
+            <Link href="/legal/privacy" className="link-underline">{t("Privacy")}</Link>
+            <Link href="/legal/terms" className="link-underline">{t("Terms")}</Link>
+            <Link href="/legal/cookies" className="link-underline">{t("Cookies")}</Link>
+            <Link href="/legal/accessibility" className="link-underline">{t("Accessibility")}</Link>
+            <LocaleSwitcher compact />
           </div>
         </div>
         <p className="mt-4 max-w-3xl text-[11px] leading-relaxed text-muted">
-          Demonstration storefront. Product photography is licensed stand-in imagery from Unsplash,
-          not photographs of the actual demo inventory. Sandbox payments are simulated locally and no
-          money is processed. Image credits are listed in docs/IMAGE_CREDITS.md.
+          {t("Demonstration storefront. Product photography is licensed stand-in imagery, not photographs of the actual demo inventory. Sandbox payments are simulated locally and no money is processed.")}
         </p>
       </div>
     </footer>

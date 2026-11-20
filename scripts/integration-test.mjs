@@ -47,19 +47,19 @@ const now = Date.now();
 await admin.ok("/auth/staff/login", { method: "POST", body: JSON.stringify({ email: "admin@dayshift.example", password: "Admin1234!Pass" }) });
 await support.ok("/auth/staff/login", { method: "POST", body: JSON.stringify({ email: "support@dayshift.example", password: "Support1234!Pass" }) });
 await customer.ok("/auth/login", { method: "POST", body: JSON.stringify({ email: "customer@dayshift.example", password: "Customer1234!Pass" }) });
-await other.ok("/auth/login", { method: "POST", body: JSON.stringify({ email: "james@example.com", password: "Customer1234!Pass" }) });
+await other.ok("/auth/login", { method: "POST", body: JSON.stringify({ email: "jirawat@example.com", password: "Customer1234!Pass" }) });
 check("staff and customer sessions", true);
 
 // Webhook signature must be verified before any state change.
 const badWebhook = await fetch(`${BASE}/payments/webhooks/sandbox`, {
   method: "POST",
   headers: { "content-type": "application/json", "x-dayshift-signature": "invalid" },
-  body: JSON.stringify({ eventId: `audit-bad-${now}`, type: "payment.succeeded", reference: "unknown", amountCents: 100, currency: "USD" }),
+  body: JSON.stringify({ eventId: `audit-bad-${now}`, type: "payment.succeeded", reference: "unknown", amountCents: 100, currency: "THB" }),
 });
 const unsignedWebhook = await fetch(`${BASE}/payments/webhooks/sandbox`, {
   method: "POST",
   headers: { "content-type": "application/json" },
-  body: JSON.stringify({ eventId: `audit-none-${now}`, type: "payment.succeeded", reference: "unknown", amountCents: 100, currency: "USD" }),
+  body: JSON.stringify({ eventId: `audit-none-${now}`, type: "payment.succeeded", reference: "unknown", amountCents: 100, currency: "THB" }),
 });
 check("payment webhooks reject invalid or missing signatures", badWebhook.status === 401 && unsignedWebhook.status === 401, `${badWebhook.status}/${unsignedWebhook.status}`);
 

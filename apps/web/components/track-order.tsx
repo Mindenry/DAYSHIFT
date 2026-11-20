@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { clientApi } from "@/lib/api";
+import { useI18n } from "@/lib/i18n-client";
 import { OrderDetailView, type OrderView } from "./order-detail-view";
 
 export function TrackOrder() {
   const [order, setOrder] = useState<OrderView | null>(null);
+  const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -14,11 +16,11 @@ export function TrackOrder() {
       <div>
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
           <div>
-            <p className="overline text-muted">Order</p>
+            <p className="overline text-muted">{t("Order")}</p>
             <p className="font-display text-3xl">{order.orderNumber}</p>
           </div>
           <button type="button" onClick={() => setOrder(null)} className="btn btn-outline !min-h-10 !px-4">
-            Look up another order
+            {t("Look up another order")}
           </button>
         </div>
         <OrderDetailView order={order} />
@@ -43,7 +45,7 @@ export function TrackOrder() {
           });
           setOrder(result);
         } catch (lookupError) {
-          setError(lookupError instanceof Error ? lookupError.message : "Order not found.");
+          setError(lookupError instanceof Error ? lookupError.message : t("Order not found."));
         } finally {
           setLoading(false);
         }
@@ -52,18 +54,18 @@ export function TrackOrder() {
     >
       {error && <div role="alert" className="border border-sale/40 bg-sale/5 p-3 text-sm text-sale">{error}</div>}
       <div>
-        <label htmlFor="track-order" className="label">Order number</label>
+        <label htmlFor="track-order" className="label">{t("Order number")}</label>
         <input id="track-order" name="orderNumber" required className="field" placeholder="DS-20260912-000141" />
       </div>
       <div>
-        <label htmlFor="track-email" className="label">Email</label>
+        <label htmlFor="track-email" className="label">{t("Email")}</label>
         <input id="track-email" name="email" type="email" required className="field" placeholder="you@example.com" />
       </div>
       <button type="submit" disabled={loading} className="btn btn-primary">
-        {loading ? "Looking up…" : "Track order"}
+        {loading ? t("Looking up…") : t("Track order")}
       </button>
       <p className="text-xs text-muted">
-        Need to change something? <a href="/support" className="underline">Contact customer care</a>.
+        {t("Need to change something?")} <a href="/support" className="underline">{t("Contact customer care")}</a>.
       </p>
     </form>
   );

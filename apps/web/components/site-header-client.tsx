@@ -8,6 +8,7 @@ import type { CategorySummary } from "@dayshift/types";
 import { CartBadge } from "./cart-badge";
 import { SearchOverlay } from "./search-overlay";
 import { MobileMenu } from "./mobile-menu";
+import { LocaleSwitcher, useI18n } from "@/lib/i18n-client";
 
 export function SiteHeaderClient({
   roots,
@@ -22,6 +23,7 @@ export function SiteHeaderClient({
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
   const pathname = usePathname();
+  const { t } = useI18n();
 
   useEffect(() => {
     let frame = 0;
@@ -78,7 +80,7 @@ export function SiteHeaderClient({
             scrolled ? "h-14 md:h-16" : "h-16 md:h-20"
           }`}
         >
-          <nav aria-label="Primary" className="hidden flex-1 items-stretch gap-6 lg:flex">
+          <nav aria-label={t("Primary")} className="hidden flex-1 items-stretch gap-6 lg:flex">
             {primary.map((root) => (
               <div
                 key={root.slug}
@@ -97,17 +99,17 @@ export function SiteHeaderClient({
               </div>
             ))}
             <Link href="/collections/new-arrivals" className="overline link-underline inline-flex items-center self-stretch !text-[10.5px] !tracking-[0.18em]">
-              New
+              {t("New")}
             </Link>
             <Link href="/collections/sale" className="overline link-underline inline-flex items-center self-stretch !text-[10.5px] !tracking-[0.18em] text-sale">
-              Sale
+              {t("Sale")}
             </Link>
           </nav>
 
           <button
             type="button"
             className="inline-flex h-11 w-11 shrink-0 items-center justify-center transition-transform duration-150 active:scale-90 lg:hidden"
-            aria-label="Open menu"
+            aria-label={t("Open menu")}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
           >
@@ -119,7 +121,7 @@ export function SiteHeaderClient({
             className={`shrink-0 whitespace-nowrap font-display text-[20px] tracking-[0.16em] transition-transform duration-300 min-[380px]:text-[24px] sm:text-[27px] md:text-[30px] ${
               scrolled ? "scale-95" : ""
             }`}
-            aria-label="DAYSHIFT home"
+            aria-label="DAYSHIFT"
           >
             DAYSHIFT
           </Link>
@@ -129,28 +131,31 @@ export function SiteHeaderClient({
               type="button"
               onClick={() => setSearchOpen(true)}
               className="inline-flex h-11 w-10 items-center justify-center transition duration-150 hover:opacity-60 active:scale-90 sm:w-11"
-              aria-label="Search"
+              aria-label={t("Search")}
             >
               <Search className="h-[19px] w-[19px]" />
             </button>
             <Link
               href={user ? "/account" : "/login"}
               className="hidden h-11 w-11 items-center justify-center transition duration-150 hover:opacity-60 active:scale-90 min-[420px]:inline-flex"
-              aria-label={user ? "Your account" : "Sign in"}
+              aria-label={user ? t("Your account") : t("Sign in")}
             >
               <User className="h-[19px] w-[19px]" />
             </Link>
+            <div className="hidden sm:block">
+              <LocaleSwitcher compact />
+            </div>
             <Link
               href="/account/wishlist"
               className="hidden h-11 w-11 items-center justify-center transition duration-150 hover:opacity-60 active:scale-90 sm:inline-flex"
-              aria-label="Wishlist"
+              aria-label={t("Wishlist")}
             >
               <Heart className="h-[19px] w-[19px]" />
             </Link>
             <Link
               href="/cart"
               className="relative inline-flex h-11 w-10 items-center justify-center transition duration-150 hover:opacity-60 active:scale-90 sm:w-11"
-              aria-label="Shopping bag"
+              aria-label={t("Shopping bag")}
             >
               <ShoppingBag className="h-[19px] w-[19px]" />
               <CartBadge />
@@ -181,10 +186,10 @@ export function SiteHeaderClient({
               </div>
               <div className="mt-8 flex gap-8">
                 <Link href={`/c/${activeRoot.slug}`} className="overline link-underline">
-                  Shop all {activeRoot.name}
+                  {t("Shop all")} {activeRoot.name}
                 </Link>
                 <Link href="/collections/new-arrivals" className="overline link-underline text-muted">
-                  New arrivals
+                  {t("New arrivals")}
                 </Link>
               </div>
             </div>
@@ -197,7 +202,7 @@ export function SiteHeaderClient({
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                 />
                 <span className="absolute bottom-5 left-5 bg-paper/90 px-4 py-2 text-[11px] uppercase tracking-[0.18em]">
-                  The {activeRoot.name} edit
+                  {t("The {name} edit", { name: activeRoot.name })}
                 </span>
               </Link>
             )}

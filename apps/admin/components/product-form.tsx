@@ -246,7 +246,7 @@ export function ProductForm({
           <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Pricing")}</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <div>
-              <label className="label" htmlFor="price">{t("Price (USD)")}</label>
+              <label className="label" htmlFor="price">{t("Price (THB)")}</label>
               <input id="price" type="number" min="0" step="0.01" className="field" value={price} onChange={(e) => setPrice(e.target.value)} required />
             </div>
             <div>

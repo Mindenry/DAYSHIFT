@@ -1,7 +1,7 @@
 # System verification
 
-**Date:** 20 November 2026
-**Commit:** `c37267a` plus the admin redesign (this document is updated in the same commit)
+**Date:** 21 November 2026
+**Commit:** `c37267a` plus the admin redesign and Thai data migration (this document is updated in the same commit)
 **Environment:** Windows host, Docker Desktop, LAN `192.168.1.107`, Node 26, pnpm 10.34.9
 **Mode:** read/write verification against the running stack, with isolated database checks.
 
@@ -74,6 +74,7 @@ With a customer session, all eight pages return **200**:
 | Mobile | `pnpm test:mobile` | 11 routes × 320/390 |
 | Accessibility | `node tests/e2e/a11y-scan.mjs` | 0 serious/critical across 18 scans (storefront, admin, Thai, mobile) |
 | Admin redesign | `node tests/e2e/admin-redesign-check.mjs` | 23 routes × EN/TH at 200; 0 heading gaps, 0 page errors, 0 mobile overflow |
+| Storefront Thai/English | `node tests/e2e/storefront-th-check.mjs` | 6 routes × EN/TH at 200; switcher works; 0 overflow at 390/320 |
 
 The new workflow suite verifies:
 
@@ -217,7 +218,26 @@ The admin portal was rebuilt on a new design system and a two-language layer.
 
 Screenshots: `docs/screenshots/admin-*-en.png`, `admin-*-th.png`, `admin-*-mobile.png`, `admin-mobile-nav.png`, `admin-command-palette.png`.
 
-## 12. Known limitations
+## 12. Thai demo data and currency
+
+The demo now runs as a Bangkok-based label rather than a US storefront.
+
+- **Currency:** THB everywhere. Prices are stored as decimal baht, formatted with the ฿ symbol, and carts, orders and payments default to `THB` through a migration on `Product`, `Cart`, `Order` and `Payment`.
+- **Tax and delivery:** 7% VAT (inclusive), standard delivery ฿50 and free over ฿1,500, express ฿100, 30-day returns.
+- **Catalogue:** 40 products with Thai names, Thai descriptions, materials, care and fit notes, priced from ฿290 to ฿2,890. Slugs and SKUs are unchanged so links and imagery still resolve.
+- **Taxonomy:** Thai category tree (ผู้หญิง, ผู้ชาย, ยูนิเซ็กซ์, รองเท้า, กระเป๋า, เครื่องประดับ), Thai collections (สินค้าใหม่, ขายดี, เสื้อผ้าพื้นฐาน, ตามฤดูกาล, ลิมิเต็ด, ลดราคา) and Thai brand descriptions.
+- **People and places:** Thai staff and customers with Thai names, Bangkok and Chiang Mai addresses, `08x` phone numbers, Thai loyalty tiers and Thai support conversations.
+- **Operations data:** คลังบางนา (BKK1) and สตูดิโอเชียงใหม่ (CNX1), Thai textile and leather suppliers, Thai purchase orders and Kerry Express shipments with Thai tracking events.
+- **Marketing:** Thai hero copy, campaign blocks, navigation, coupons (WELCOME10, DAYSHIFT15, STYLE20, FLAT250) and promotions in baht.
+
+**Storefront language switch**
+
+- The storefront now shares the `ds_locale` cookie with admin. `getI18n()` reads it on the server and `I18nProvider` exposes it to client components.
+- A Thai/English switch sits in the header and footer. Choosing a language writes the cookie and refreshes server components, so pages re-render in place.
+- English is the default interface; Thai covers the full shopping journey — home, listing, filters, product, cart, checkout, payment, confirmation, tracking, support, auth and the account area — with English fallback for anything untranslated.
+- Catalogue data stays Thai in both languages by design; interface labels, buttons, errors and status names translate.
+
+## 13. Known limitations
 
 - A physical Mac was not available; macOS access is documented but not device-tested.
 - Payments, shipping and email use sandbox/local adapters; no real provider is connected.

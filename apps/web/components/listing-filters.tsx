@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import type { Facets } from "./listing-view";
 import { usePresence } from "./use-presence";
+import { useI18n } from "@/lib/i18n-client";
 
 interface Props {
   facets: Facets;
@@ -20,6 +21,7 @@ function hiddenFields(params: Record<string, string | string[] | undefined>, exc
 }
 
 export function ListingFilters({ facets, basePath, params, activeSort, sortOptions }: Props) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const { mounted, state } = usePresence(open, 240);
   const isOpen = state === "open";
@@ -47,7 +49,7 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
     <form method="get" action={basePath} className="space-y-8" onSubmit={() => setOpen(false)}>
       {hiddenFields(params, ["size", "color", "minPrice", "maxPrice", "inStock", "sort", "page"])}
       <div>
-        <p className="overline mb-3">Sort</p>
+        <p className="overline mb-3">{t("Sort")}</p>
         <select name="sort" defaultValue={activeSort} className="field !min-h-0 py-2 text-xs uppercase tracking-[0.08em] lg:hidden">
           {sortOptions.map((option) => (
             <option key={option.value} value={option.value}>{option.label}</option>
@@ -56,7 +58,7 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
       </div>
 
       <fieldset>
-        <legend className="overline mb-3">Size</legend>
+        <legend className="overline mb-3">{t("Size")}</legend>
         <div className="flex flex-wrap gap-2">
           {facets.sizes.map((size) => (
             <label key={size.name} className="cursor-pointer">
@@ -76,7 +78,7 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
             <label className="cursor-pointer">
               <input type="radio" name="size" value="" defaultChecked={false} className="peer sr-only" />
               <span className="inline-flex items-center border border-dashed border-line px-2.5 py-2 text-[11px] text-muted peer-checked:border-ink">
-                Any
+                {t("Any")}
               </span>
             </label>
           )}
@@ -84,7 +86,7 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
       </fieldset>
 
       <fieldset>
-        <legend className="overline mb-3">Colour</legend>
+        <legend className="overline mb-3">{t("Colour")}</legend>
         <div className="flex flex-wrap gap-2">
           {facets.colors.map((color) => (
             <label key={color.name} className="cursor-pointer">
@@ -108,9 +110,9 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
       </fieldset>
 
       <fieldset>
-        <legend className="overline mb-3">Price</legend>
+        <legend className="overline mb-3">{t("Price")}</legend>
         <div className="flex items-center gap-2">
-          <label className="sr-only" htmlFor="minPrice">Minimum price</label>
+          <label className="sr-only" htmlFor="minPrice">{t("Minimum price")}</label>
           <input
             id="minPrice"
             name="minPrice"
@@ -121,7 +123,7 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
             className="field !min-h-0 w-full px-3 py-2 text-sm"
           />
           <span className="text-muted">–</span>
-          <label className="sr-only" htmlFor="maxPrice">Maximum price</label>
+          <label className="sr-only" htmlFor="maxPrice">{t("Maximum price")}</label>
           <input
             id="maxPrice"
             name="maxPrice"
@@ -142,12 +144,12 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
           defaultChecked={activeStock}
           className="h-4 w-4 accent-[#1a1917]"
         />
-        In stock only
+        {t("In stock only")}
       </label>
 
       <div className="flex gap-2 pt-2">
-        <button type="submit" className="btn btn-primary flex-1 !min-h-11 !px-4">Apply</button>
-        <a href={basePath} className="btn btn-outline !min-h-11 !px-4">Reset</a>
+        <button type="submit" className="btn btn-primary flex-1 !min-h-11 !px-4">{t("Apply")}</button>
+        <a href={basePath} className="btn btn-outline !min-h-11 !px-4">{t("Reset")}</a>
       </div>
     </form>
   );
@@ -160,8 +162,8 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
         className="mb-6 flex w-full items-center justify-between border border-line px-4 py-3 text-xs uppercase tracking-[0.14em] lg:hidden"
         aria-expanded={open}
       >
-        <span className="flex items-center gap-2"><SlidersHorizontal className="h-4 w-4" /> Filter & sort</span>
-        <span>{activeSize || activeColor ? "Active" : ""}</span>
+        <span className="flex items-center gap-2"><SlidersHorizontal className="h-4 w-4" /> {t("Filter & sort")}</span>
+        <span>{activeSize || activeColor ? t("Active") : ""}</span>
       </button>
 
       <div className="hidden lg:block">
@@ -169,10 +171,10 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
       </div>
 
       {mounted && (
-        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Filters" aria-hidden={!isOpen}>
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label={t("Filters")} aria-hidden={!isOpen}>
           <button
             type="button"
-            aria-label="Close filters"
+            aria-label={t("Close filters")}
             onClick={() => setOpen(false)}
             className={`absolute inset-0 bg-ink/45 backdrop-blur-[2px] transition-opacity duration-300 ${
               isOpen ? "opacity-100" : "opacity-0"
@@ -184,7 +186,7 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
             }`}
           >
             <div className="flex shrink-0 items-center justify-between border-b border-line px-5 py-4">
-              <p className="overline">Filter & sort</p>
+              <p className="overline">{t("Filter & sort")}</p>
               <button
                 type="button"
                 onClick={() => setOpen(false)}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LoginForm } from "@/components/auth-forms";
+import { getI18n } from "@/lib/i18n";
 
 export const metadata: Metadata = { title: "Sign in", robots: { index: false } };
 
@@ -11,6 +12,7 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   const next = typeof params.next === "string" ? params.next : "/account";
+  const { t } = await getI18n();
   return (
     <div className="grid min-h-[70vh] lg:grid-cols-2">
       <div className="hidden bg-ink lg:block">
@@ -19,21 +21,21 @@ export default async function LoginPage({
       </div>
       <div className="flex items-center justify-center px-5 py-16 md:px-12">
         <div className="w-full max-w-sm">
-          <p className="overline text-muted">Your account</p>
-          <h1 className="mt-2 font-display text-5xl">Sign in</h1>
+          <p className="overline text-muted">{t("Your account")}</p>
+          <h1 className="mt-2 font-display text-5xl">{t("Sign in")}</h1>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            View orders, manage returns, save pieces and track your loyalty points.
+            {t("View orders, manage returns, save pieces and track your loyalty points.")}
           </p>
           <LoginForm next={next} />
           <p className="mt-6 text-sm">
-            New to DAYSHIFT?{" "}
-            <Link href={`/register?next=${encodeURIComponent(next)}`} className="underline">Create an account</Link>
+            {t("New to DAYSHIFT?")}{" "}
+            <Link href={`/register?next=${encodeURIComponent(next)}`} className="underline">{t("Create an account")}</Link>
           </p>
           <p className="mt-2 text-sm text-muted">
-            <Link href="/forgot-password" className="underline">Forgot your password?</Link>
+            <Link href="/forgot-password" className="underline">{t("Forgot your password?")}</Link>
           </p>
           <div className="mt-8 border-t border-line pt-5 text-xs leading-relaxed text-muted">
-            <p className="font-medium uppercase tracking-[0.1em] text-ink">Demo account</p>
+            <p className="font-medium uppercase tracking-[0.1em] text-ink">{t("Demo account")}</p>
             <p className="mt-2">customer@dayshift.example</p>
             <p>Customer1234!Pass</p>
           </div>

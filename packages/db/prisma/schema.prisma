@@ -316,7 +316,7 @@ model Product {
   price            Decimal       @db.Decimal(12, 2)
   compareAtPrice   Decimal?      @db.Decimal(12, 2)
   costPrice        Decimal?      @db.Decimal(12, 2)
-  currency         String        @default("USD") @db.VarChar(3)
+  currency         String        @default("THB") @db.VarChar(3)
   taxClass         String        @default("standard")
   material         String?
   careInstructions String?
@@ -547,7 +547,7 @@ model Cart {
   userId     String?
   guestToken String?    @unique
   status     CartStatus @default(ACTIVE)
-  currency   String     @default("USD") @db.VarChar(3)
+  currency   String     @default("THB") @db.VarChar(3)
   couponCode String?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
@@ -769,7 +769,7 @@ model Order {
   shippingTotal   Decimal       @default(0) @db.Decimal(12, 2)
   taxTotal        Decimal       @default(0) @db.Decimal(12, 2)
   grandTotal      Decimal       @db.Decimal(12, 2)
-  currency        String        @default("USD") @db.VarChar(3)
+  currency        String        @default("THB") @db.VarChar(3)
   couponCode      String?
   customerNote    String?
   internalNotes   String?
@@ -857,7 +857,7 @@ model Payment {
   method        PaymentMethod @default(SANDBOX_CARD)
   status        PaymentStatus @default(PENDING)
   amount        Decimal       @db.Decimal(12, 2)
-  currency      String        @default("USD") @db.VarChar(3)
+  currency      String        @default("THB") @db.VarChar(3)
   providerRef   String        @unique
   clientSecret  String?
   failureReason String?

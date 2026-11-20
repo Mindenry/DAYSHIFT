@@ -264,7 +264,7 @@ const PAGES: Record<string, Page> = {
         heading: "Orders",
         body: [
           "An order is an offer to purchase. It is accepted when payment is confirmed or, for cash on delivery, when the order is dispatched.",
-          "Prices are shown in USD and include applicable tax estimated at checkout. We may correct pricing errors before dispatch.",
+          "Prices are shown in THB and include 7% VAT. Delivery is ฿50, free over ฿1,500. We may correct pricing errors before dispatch.",
         ],
       },
       {

@@ -8,6 +8,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { apiGet } from "@/lib/api";
 import { getSession } from "@/lib/session";
+import { getI18n } from "@/lib/i18n";
+import { I18nProvider } from "@/lib/i18n-client";
 import { serializeJsonLd } from "@dayshift/config";
 import type { CategorySummary } from "@dayshift/types";
 
@@ -20,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s — DAYSHIFT",
   },
   description:
-    "Shop contemporary clothing, shoes, bags and accessories for women and men. Considered pieces, made in small runs, with free delivery over $150 and 30-day returns.",
+    "Shop contemporary Thai clothing, shoes, bags and accessories for women and men. Considered pieces made in small runs, priced in THB with 7% VAT, free delivery over ฿1,500 and 30-day returns.",
   applicationName: "DAYSHIFT",
   category: "shopping",
   alternates: { types: { "text/plain": "/llms.txt" } },
@@ -71,9 +73,10 @@ export const viewport: Viewport = {
 
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [categories, user] = await Promise.all([
+  const [categories, user, { locale, t }] = await Promise.all([
     apiGet<CategorySummary[]>("/categories", { revalidate: 120 }).catch(() => []),
     getSession().catch(() => null),
+    getI18n(),
   ]);
 
   const organizationLd = {
@@ -98,8 +101,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   };
 
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body className="min-h-screen bg-paper text-ink">
+        <I18nProvider locale={locale}>
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
         <script
           type="application/ld+json"
@@ -113,11 +117,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-ink focus:px-4 focus:py-3 focus:text-paper"
         >
-          Skip to main content
+          {t("Skip to main content")}
         </a>
         <SiteHeader categories={categories ?? []} user={user} />
         <main id="main">{children}</main>
         <SiteFooter />
+        </I18nProvider>
       </body>
     </html>
   );
