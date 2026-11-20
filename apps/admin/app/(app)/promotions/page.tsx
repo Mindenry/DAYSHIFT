@@ -12,7 +12,7 @@ export default async function PromotionsPage() {
   );
   return (
     <div>
-      <PageHeader eyebrow="Marketing" title="Promotions" description="Automatic discounts applied by the pricing engine. Only the most valuable applicable promotion is applied." />
+      <PageHeader eyebrow="Marketing" title="Promotions" description="Scheduled campaigns and storefront promotions." />
       <PromotionManager initial={promotions ?? []} />
     </div>
   );

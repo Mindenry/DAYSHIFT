@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { PageHeader, Badge } from "@/components/ui";
 import { apiGet, money, date, dateTime } from "@/lib/api";
 import { getCookieHeader, requireStaff } from "@/lib/session";
+import { getI18n } from "@/lib/i18n";
+import { enumLabel } from "@/lib/messages";
 import { CustomerEditor } from "@/components/customer-editor";
 
 interface AdminCustomer {
@@ -20,6 +22,7 @@ interface AdminCustomer {
 
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireStaff();
+  const { t, locale } = await getI18n();
   const { id } = await params;
   const cookie = await getCookieHeader();
   const customer = await apiGet<AdminCustomer>(`/admin/customers/${id}`, { cookie });
@@ -30,7 +33,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
       <PageHeader
         eyebrow="Customer"
         title={`${customer.firstName} ${customer.lastName}`}
-        description={`${customer.email} · joined ${date(customer.createdAt)}`}
+        description={t("{email} · joined {when}", { email: customer.email, when: date(customer.createdAt) })}
         back={{ href: "/customers", label: "Customers" }}
         actions={<Badge status={customer.status} />}
       />
@@ -43,19 +46,19 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               { label: "Loyalty tier", value: customer.loyalty?.tier ?? "—" },
               { label: "Points", value: String(customer.loyalty?.pointsBalance ?? 0) },
             ].map((stat) => (
-              <div key={stat.label} className="panel p-3">
-                <p className="text-[10px] uppercase tracking-[0.08em] text-muted">{stat.label}</p>
-                <p className="mt-1.5 text-lg font-medium">{stat.value}</p>
+              <div key={stat.label} className="panel p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">{t(stat.label)}</p>
+                <p className="mt-1.5 text-lg font-semibold tracking-[-0.02em]">{stat.value}</p>
               </div>
             ))}
           </div>
 
           <section className="panel overflow-hidden">
-            <div className="border-b border-line px-4 py-3"><h2 className="text-xs font-medium uppercase tracking-[0.08em]">Orders</h2></div>
-            {customer.orders.length === 0 ? <p className="p-4 text-xs text-muted">No orders.</p> : (
-              <div className="overflow-x-auto">
+            <div className="panel-header"><h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Orders")}</h2></div>
+            {customer.orders.length === 0 ? <p className="p-4 text-xs text-muted">{t("No orders.")}</p> : (
+              <div className="table-wrap">
                 <table>
-                  <thead><tr><th>Order</th><th>Status</th><th>Payment</th><th className="text-right">Total</th><th>Date</th></tr></thead>
+                  <thead><tr><th>{t("Order")}</th><th>{t("Status")}</th><th>{t("Payment")}</th><th className="text-right">{t("Total")}</th><th>{t("Date")}</th></tr></thead>
                   <tbody>
                     {customer.orders.map((order) => (
                       <tr key={order.id}>
@@ -73,27 +76,27 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           </section>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <section className="panel p-4">
-              <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Tickets</h2>
-              {customer.tickets.length === 0 ? <p className="mt-2 text-[11px] text-muted">No support tickets.</p> : (
+            <section className="panel p-5">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Tickets")}</h2>
+              {customer.tickets.length === 0 ? <p className="mt-2 text-[11px] text-muted">{t("No support tickets.")}</p> : (
                 <ul className="mt-2 space-y-2">
                   {customer.tickets.map((ticket) => (
                     <li key={ticket.id} className="text-[11px]">
                       <Link href={`/tickets/${ticket.id}`} className="font-medium underline">{ticket.ticketNumber}</Link>
-                      <p className="text-muted">{ticket.subject} · {ticket.status.replace(/_/g, " ").toLowerCase()}</p>
+                      <p className="text-muted">{ticket.subject} · {enumLabel(locale, ticket.status)}</p>
                     </li>
                   ))}
                 </ul>
               )}
             </section>
-            <section className="panel p-4">
-              <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Returns</h2>
-              {customer.returns.length === 0 ? <p className="mt-2 text-[11px] text-muted">No returns.</p> : (
+            <section className="panel p-5">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Returns")}</h2>
+              {customer.returns.length === 0 ? <p className="mt-2 text-[11px] text-muted">{t("No returns.")}</p> : (
                 <ul className="mt-2 space-y-2">
                   {customer.returns.map((request) => (
                     <li key={request.id} className="text-[11px]">
                       <Link href={`/returns/${request.id}`} className="font-medium underline">{request.returnNumber}</Link>
-                      <p className="text-muted">{request.status.replace(/_/g, " ").toLowerCase()} · {date(request.requestedAt)}</p>
+                      <p className="text-muted">{enumLabel(locale, request.status)} · {date(request.requestedAt)}</p>
                     </li>
                   ))}
                 </ul>
@@ -101,9 +104,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             </section>
           </div>
 
-          <section className="panel p-4">
-            <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Loyalty activity</h2>
-            {!customer.loyalty?.transactions.length ? <p className="mt-2 text-[11px] text-muted">No points activity.</p> : (
+          <section className="panel p-5">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Loyalty activity")}</h2>
+            {!customer.loyalty?.transactions.length ? <p className="mt-2 text-[11px] text-muted">{t("No points activity.")}</p> : (
               <ul className="mt-2 divide-y divide-line">
                 {customer.loyalty.transactions.map((transaction) => (
                   <li key={transaction.id} className="flex items-center justify-between py-2 text-[11px]">
@@ -117,19 +120,19 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         </div>
 
         <div className="space-y-4">
-          <section className="panel p-4">
-            <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Profile</h2>
+          <section className="panel p-5">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Profile")}</h2>
             <dl className="mt-3 space-y-2 text-[11px]">
-              <div className="flex justify-between"><dt className="text-muted">Email</dt><dd>{customer.email}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">Phone</dt><dd>{customer.phone ?? "—"}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">Marketing</dt><dd>{customer.profile?.marketingOptIn ? "Opted in" : "Opted out"}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">Verified</dt><dd>{customer.emailVerifiedAt ? "Yes" : "No"}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">Last login</dt><dd>{dateTime(customer.lastLoginAt)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">{t("Email")}</dt><dd>{customer.email}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">{t("Phone")}</dt><dd>{customer.phone ?? "—"}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">{t("Marketing")}</dt><dd>{customer.profile?.marketingOptIn ? t("Opted in") : t("Opted out")}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">{t("Verified")}</dt><dd>{customer.emailVerifiedAt ? t("Yes") : t("No")}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">{t("Last login")}</dt><dd>{dateTime(customer.lastLoginAt)}</dd></div>
             </dl>
             <div className="mt-3 border-t border-line pt-3">
-              <p className="label">Addresses</p>
+              <p className="label">{t("Addresses")}</p>
               {customer.addresses.map((address) => (
-                <p key={address.id} className="mt-1 text-[11px] text-muted">{address.label ?? "Address"} · {address.line1}, {address.city} {address.postalCode}, {address.country}</p>
+                <p key={address.id} className="mt-1 text-[11px] text-muted">{address.label ?? t("Address")} · {address.line1}, {address.city} {address.postalCode}, {address.country}</p>
               ))}
             </div>
           </section>

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { PageHeader, Badge, Pagination, EmptyState } from "@/components/ui";
 import { apiGet, money, date } from "@/lib/api";
 import { getCookieHeader, requireStaff } from "@/lib/session";
+import { getI18n } from "@/lib/i18n";
+import { enumLabel } from "@/lib/messages";
 
 interface ProductsResponse {
   items: Array<{
@@ -18,6 +20,7 @@ export default async function ProductsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const session = await requireStaff();
+  const { t, locale } = await getI18n();
   const params = await searchParams;
   const q = typeof params.q === "string" ? params.q : "";
   const status = typeof params.status === "string" ? params.status : "";
@@ -33,33 +36,33 @@ export default async function ProductsPage({
       <PageHeader
         eyebrow="Catalog"
         title="Products"
-        description={`${products?.meta.total ?? 0} products across the catalogue. Manage pricing, media, variants and publication.`}
-        actions={session?.permissions.includes("products.create") ? <Link href="/products/new" className="a-btn">New product</Link> : null}
+        description={t("{count} products across the catalogue. Manage pricing, media, variants and publication.", { count: products?.meta.total ?? 0 })}
+        actions={session?.permissions.includes("products.create") ? <Link href="/products/new" className="a-btn">{t("New product")}</Link> : null}
       />
       <div className="panel">
         <form method="get" className="flex flex-wrap items-end gap-2 border-b border-line p-3">
           <div className="min-w-56 flex-1">
-            <label htmlFor="q" className="label">Search</label>
-            <input id="q" name="q" defaultValue={q} placeholder="Name or SKU" className="field" />
+            <label htmlFor="q" className="label">{t("Search")}</label>
+            <input id="q" name="q" defaultValue={q} placeholder={t("Name or SKU")} className="field" />
           </div>
           <div>
-            <label htmlFor="status" className="label">Status</label>
+            <label htmlFor="status" className="label">{t("Status")}</label>
             <select id="status" name="status" defaultValue={status} className="field">
-              <option value="">All</option>
-              {["ACTIVE", "DRAFT", "ARCHIVED", "DISCONTINUED"].map((value) => <option key={value} value={value}>{value}</option>)}
+              <option value="">{t("All")}</option>
+              {["ACTIVE", "DRAFT", "ARCHIVED", "DISCONTINUED"].map((value) => <option key={value} value={value}>{enumLabel(locale, value)}</option>)}
             </select>
           </div>
-          <button type="submit" className="a-btn a-btn-outline">Filter</button>
-          {(q || status) && <Link href="/products" className="a-btn a-btn-outline">Reset</Link>}
+          <button type="submit" className="a-btn a-btn-outline">{t("Filter")}</button>
+          {(q || status) && <Link href="/products" className="a-btn a-btn-outline">{t("Reset")}</Link>}
         </form>
 
         {!products?.items.length ? (
-          <EmptyState title="No products found" body="Try another search, or create a product." action={<Link href="/products/new" className="a-btn">New product</Link>} />
+          <EmptyState title="No products found" body="Try another search, or create a product." action={<Link href="/products/new" className="a-btn">{t("New product")}</Link>} />
         ) : (
           <>
-            <div className="overflow-x-auto">
+            <div className="table-wrap">
               <table>
-                <thead><tr><th>Product</th><th>Status</th><th>Categories</th><th>Variants</th><th>Stock</th><th className="text-right">Price</th><th>Updated</th><th /></tr></thead>
+                <thead><tr><th>{t("Product")}</th><th>{t("Status")}</th><th>{t("Categories")}</th><th>{t("Variants")}</th><th>{t("Stock")}</th><th className="text-right">{t("Price")}</th><th>{t("Updated")}</th><th /></tr></thead>
                 <tbody>
                   {products.items.map((product) => (
                     <tr key={product.id}>
@@ -83,7 +86,7 @@ export default async function ProductsPage({
                       <td className={product.stock <= 0 ? "text-danger" : product.stock < 10 ? "text-warn" : ""}>{product.stock}</td>
                       <td className="text-right">{money(product.price)}</td>
                       <td className="text-[11px] text-muted">{date(product.updatedAt)}</td>
-                      <td className="text-right"><Link href={`/products/${product.id}`} className="text-[11px] underline">Edit</Link></td>
+                      <td className="text-right"><Link href={`/products/${product.id}`} className="a-link">{t("Edit")}</Link></td>
                     </tr>
                   ))}
                 </tbody>

@@ -12,7 +12,7 @@ export default async function CouponsPage() {
   );
   return (
     <div>
-      <PageHeader eyebrow="Marketing" title="Coupons" description="The backend validates eligibility, usage limits and stacking rules on every quote and checkout." />
+      <PageHeader eyebrow="Marketing" title="Coupons" description="Discount codes, limits and redemption rules." />
       <CouponManager initial={coupons ?? []} />
     </div>
   );

@@ -12,7 +12,7 @@ export default async function CategoriesPage() {
   );
   return (
     <div>
-      <PageHeader eyebrow="Catalog" title="Categories" description="The navigation tree customers browse. Changes are reflected on the storefront immediately." />
+      <PageHeader eyebrow="Catalog" title="Categories" description="Category tree used by navigation and filters." />
       <CategoryManager initial={categories ?? []} />
     </div>
   );

@@ -15,7 +15,7 @@ export default async function StaffPage() {
   ]);
   return (
     <div>
-      <PageHeader eyebrow="Administration" title="Staff" description="Staff accounts and role assignment. Disabling an account revokes access immediately on the next request." />
+      <PageHeader eyebrow="Administration" title="Staff" description="Team accounts and their roles." />
       <StaffManager initial={staff ?? []} roles={(roles ?? []).map((role) => role.name)} currentUserId={session?.id ?? ""} />
     </div>
   );

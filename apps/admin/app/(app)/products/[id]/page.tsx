@@ -4,6 +4,7 @@ import { PageHeader, Badge } from "@/components/ui";
 import { apiGet } from "@/lib/api";
 import { STOREFRONT_URL } from "@/lib/site";
 import { getCookieHeader, requireStaff } from "@/lib/session";
+import { getI18n } from "@/lib/i18n";
 import { ProductForm } from "@/components/product-form";
 import { VariantManager } from "@/components/variant-manager";
 
@@ -44,6 +45,7 @@ interface AdminProduct {
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   await requireStaff();
+  const { t } = await getI18n();
   const { id } = await params;
   const cookie = await getCookieHeader();
   const [product, categories, collections, brands] = await Promise.all([
@@ -59,18 +61,17 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       <PageHeader
         eyebrow="Catalog"
         title={product.name}
-        description={`${product.sku} · ${product.variants.length} variants`}
+        description={t("{sku} · {count} variants", { sku: product.sku, count: product.variants.length })}
         back={{ href: "/products", label: "Products" }}
         actions={
           <Link href={`${STOREFRONT_URL}/products/${product.slug}`} target="_blank" className="a-btn a-btn-outline">
-            View on storefront
+            {t("View on storefront")}
           </Link>
         }
       />
       <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-muted">
         <Badge status={product.status} />
-        <span>{product.visibility.toLowerCase()}</span>
-        <span>Updated by catalogue team</span>
+        <span>{t(product.visibility === "PUBLIC" ? "Public" : "Hidden")}</span>
       </div>
       <ProductForm
         mode="edit"

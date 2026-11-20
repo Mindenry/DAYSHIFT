@@ -2,6 +2,8 @@ import Link from "next/link";
 import { PageHeader, Badge, Pagination, EmptyState } from "@/components/ui";
 import { apiGet, money, dateTime } from "@/lib/api";
 import { getCookieHeader, requireStaff } from "@/lib/session";
+import { getI18n } from "@/lib/i18n";
+import { enumLabel } from "@/lib/messages";
 
 interface OrdersResponse {
   items: Array<{
@@ -25,6 +27,7 @@ const TABS = [
 
 export default async function OrdersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await requireStaff();
+  const { t, locale } = await getI18n();
   const params = await searchParams;
   const status = typeof params.status === "string" ? params.status : "";
   const q = typeof params.q === "string" ? params.q : "";
@@ -37,7 +40,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
 
   return (
     <div>
-      <PageHeader eyebrow="Sales" title="Orders" description={`${orders?.meta.total ?? 0} orders. Every status change is recorded with actor, reason and timestamp.`} />
+      <PageHeader eyebrow="Sales" title="Orders" description={t("{count} orders. Every status change is recorded with actor, reason and timestamp.", { count: orders?.meta.total ?? 0 })} />
       <div className="panel">
         <nav className="flex gap-1 overflow-x-auto border-b border-line px-3">
           {TABS.map((tab) => {
@@ -48,7 +51,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                 href={`/orders${tab.value ? `?status=${tab.value}` : ""}`}
                 className={`shrink-0 border-b-2 px-3 py-3 text-[11px] ${active ? "border-ink font-medium text-ink" : "border-transparent text-muted hover:text-ink"}`}
               >
-                {tab.label}
+                {tab.value ? enumLabel(locale, tab.value) : t("All")}
               </Link>
             );
           })}
@@ -56,20 +59,20 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
         <form method="get" className="flex flex-wrap items-end gap-2 border-b border-line p-3">
           {status && <input type="hidden" name="status" value={status} />}
           <div className="min-w-56 flex-1">
-            <label htmlFor="q" className="label">Search</label>
-            <input id="q" name="q" defaultValue={q} placeholder="Order number or email" className="field" />
+            <label htmlFor="q" className="label">{t("Search")}</label>
+            <input id="q" name="q" defaultValue={q} placeholder={t("Order number or email")} className="field" />
           </div>
-          <button type="submit" className="a-btn a-btn-outline">Search</button>
-          {q && <Link href={`/orders${status ? `?status=${status}` : ""}`} className="a-btn a-btn-outline">Reset</Link>}
+          <button type="submit" className="a-btn a-btn-outline">{t("Search")}</button>
+          {q && <Link href={`/orders${status ? `?status=${status}` : ""}`} className="a-btn a-btn-outline">{t("Reset")}</Link>}
         </form>
 
         {!orders?.items.length ? (
           <EmptyState title="No orders found" body="Try a different status or search." />
         ) : (
           <>
-            <div className="overflow-x-auto">
+            <div className="table-wrap">
               <table>
-                <thead><tr><th>Order</th><th>Customer</th><th>Status</th><th>Payment</th><th>Method</th><th className="text-right">Items</th><th className="text-right">Total</th><th>Placed</th></tr></thead>
+                <thead><tr><th>{t("Order")}</th><th>{t("Customer")}</th><th>{t("Status")}</th><th>{t("Payment")}</th><th>{t("Method")}</th><th className="text-right">{t("Items")}</th><th className="text-right">{t("Total")}</th><th>{t("Placed")}</th></tr></thead>
                 <tbody>
                   {orders.items.map((order) => (
                     <tr key={order.id}>
@@ -78,12 +81,12 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                         {order.trackingNumber && <p className="mt-0.5 text-[10px] text-muted">{order.trackingNumber}</p>}
                       </td>
                       <td>
-                        <p className="text-xs">{order.customerName || "Guest"}</p>
+                        <p className="text-xs">{order.customerName || t("Guest")}</p>
                         <p className="text-[10px] text-muted">{order.email}</p>
                       </td>
                       <td><Badge status={order.status} /></td>
                       <td><Badge status={order.paymentStatus} /></td>
-                      <td className="text-[10px] uppercase tracking-[0.05em] text-muted">{order.paymentMethod?.replace(/_/g, " ").toLowerCase() ?? "—"}</td>
+                      <td className="text-[10px] uppercase tracking-[0.05em] text-muted">{order.paymentMethod ? enumLabel(locale, order.paymentMethod) : "—"}</td>
                       <td className="text-right">{order.itemCount}</td>
                       <td className="text-right font-medium">{money(order.grandTotal)}</td>
                       <td className="whitespace-nowrap text-[11px] text-muted">{dateTime(order.createdAt)}</td>

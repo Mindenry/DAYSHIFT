@@ -1,7 +1,7 @@
 # System verification
 
 **Date:** 20 November 2026
-**Commit:** `c37267a` (verified working tree; admin image fix follows in the next commit)
+**Commit:** `c37267a` plus the admin redesign (this document is updated in the same commit)
 **Environment:** Windows host, Docker Desktop, LAN `192.168.1.107`, Node 26, pnpm 10.34.9
 **Mode:** read/write verification against the running stack, with isolated database checks.
 
@@ -72,7 +72,8 @@ With a customer session, all eight pages return **200**:
 | Browser E2E | `pnpm --filter @dayshift/e2e test` | 7/7 |
 | Account/workflow | `node scripts/verify-workflows.mjs` | 19/19 |
 | Mobile | `pnpm test:mobile` | 11 routes × 320/390 |
-| Accessibility | `node tests/e2e/a11y-scan.mjs` | 0 serious/critical on 6 surfaces |
+| Accessibility | `node tests/e2e/a11y-scan.mjs` | 0 serious/critical across 18 scans (storefront, admin, Thai, mobile) |
+| Admin redesign | `node tests/e2e/admin-redesign-check.mjs` | 23 routes × EN/TH at 200; 0 heading gaps, 0 page errors, 0 mobile overflow |
 
 The new workflow suite verifies:
 
@@ -181,7 +182,42 @@ Firewall rules remain **Private / LocalSubnet** on TCP 3000, 3001 and 4000.
 | Git working tree | clean before the verification artifacts; no secrets or dumps staged |
 | Tag | `v1.0.0` unchanged at `4a48a7d` |
 
-## 11. Known limitations
+## 11. Admin redesign verification
+
+The admin portal was rebuilt on a new design system and a two-language layer.
+
+**Design system**
+
+- Warm canvas, dark forest sidebar, emerald accent, Manrope + Noto Sans Thai + JetBrains Mono.
+- Shared primitives in `components/ui.tsx`: page header, stat cards, status badges, empty states, pagination, modal, form actions.
+- Collapsible desktop sidebar (persisted), mobile drawer, sticky top bar, command palette (`Ctrl/⌘ K`), breadcrumb-style context label, quick actions.
+- Responsive tables with horizontal scroll wrappers, stacked form grids, safe-area viewport, 16 px inputs on mobile.
+
+**Language switching**
+
+- Locale lives in the `ds_locale` cookie (`en` default, `th`), read server-side by `getI18n()` and client-side by `I18nProvider`.
+- The switcher in the top bar (and in the mobile drawer) writes the cookie and refreshes server components, so every page re-renders in the selected language without a reload.
+- Interface strings, page titles/descriptions, table headers, form labels, empty states, toasts and dialog copy are translated; English is the fallback for anything untranslated.
+- Enumerations (order, payment, return, ticket, shipment, role, movement, collection types) use `enumLabel()` so Thai shows real Thai status labels instead of raw codes.
+- Data that must not be rewritten stays as stored: product names, customer names, emails, order numbers, audit action codes and free-text notes.
+
+**Verified**
+
+| Check | Result |
+| --- | --- |
+| Admin routes, EN and TH | 23/23 return 200, no error page |
+| Untranslated page headings EN vs TH | 0 |
+| Browser console errors / failed requests | 0 (excluding benign aborted RSC prefetches) |
+| Login page language switch | works, Thai and English copy |
+| Dashboard language switch through the UI | works (`แดชบอร์ด`) |
+| Command palette | opens with `Ctrl+K`, translates entries |
+| Mobile overflow at 390 px and 320 px | 0 routes |
+| Accessibility (Axe WCAG 2.1/2.2 A+AA) | 0 serious/critical across 18 scans in EN, TH and mobile |
+| Playwright E2E | 7/7 |
+
+Screenshots: `docs/screenshots/admin-*-en.png`, `admin-*-th.png`, `admin-*-mobile.png`, `admin-mobile-nav.png`, `admin-command-palette.png`.
+
+## 12. Known limitations
 
 - A physical Mac was not available; macOS access is documented but not device-tested.
 - Payments, shipping and email use sandbox/local adapters; no real provider is connected.

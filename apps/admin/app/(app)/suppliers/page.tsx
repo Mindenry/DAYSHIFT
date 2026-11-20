@@ -12,7 +12,7 @@ export default async function SuppliersPage() {
   );
   return (
     <div>
-      <PageHeader eyebrow="Inventory" title="Suppliers" description="Vendors used for replenishment and purchase orders." />
+      <PageHeader eyebrow="Inventory" title="Suppliers" description="Vendors and lead times for purchasing." />
       <SupplierManager initial={suppliers ?? []} />
     </div>
   );

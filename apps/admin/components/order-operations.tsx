@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { clientApi } from "@/lib/api";
+import { useI18n } from "@/lib/i18n-client";
+import { enumLabel } from "@/lib/messages";
 
 const NEXT: Record<string, string[]> = {
   PENDING_PAYMENT: ["PAID", "PAYMENT_FAILED", "CANCELLED", "ON_HOLD"],
@@ -50,6 +52,7 @@ export function OrderOperations({
   shipments: Shipment[];
 }) {
   const router = useRouter();
+  const { t, locale } = useI18n();
   const [busy, setBusy] = useState<string | null>(null);
   const [nextStatus, setNextStatus] = useState(NEXT[status]?.[0] ?? "");
   const [reason, setReason] = useState("");
@@ -68,7 +71,7 @@ export function OrderOperations({
       toast(success);
       router.refresh();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Action failed");
+      toast.error(error instanceof Error ? error.message : t("Action failed"));
     } finally {
       setBusy(null);
     }
@@ -79,8 +82,8 @@ export function OrderOperations({
   return (
     <div className="space-y-4">
       {NEXT[status]?.length > 0 && (
-        <section className="panel p-4">
-          <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Advance order</h2>
+        <section className="panel p-5">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Advance order")}</h2>
           <form
             className="mt-3 space-y-3"
             onSubmit={(event) => {
@@ -88,39 +91,39 @@ export function OrderOperations({
               act("status", () => clientApi(`/admin/orders/${orderNumber}/status`, {
                 method: "PATCH",
                 body: JSON.stringify({ status: nextStatus, reason: reason || undefined }),
-              }), `Order moved to ${nextStatus.replace(/_/g, " ").toLowerCase()}`);
+              }), t("Order moved to {status}", { status: enumLabel(locale, nextStatus) }));
             }}
           >
-            <select className="field" value={nextStatus} onChange={(e) => setNextStatus(e.target.value)} aria-label="Next status">
-              {NEXT[status].map((value) => <option key={value} value={value}>{value.replace(/_/g, " ")}</option>)}
+            <select className="field" value={nextStatus} onChange={(e) => setNextStatus(e.target.value)} aria-label={t("Next status")}>
+              {NEXT[status].map((value) => <option key={value} value={value}>{enumLabel(locale, value)}</option>)}
             </select>
-            <input className="field" placeholder="Reason (optional)" value={reason} onChange={(e) => setReason(e.target.value)} />
+            <input className="field" placeholder={t("Reason (optional)")} value={reason} onChange={(e) => setReason(e.target.value)} />
             <button type="submit" disabled={busy === "status"} className="a-btn w-full">
-              {busy === "status" ? "Updating…" : nextStatus === "CANCELLED" ? "Cancel order" : "Update status"}
+              {busy === "status" ? t("Updating…") : nextStatus === "CANCELLED" ? t("Cancel order") : t("Update status")}
             </button>
           </form>
           {nextStatus === "SHIPPED" && !shipments.length && (
-            <p className="mt-2 text-[10px] text-warn">Create a shipment first; shipping without tracking is blocked.</p>
+            <p className="mt-2 text-[10px] text-warn">{t("Create a shipment first; shipping without tracking is blocked.")}</p>
           )}
         </section>
       )}
 
-      <section className="panel p-4">
-        <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Internal notes</h2>
-        <textarea rows={4} className="field mt-3" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Visible to staff only" />
+      <section className="panel p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Internal notes")}</h2>
+        <textarea rows={4} className="field mt-3" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("Visible to staff only")} />
         <button
           type="button"
           disabled={busy === "notes"}
-          onClick={() => act("notes", () => clientApi(`/admin/orders/${orderNumber}/notes`, { method: "PATCH", body: JSON.stringify({ notes }) }), "Notes saved")}
+          onClick={() => act("notes", () => clientApi(`/admin/orders/${orderNumber}/notes`, { method: "PATCH", body: JSON.stringify({ notes }) }), t("Notes saved"))}
           className="a-btn a-btn-outline mt-2 w-full"
         >
-          {busy === "notes" ? "Saving…" : "Save notes"}
+          {busy === "notes" ? t("Saving…") : t("Save notes")}
         </button>
       </section>
 
       {["PACKED", "SHIPPED"].includes(status) && (
-        <section className="panel p-4">
-          <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Create shipment</h2>
+        <section className="panel p-5">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Create shipment")}</h2>
           <form
             className="mt-3 space-y-2"
             onSubmit={(event) => {
@@ -128,41 +131,41 @@ export function OrderOperations({
               act("shipment", () => clientApi(`/admin/orders/${orderNumber}/shipments`, {
                 method: "POST",
                 body: JSON.stringify({ carrier, service, trackingNumber: tracking || undefined }),
-              }), "Shipment created");
+              }), t("Shipment created"));
             }}
           >
-            <input className="field" value={carrier} onChange={(e) => setCarrier(e.target.value)} placeholder="Carrier" aria-label="Carrier" />
-            <input className="field" value={service} onChange={(e) => setService(e.target.value)} placeholder="Service" aria-label="Service" />
-            <input className="field" value={tracking} onChange={(e) => setTracking(e.target.value)} placeholder="Tracking number (optional)" aria-label="Tracking number" />
-            <button type="submit" disabled={busy === "shipment"} className="a-btn w-full">Create shipment</button>
+            <input className="field" value={carrier} onChange={(e) => setCarrier(e.target.value)} placeholder={t("Carrier")} aria-label={t("Carrier")} />
+            <input className="field" value={service} onChange={(e) => setService(e.target.value)} placeholder={t("Service")} aria-label={t("Service")} />
+            <input className="field" value={tracking} onChange={(e) => setTracking(e.target.value)} placeholder={t("Tracking number (optional)")} aria-label={t("Tracking number")} />
+            <button type="submit" disabled={busy === "shipment"} className="a-btn w-full">{t("Create shipment")}</button>
           </form>
         </section>
       )}
 
       {shipments.length > 0 && (
-        <section className="panel p-4">
-          <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Shipment updates</h2>
+        <section className="panel p-5">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Shipment updates")}</h2>
           <div className="mt-3 space-y-2">
-            <select className="field" value={shipmentId} onChange={(e) => { setShipmentId(e.target.value); setShipmentStatus(""); }} aria-label="Shipment">
-              {shipments.map((shipment) => <option key={shipment.id} value={shipment.id}>{shipment.carrier} · {shipment.trackingNumber ?? "no tracking"} · {shipment.status}</option>)}
+            <select className="field" value={shipmentId} onChange={(e) => { setShipmentId(e.target.value); setShipmentStatus(""); }} aria-label={t("Shipment")}>
+              {shipments.map((shipment) => <option key={shipment.id} value={shipment.id}>{shipment.carrier} · {shipment.trackingNumber ?? t("no tracking")} · {enumLabel(locale, shipment.status)}</option>)}
             </select>
             {activeShipment && (
               <>
-                <select className="field" value={shipmentStatus} onChange={(e) => setShipmentStatus(e.target.value)} aria-label="Shipment status">
-                  <option value="">Choose next status</option>
-                  {(SHIPMENT_NEXT[activeShipment.status] ?? []).map((value) => <option key={value} value={value}>{value.replace(/_/g, " ")}</option>)}
+                <select className="field" value={shipmentStatus} onChange={(e) => setShipmentStatus(e.target.value)} aria-label={t("Shipment status")}>
+                  <option value="">{t("Choose next status")}</option>
+                  {(SHIPMENT_NEXT[activeShipment.status] ?? []).map((value) => <option key={value} value={value}>{enumLabel(locale, value)}</option>)}
                 </select>
-                <input className="field" placeholder="Event description" value={shipmentNote} onChange={(e) => setShipmentNote(e.target.value)} />
+                <input className="field" placeholder={t("Event description")} value={shipmentNote} onChange={(e) => setShipmentNote(e.target.value)} />
                 <button
                   type="button"
                   disabled={!shipmentStatus || !shipmentNote || busy === "shipment-status"}
                   onClick={() => act("shipment-status", () => clientApi(`/admin/shipments/${shipmentId}/status`, {
                     method: "PATCH",
                     body: JSON.stringify({ status: shipmentStatus, description: shipmentNote }),
-                  }), "Shipment updated")}
+                  }), t("Shipment updated"))}
                   className="a-btn w-full"
                 >
-                  {busy === "shipment-status" ? "Updating…" : "Add shipment event"}
+                  {busy === "shipment-status" ? t("Updating…") : t("Add shipment event")}
                 </button>
               </>
             )}

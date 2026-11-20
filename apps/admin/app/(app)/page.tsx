@@ -2,6 +2,20 @@ import { PageHeader, Stat, Badge, EmptyState } from "@/components/ui";
 import { apiGet, money, dateTime, date } from "@/lib/api";
 import { getCookieHeader, requireStaff } from "@/lib/session";
 import Link from "next/link";
+import {
+  AlertTriangle,
+  ArrowRight,
+  BadgeDollarSign,
+  Boxes,
+  Package,
+  ReceiptText,
+  RotateCcw,
+  ShoppingCart,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
+import { getI18n } from "@/lib/i18n";
+import { enumLabel } from "@/lib/messages";
 
 interface Metrics {
   range: { from: string; to: string };
@@ -33,13 +47,13 @@ interface LowStockRow {
   warehouse: string;
 }
 
-function SalesChart({ series }: { series: Metrics["salesSeries"] }) {
+function SalesChart({ series, locale }: { series: Metrics["salesSeries"]; locale: "en" | "th" }) {
   if (!series.length) {
-    return <div className="flex h-56 items-center justify-center text-xs text-muted">No paid orders in this period.</div>;
+    return <div className="flex h-64 items-center justify-center text-xs text-muted">{locale === "th" ? "ไม่มีคำสั่งซื้อที่ชำระแล้วในช่วงนี้" : "No paid orders in this period."}</div>;
   }
   const width = 760;
-  const height = 200;
-  const padding = { top: 12, right: 8, bottom: 24, left: 44 };
+  const height = 230;
+  const padding = { top: 16, right: 12, bottom: 28, left: 52 };
   const values = series.map((point) => Number(point.total));
   const max = Math.max(...values, 1);
   const innerW = width - padding.left - padding.right;
@@ -56,23 +70,30 @@ function SalesChart({ series }: { series: Metrics["salesSeries"] }) {
     y: padding.top + innerH - ratio * innerH,
     label: money(max * ratio),
   }));
+  const dayFormat = new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-US", { month: "short", day: "numeric" });
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="h-56 w-full" role="img" aria-label="Daily paid sales">
+    <svg viewBox={`0 0 ${width} ${height}`} className="h-64 w-full" role="img" aria-label={locale === "th" ? "ยอดขายที่ชำระแล้วรายวัน" : "Daily paid sales"}>
+      <defs>
+        <linearGradient id="sales-fill" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#2f6b4f" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#2f6b4f" stopOpacity="0" />
+        </linearGradient>
+      </defs>
       {ticks.map((tick) => (
         <g key={tick.y}>
-          <line x1={padding.left} x2={width - padding.right} y1={tick.y} y2={tick.y} stroke="#ddd6c9" strokeDasharray="2 4" />
-          <text x={padding.left - 8} y={tick.y + 3} textAnchor="end" fontSize="9" fill="#6f6a61">{tick.label}</text>
+          <line x1={padding.left} x2={width - padding.right} y1={tick.y} y2={tick.y} stroke="#e2ddd3" strokeDasharray="2 5" />
+          <text x={padding.left - 10} y={tick.y + 3} textAnchor="end" fontSize="9" fill="#686d66">{tick.label}</text>
         </g>
       ))}
-      <polygon points={area} fill="#3f5b4a" opacity="0.08" />
-      <polyline points={line} fill="none" stroke="#3f5b4a" strokeWidth="1.6" />
+      <polygon points={area} fill="url(#sales-fill)" />
+      <polyline points={line} fill="none" stroke="#2f6b4f" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
       {points.map((point, index) => (
         <g key={point.day}>
-          <circle cx={point.x} cy={point.y} r="2.2" fill="#3f5b4a" />
+          <circle cx={point.x} cy={point.y} r="2.6" fill="#fffdfa" stroke="#2f6b4f" strokeWidth="1.6" />
           {(index === 0 || index === points.length - 1 || index % Math.ceil(points.length / 6) === 0) && (
-            <text x={point.x} y={height - 6} textAnchor="middle" fontSize="8.5" fill="#6f6a61">
-              {new Date(point.day).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+            <text x={point.x} y={height - 8} textAnchor="middle" fontSize="9" fill="#686d66">
+              {dayFormat.format(new Date(point.day))}
             </text>
           )}
         </g>
@@ -91,6 +112,7 @@ export default async function DashboardPage({
   const from = typeof params.from === "string" ? params.from : "";
   const to = typeof params.to === "string" ? params.to : "";
   const cookie = await getCookieHeader();
+  const { locale, t } = await getI18n();
   const query = new URLSearchParams();
   if (from) query.set("from", from);
   if (to) query.set("to", to);
@@ -108,58 +130,80 @@ export default async function DashboardPage({
     return <PageHeader title="Dashboard" description="Metrics are unavailable. Check the API and database." />;
   }
 
+  const actions = metrics.pendingOrders + metrics.pendingReturns;
+  const maxUnits = Math.max(...metrics.topProducts.map((product) => product.units), 1);
+
   return (
     <div>
       <PageHeader
         eyebrow="Overview"
         title="Dashboard"
-        description={`Commercial performance from ${date(metrics.range.from)} to ${date(metrics.range.to)}. All figures come from live orders and refunds.`}
+        description={t("Commercial performance from {from} to {to}. All figures come from live orders and refunds.", {
+          from: date(metrics.range.from),
+          to: date(metrics.range.to),
+        })}
         actions={
           <form method="get" className="flex flex-wrap items-end gap-2">
             <div>
-              <label htmlFor="from" className="label">From</label>
-              <input id="from" name="from" type="date" defaultValue={from || metrics.range.from.slice(0, 10)} className="field !min-h-0 !py-1.5 text-xs" />
+              <label htmlFor="from" className="label">{t("From")}</label>
+              <input id="from" name="from" type="date" defaultValue={from || metrics.range.from.slice(0, 10)} className="field !min-h-9 !py-1.5 text-xs" />
             </div>
             <div>
-              <label htmlFor="to" className="label">To</label>
-              <input id="to" name="to" type="date" defaultValue={to || metrics.range.to.slice(0, 10)} className="field !min-h-0 !py-1.5 text-xs" />
+              <label htmlFor="to" className="label">{t("To")}</label>
+              <input id="to" name="to" type="date" defaultValue={to || metrics.range.to.slice(0, 10)} className="field !min-h-9 !py-1.5 text-xs" />
             </div>
-            <button type="submit" className="a-btn a-btn-outline a-btn-sm">Apply</button>
+            <button type="submit" className="a-btn a-btn-outline a-btn-sm">{t("Apply")}</button>
           </form>
         }
       />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <Stat label="Gross sales" value={money(metrics.grossSales)} hint={`${metrics.paidOrders} paid orders`} />
-        <Stat label="Net sales" value={money(metrics.netSales)} hint={`${money(metrics.refunds)} refunded`} />
-        <Stat label="Average order" value={money(metrics.averageOrderValue)} hint={`${metrics.orders} orders placed`} />
-        <Stat label="Units sold" value={String(metrics.unitsSold)} hint={`${metrics.newCustomers} new customers`} />
+        <Stat label="Gross sales" value={money(metrics.grossSales)} hint={`${metrics.paidOrders} ${t("paid orders")}`} icon="wallet" />
+        <Stat label="Net sales" value={money(metrics.netSales)} hint={`${money(metrics.refunds)} ${t("refunded")}`} icon="trending" />
+        <Stat label="Average order" value={money(metrics.averageOrderValue)} hint={`${metrics.orders} ${t("orders placed")}`} icon="receipt" />
+        <Stat label="Units sold" value={String(metrics.unitsSold)} hint={`${metrics.newCustomers} ${t("new customers")}`} icon="package" />
         <Stat
           label="Needs action"
-          value={`${metrics.pendingOrders + metrics.pendingReturns}`}
-          hint={`${metrics.pendingOrders} orders · ${metrics.pendingReturns} returns`}
-          tone={metrics.pendingOrders + metrics.pendingReturns > 0 ? "amber" : "green"}
+          value={String(actions)}
+          hint={`${metrics.pendingOrders} ${t("orders")} · ${metrics.pendingReturns} ${t("returns")}`}
+          tone={actions > 0 ? "amber" : "green"}
+          icon="alert"
         />
       </div>
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-[1.6fr_1fr]">
-        <section className="panel p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.12em] text-muted">Sales over time</p>
-              <p className="mt-1 text-sm">Paid revenue by day</p>
-            </div>
-            <span className="text-[11px] text-muted">{metrics.salesSeries.length} days with sales</span>
+      {actions > 0 && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warn/25 bg-warn-soft/70 px-4 py-3">
+          <div className="flex items-center gap-2 text-xs text-ink-soft">
+            <AlertTriangle className="h-4 w-4 text-warn" />
+            <span>
+              <strong>{metrics.pendingOrders}</strong> {t("orders")} · <strong>{metrics.pendingReturns}</strong> {t("returns")}
+            </span>
           </div>
-          <div className="mt-4">
-            <SalesChart series={metrics.salesSeries} />
+          <div className="flex gap-2">
+            <Link href="/orders?status=PAID" className="a-btn a-btn-outline a-btn-sm">{t("Paid orders")}</Link>
+            <Link href="/returns?status=REQUESTED" className="a-btn a-btn-sm">{t("Returns to review")}</Link>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-4 grid gap-4 xl:grid-cols-[1.55fr_1fr]">
+        <section className="panel overflow-hidden">
+          <div className="panel-header">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">{t("Sales over time")}</p>
+              <p className="mt-0.5 text-sm font-semibold">{t("Paid revenue by day")}</p>
+            </div>
+            <span className="a-chip">{t("{count} days with sales", { count: metrics.salesSeries.length })}</span>
+          </div>
+          <div className="p-4">
+            <SalesChart series={metrics.salesSeries} locale={locale} />
           </div>
         </section>
 
-        <section className="panel">
-          <div className="flex items-center justify-between border-b border-line px-4 py-3">
-            <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Low stock</h2>
-            <Link href="/inventory?lowStock=true" className="text-[11px] text-muted hover:text-ink">View all</Link>
+        <section className="panel overflow-hidden">
+          <div className="panel-header">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Low stock")}</h2>
+            <Link href="/inventory?lowStock=true" className="inline-flex min-h-6 items-center text-[11px] font-medium text-muted hover:text-ink">{t("View all")}</Link>
           </div>
           {!lowStock?.length ? (
             <EmptyState title="Stock is healthy" body="Nothing is below its reorder point." />
@@ -168,12 +212,14 @@ export default async function DashboardPage({
               {lowStock.slice(0, 6).map((row) => (
                 <li key={`${row.variantId}-${row.warehouse}`} className="flex items-center justify-between gap-3 px-4 py-3">
                   <div className="min-w-0">
-                    <p className="truncate text-xs font-medium">{row.productName}</p>
-                    <p className="mt-0.5 text-[10px] text-muted">{row.sku} · {row.warehouse}</p>
+                    <p className="truncate text-xs font-semibold">{row.productName}</p>
+                    <p className="mt-0.5 truncate text-[10px] text-muted">{row.sku} · {row.warehouse}</p>
                   </div>
-                  <div className="text-right">
-                    <p className={`text-xs font-medium ${row.available <= 0 ? "text-danger" : "text-warn"}`}>{row.available} left</p>
-                    <p className="text-[10px] text-muted">Reorder at {row.reorderPoint}</p>
+                  <div className="shrink-0 text-right">
+                    <p className={`text-xs font-semibold ${row.available <= 0 ? "text-danger" : "text-warn"}`}>
+                      {row.available} {t("left")}
+                    </p>
+                    <p className="text-[10px] text-muted">{t("Reorder at")} {row.reorderPoint}</p>
                   </div>
                 </li>
               ))}
@@ -182,26 +228,30 @@ export default async function DashboardPage({
         </section>
       </div>
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-[1.6fr_1fr]">
+      <div className="mt-4 grid gap-4 xl:grid-cols-[1.55fr_1fr]">
         <section className="panel overflow-hidden">
-          <div className="flex items-center justify-between border-b border-line px-4 py-3">
-            <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Recent orders</h2>
-            <Link href="/orders" className="text-[11px] text-muted hover:text-ink">All orders</Link>
+          <div className="panel-header">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Recent orders")}</h2>
+            <Link href="/orders" className="inline-flex min-h-6 items-center gap-1 text-[11px] font-medium text-muted hover:text-ink">
+              {t("All orders")} <ArrowRight className="h-3 w-3" />
+            </Link>
           </div>
-          <div className="overflow-x-auto">
+          <div className="table-wrap">
             <table>
               <thead>
-                <tr><th>Order</th><th>Customer</th><th>Status</th><th>Payment</th><th className="text-right">Total</th><th>Placed</th></tr>
+                <tr><th>{t("Order")}</th><th>{t("Customer")}</th><th>{t("Status")}</th><th>{t("Payment")}</th><th className="text-right">{t("Total")}</th></tr>
               </thead>
               <tbody>
                 {metrics.recentOrders.map((order) => (
                   <tr key={order.id}>
-                    <td><Link href={`/orders/${order.orderNumber}`} className="font-medium hover:underline">{order.orderNumber}</Link></td>
-                    <td className="text-muted">{order.email}</td>
+                    <td className="whitespace-nowrap"><Link href={`/orders/${order.orderNumber}`} className="font-medium hover:underline">{order.orderNumber}</Link></td>
+                    <td className="max-w-[220px]">
+                      <p className="truncate text-muted">{order.email}</p>
+                      <p className="text-[10px] text-muted">{dateTime(order.createdAt)}</p>
+                    </td>
                     <td><Badge status={order.status} /></td>
                     <td><Badge status={order.paymentStatus} /></td>
-                    <td className="text-right">{money(order.grandTotal)}</td>
-                    <td className="text-[11px] text-muted">{dateTime(order.createdAt)}</td>
+                    <td className="whitespace-nowrap text-right font-medium">{money(order.grandTotal)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -210,10 +260,10 @@ export default async function DashboardPage({
         </section>
 
         <div className="space-y-4">
-          <section className="panel">
-            <div className="flex items-center justify-between border-b border-line px-4 py-3">
-              <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Returns to review</h2>
-              <Link href="/returns?status=REQUESTED" className="text-[11px] text-muted hover:text-ink">View all</Link>
+          <section className="panel overflow-hidden">
+            <div className="panel-header">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Returns to review")}</h2>
+              <Link href="/returns?status=REQUESTED" className="inline-flex min-h-6 items-center text-[11px] font-medium text-muted hover:text-ink">{t("View all")}</Link>
             </div>
             {!returns?.items.length ? (
               <EmptyState title="No returns waiting" />
@@ -221,9 +271,9 @@ export default async function DashboardPage({
               <ul className="divide-y divide-line">
                 {returns.items.map((request) => (
                   <li key={request.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                    <div>
-                      <Link href={`/returns/${request.id}`} className="text-xs font-medium hover:underline">{request.returnNumber}</Link>
-                      <p className="mt-0.5 text-[10px] text-muted">{request.orderNumber} · {request.resolution.toLowerCase()}</p>
+                    <div className="min-w-0">
+                      <Link href={`/returns/${request.id}`} className="text-xs font-semibold hover:underline">{request.returnNumber}</Link>
+                      <p className="mt-0.5 text-[10px] text-muted">{request.orderNumber} · {enumLabel(locale, request.resolution)}</p>
                     </div>
                     <Badge status={request.status} />
                   </li>
@@ -232,20 +282,25 @@ export default async function DashboardPage({
             )}
           </section>
 
-          <section className="panel">
-            <div className="border-b border-line px-4 py-3">
-              <h2 className="text-xs font-medium uppercase tracking-[0.08em]">Top products</h2>
+          <section className="panel overflow-hidden">
+            <div className="panel-header">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Top products")}</h2>
             </div>
             {!metrics.topProducts.length ? (
               <EmptyState title="No sales yet" />
             ) : (
               <ul className="divide-y divide-line">
                 {metrics.topProducts.slice(0, 5).map((product) => (
-                  <li key={product.productId ?? product.name} className="flex items-center justify-between gap-3 px-4 py-2.5">
-                    <p className="truncate text-xs">{product.name}</p>
-                    <div className="shrink-0 text-right">
-                      <p className="text-xs">{product.units} units</p>
-                      <p className="text-[10px] text-muted">{money(product.revenue)}</p>
+                  <li key={product.productId ?? product.name} className="px-4 py-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="truncate text-xs font-medium">{product.name}</p>
+                      <p className="shrink-0 text-[11px] font-semibold">{product.units} {t("units")}</p>
+                    </div>
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <div className="h-1 flex-1 overflow-hidden rounded-full bg-surface-2">
+                        <div className="h-full rounded-full bg-accent/70" style={{ width: `${Math.round((product.units / maxUnits) * 100)}%` }} />
+                      </div>
+                      <span className="text-[10px] text-muted">{money(product.revenue)}</span>
                     </div>
                   </li>
                 ))}
@@ -255,22 +310,34 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Link href="/orders?status=PAID" className="panel flex items-center justify-between p-4 hover:border-ink">
-          <div><p className="text-xs font-medium">Paid orders</p><p className="mt-1 text-[11px] text-muted">Ready to process</p></div>
-          <span className="text-xl font-medium">{metrics.pendingOrders}</span>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <Link href="/orders?status=PAID" className="panel group flex items-center justify-between p-4 transition-colors hover:border-line-strong">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-info-soft text-info"><ShoppingCart className="h-4 w-4" /></span>
+            <div><p className="text-xs font-semibold">{t("Paid orders")}</p><p className="mt-0.5 text-[10px] text-muted">{t("Ready to process")}</p></div>
+          </div>
+          <span className="text-xl font-semibold">{metrics.pendingOrders}</span>
         </Link>
-        <Link href="/inventory?lowStock=true" className="panel flex items-center justify-between p-4 hover:border-ink">
-          <div><p className="text-xs font-medium">Low stock lines</p><p className="mt-1 text-[11px] text-muted">At or below reorder point</p></div>
-          <span className={`text-xl font-medium ${metrics.lowStockVariants ? "text-warn" : ""}`}>{metrics.lowStockVariants}</span>
+        <Link href="/inventory?lowStock=true" className="panel group flex items-center justify-between p-4 transition-colors hover:border-line-strong">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-warn-soft text-warn"><Boxes className="h-4 w-4" /></span>
+            <div><p className="text-xs font-semibold">{t("Low stock lines")}</p><p className="mt-0.5 text-[10px] text-muted">{t("At or below reorder point")}</p></div>
+          </div>
+          <span className={`text-xl font-semibold ${metrics.lowStockVariants ? "text-warn" : ""}`}>{metrics.lowStockVariants}</span>
         </Link>
-        <Link href="/returns" className="panel flex items-center justify-between p-4 hover:border-ink">
-          <div><p className="text-xs font-medium">Open returns</p><p className="mt-1 text-[11px] text-muted">Across all stages</p></div>
-          <span className="text-xl font-medium">{metrics.pendingReturns}</span>
+        <Link href="/returns" className="panel group flex items-center justify-between p-4 transition-colors hover:border-line-strong">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-danger-soft text-danger"><RotateCcw className="h-4 w-4" /></span>
+            <div><p className="text-xs font-semibold">{t("Open returns")}</p><p className="mt-0.5 text-[10px] text-muted">{t("Across all stages")}</p></div>
+          </div>
+          <span className="text-xl font-semibold">{metrics.pendingReturns}</span>
         </Link>
-        <Link href="/customers" className="panel flex items-center justify-between p-4 hover:border-ink">
-          <div><p className="text-xs font-medium">New customers</p><p className="mt-1 text-[11px] text-muted">In selected period</p></div>
-          <span className="text-xl font-medium">{metrics.newCustomers}</span>
+        <Link href="/customers" className="panel group flex items-center justify-between p-4 transition-colors hover:border-line-strong">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent"><BadgeDollarSign className="h-4 w-4" /></span>
+            <div><p className="text-xs font-semibold">{t("New customers")}</p><p className="mt-0.5 text-[10px] text-muted">{t("In selected period")}</p></div>
+          </div>
+          <span className="text-xl font-semibold">{metrics.newCustomers}</span>
         </Link>
       </div>
     </div>

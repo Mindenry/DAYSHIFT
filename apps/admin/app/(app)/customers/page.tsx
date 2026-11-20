@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHeader, Badge, Pagination, EmptyState } from "@/components/ui";
 import { apiGet, money, date } from "@/lib/api";
 import { getCookieHeader, requireStaff } from "@/lib/session";
+import { getI18n } from "@/lib/i18n";
 
 interface CustomersResponse {
   items: Array<{
@@ -14,6 +15,7 @@ interface CustomersResponse {
 
 export default async function CustomersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await requireStaff();
+  const { t } = await getI18n();
   const params = await searchParams;
   const q = typeof params.q === "string" ? params.q : "";
   const segment = typeof params.segment === "string" ? params.segment : "";
@@ -26,29 +28,29 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
 
   return (
     <div>
-      <PageHeader eyebrow="Customers" title="Customers" description={`${customers?.meta.total ?? 0} customer accounts. Spend is calculated from paid orders only.`} />
+      <PageHeader eyebrow="Customers" title="Customers" description={t("{count} customer accounts. Spend is calculated from paid orders only.", { count: customers?.meta.total ?? 0 })} />
       <div className="panel">
         <form method="get" className="flex flex-wrap items-end gap-2 border-b border-line p-3">
           <div className="min-w-56 flex-1">
-            <label htmlFor="q" className="label">Search</label>
-            <input id="q" name="q" defaultValue={q} placeholder="Name or email" className="field" />
+            <label htmlFor="q" className="label">{t("Search")}</label>
+            <input id="q" name="q" defaultValue={q} placeholder={t("Name or email")} className="field" />
           </div>
           <div>
-            <label htmlFor="segment" className="label">Segment</label>
+            <label htmlFor="segment" className="label">{t("Segment")}</label>
             <select id="segment" name="segment" defaultValue={segment} className="field">
-              <option value="">All segments</option>
-              {["New", "Returning", "High-value"].map((value) => <option key={value} value={value}>{value}</option>)}
+              <option value="">{t("All segments")}</option>
+              {["New", "Returning", "High-value"].map((value) => <option key={value} value={value}>{t(value)}</option>)}
             </select>
           </div>
-          <button type="submit" className="a-btn a-btn-outline">Filter</button>
+          <button type="submit" className="a-btn a-btn-outline">{t("Filter")}</button>
         </form>
         {!customers?.items.length ? (
           <EmptyState title="No customers found" />
         ) : (
           <>
-            <div className="overflow-x-auto">
+            <div className="table-wrap">
               <table>
-                <thead><tr><th>Customer</th><th>Segment</th><th>Orders</th><th className="text-right">Spent</th><th>Loyalty</th><th>Status</th><th>Joined</th><th>Last seen</th></tr></thead>
+                <thead><tr><th>{t("Customer")}</th><th>{t("Segment")}</th><th>{t("Orders")}</th><th className="text-right">{t("Spent")}</th><th>{t("Loyalty")}</th><th>{t("Status")}</th><th>{t("Joined")}</th><th>{t("Last seen")}</th></tr></thead>
                 <tbody>
                   {customers.items.map((customer) => (
                     <tr key={customer.id}>

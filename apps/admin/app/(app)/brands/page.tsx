@@ -12,7 +12,7 @@ export default async function BrandsPage() {
   );
   return (
     <div>
-      <PageHeader eyebrow="Catalog" title="Brands" description="Own label and partner brands carried by the store." />
+      <PageHeader eyebrow="Catalog" title="Brands" description="Brand records shown on product pages." />
       <BrandManager initial={brands ?? []} />
     </div>
   );

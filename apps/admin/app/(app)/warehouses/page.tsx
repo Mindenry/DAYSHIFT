@@ -12,7 +12,7 @@ export default async function WarehousesPage() {
   );
   return (
     <div>
-      <PageHeader eyebrow="Inventory" title="Warehouses" description="Physical locations holding sellable and reserved stock. One warehouse is the default for new inventory." />
+      <PageHeader eyebrow="Inventory" title="Warehouses" description="Locations that hold and ship stock." />
       <WarehouseManager initial={warehouses ?? []} />
     </div>
   );

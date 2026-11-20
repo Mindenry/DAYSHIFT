@@ -12,7 +12,7 @@ export default async function CollectionsPage() {
   );
   return (
     <div>
-      <PageHeader eyebrow="Catalog" title="Collections" description="Merchandising edits used on the storefront, including new arrivals, best sellers and sale." />
+      <PageHeader eyebrow="Catalog" title="Collections" description="Curated groups of products for the storefront." />
       <CollectionManager initial={collections ?? []} />
     </div>
   );

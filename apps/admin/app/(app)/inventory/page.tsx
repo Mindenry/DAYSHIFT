@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHeader, Pagination, EmptyState } from "@/components/ui";
 import { apiGet } from "@/lib/api";
 import { getCookieHeader, requireStaff } from "@/lib/session";
+import { getI18n } from "@/lib/i18n";
 import { InventoryTable } from "@/components/inventory-table";
 
 interface InventoryResponse {
@@ -21,6 +22,7 @@ export default async function InventoryPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   await requireStaff();
+  const { t } = await getI18n();
   const params = await searchParams;
   const q = typeof params.q === "string" ? params.q : "";
   const warehouseId = typeof params.warehouseId === "string" ? params.warehouseId : "";
@@ -42,28 +44,28 @@ export default async function InventoryPage({
       <PageHeader
         eyebrow="Inventory"
         title="Stock"
-        description="Available stock is on hand minus reserved and damaged. Every change writes an auditable movement."
-        actions={<Link href="/inventory/movements" className="a-btn a-btn-outline">Movement history</Link>}
+        description="Stock levels across warehouses, with a full movement history."
+        actions={<Link href="/inventory/movements" className="a-btn a-btn-outline">{t("Movement history")}</Link>}
       />
       <div className="panel">
         <form method="get" className="flex flex-wrap items-end gap-2 border-b border-line p-3">
           <div className="min-w-52 flex-1">
-            <label htmlFor="q" className="label">Search</label>
-            <input id="q" name="q" defaultValue={q} placeholder="Product, SKU or colour" className="field" />
+            <label htmlFor="q" className="label">{t("Search")}</label>
+            <input id="q" name="q" defaultValue={q} placeholder={t("Product, SKU or colour")} className="field" />
           </div>
           <div>
-            <label htmlFor="warehouse" className="label">Warehouse</label>
+            <label htmlFor="warehouse" className="label">{t("Warehouse")}</label>
             <select id="warehouse" name="warehouseId" defaultValue={warehouseId} className="field">
-              <option value="">All warehouses</option>
+              <option value="">{t("All warehouses")}</option>
               {(warehouses ?? []).map((warehouse) => <option key={warehouse.id} value={warehouse.id}>{warehouse.name}</option>)}
             </select>
           </div>
           <label className="flex h-9 items-center gap-2 text-xs">
-            <input type="checkbox" name="lowStock" value="true" defaultChecked={lowStock === "true"} className="h-4 w-4 accent-[#3f5b4a]" />
-            Low stock only
+            <input type="checkbox" name="lowStock" value="true" defaultChecked={lowStock === "true"} className="h-4 w-4 accent-[#2f6b4f]" />
+            {t("Low stock only")}
           </label>
-          <button type="submit" className="a-btn a-btn-outline">Filter</button>
-          {(q || warehouseId || lowStock) && <Link href="/inventory" className="a-btn a-btn-outline">Reset</Link>}
+          <button type="submit" className="a-btn a-btn-outline">{t("Filter")}</button>
+          {(q || warehouseId || lowStock) && <Link href="/inventory" className="a-btn a-btn-outline">{t("Reset")}</Link>}
         </form>
         {!inventory?.items.length ? (
           <EmptyState title="No stock lines found" body="Try a different filter." />

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { PageHeader, Badge, Pagination, EmptyState } from "@/components/ui";
 import { apiGet, dateTime } from "@/lib/api";
 import { getCookieHeader, requireStaff } from "@/lib/session";
+import { getI18n } from "@/lib/i18n";
+import { enumLabel } from "@/lib/messages";
 
 interface TicketsResponse {
   items: Array<{
@@ -14,6 +16,7 @@ interface TicketsResponse {
 
 export default async function TicketsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await requireStaff();
+  const { t, locale } = await getI18n();
   const params = await searchParams;
   const status = typeof params.status === "string" ? params.status : "";
   const q = typeof params.q === "string" ? params.q : "";
@@ -30,23 +33,23 @@ export default async function TicketsPage({ searchParams }: { searchParams: Prom
       <div className="panel">
         <form method="get" className="flex flex-wrap items-end gap-2 border-b border-line p-3">
           <div className="min-w-52 flex-1">
-            <label htmlFor="q" className="label">Search</label>
-            <input id="q" name="q" defaultValue={q} placeholder="Ticket, subject or email" className="field" />
+            <label htmlFor="q" className="label">{t("Search")}</label>
+            <input id="q" name="q" defaultValue={q} placeholder={t("Ticket, subject or email")} className="field" />
           </div>
           <div>
-            <label htmlFor="status" className="label">Status</label>
+            <label htmlFor="status" className="label">{t("Status")}</label>
             <select id="status" name="status" defaultValue={status} className="field">
-              <option value="">All</option>
-              {["OPEN", "IN_PROGRESS", "WAITING_FOR_CUSTOMER", "WAITING_FOR_INTERNAL_TEAM", "RESOLVED", "CLOSED"].map((value) => <option key={value} value={value}>{value.replace(/_/g, " ")}</option>)}
+              <option value="">{t("All")}</option>
+              {["OPEN", "IN_PROGRESS", "WAITING_FOR_CUSTOMER", "WAITING_FOR_INTERNAL_TEAM", "RESOLVED", "CLOSED"].map((value) => <option key={value} value={value}>{enumLabel(locale, value)}</option>)}
             </select>
           </div>
-          <button type="submit" className="a-btn a-btn-outline">Filter</button>
+          <button type="submit" className="a-btn a-btn-outline">{t("Filter")}</button>
         </form>
         {!tickets?.items.length ? <EmptyState title="No tickets found" /> : (
           <>
-            <div className="overflow-x-auto">
+            <div className="table-wrap">
               <table>
-                <thead><tr><th>Ticket</th><th>Customer</th><th>Subject</th><th>Order</th><th>Priority</th><th>Status</th><th>Agent</th><th>Updated</th></tr></thead>
+                <thead><tr><th>{t("Ticket")}</th><th>{t("Customer")}</th><th>{t("Subject")}</th><th>{t("Order")}</th><th>{t("Priority")}</th><th>{t("Status")}</th><th>{t("Agent")}</th><th>{t("Updated")}</th></tr></thead>
                 <tbody>
                   {tickets.items.map((ticket) => (
                     <tr key={ticket.id}>
@@ -56,7 +59,7 @@ export default async function TicketsPage({ searchParams }: { searchParams: Prom
                       <td className="text-[11px]">{ticket.orderNumber ?? "—"}</td>
                       <td><Badge status={ticket.priority} /></td>
                       <td><Badge status={ticket.status} /></td>
-                      <td className="text-[11px] text-muted">{ticket.assignedTo ?? "Unassigned"}</td>
+                      <td className="text-[11px] text-muted">{ticket.assignedTo ?? t("Unassigned")}</td>
                       <td className="text-[11px] text-muted">{dateTime(ticket.updatedAt)}</td>
                     </tr>
                   ))}

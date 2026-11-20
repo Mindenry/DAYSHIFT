@@ -1,4 +1,36 @@
+"use client";
+
 import Link from "next/link";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  BadgeDollarSign,
+  Boxes,
+  type LucideIcon,
+  Package,
+  ReceiptText,
+  RotateCcw,
+  ShoppingCart,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
+import { useI18n } from "@/lib/i18n-client";
+import { enumLabel } from "@/lib/messages";
+
+const STAT_ICONS = {
+  wallet: Wallet,
+  trending: TrendingUp,
+  receipt: ReceiptText,
+  package: Package,
+  alert: AlertTriangle,
+  boxes: Boxes,
+  returns: RotateCcw,
+  orders: ShoppingCart,
+  customers: BadgeDollarSign,
+} satisfies Record<string, LucideIcon>;
+
+export type StatIcon = keyof typeof STAT_ICONS;
 
 export function PageHeader({
   eyebrow,
@@ -13,13 +45,18 @@ export function PageHeader({
   actions?: React.ReactNode;
   back?: { href: string; label: string };
 }) {
+  const { t } = useI18n();
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
-      <div>
-        {back && <Link href={back.href} className="text-[11px] text-muted hover:text-ink">← {back.label}</Link>}
-        {eyebrow && <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-muted">{eyebrow}</p>}
-        <h1 className="mt-1 text-2xl font-medium tracking-tight">{title}</h1>
-        {description && <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-muted">{description}</p>}
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <div className="min-w-0">
+        {back && (
+          <Link href={back.href} className="mb-2 inline-flex items-center gap-1 text-[11px] font-medium text-muted hover:text-ink">
+            <ArrowLeft className="h-3 w-3" /> {t(back.label)}
+          </Link>
+        )}
+        {eyebrow && <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">{t(eyebrow)}</p>}
+        <h1 className="mt-1 text-[26px] font-semibold leading-tight tracking-[-0.035em] text-ink md:text-[30px]">{t(title)}</h1>
+        {description && <p className="mt-1.5 max-w-3xl text-[12.5px] leading-relaxed text-muted">{t(description)}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
@@ -27,11 +64,11 @@ export function PageHeader({
 }
 
 const TONES: Record<string, string> = {
-  green: "bg-accent-soft text-accent border-accent/20",
-  amber: "bg-warn-soft text-warn border-warn/20",
-  red: "bg-danger-soft text-danger border-danger/20",
-  blue: "bg-info-soft text-info border-info/20",
-  neutral: "bg-paper text-muted border-line",
+  green: "bg-accent-soft text-accent border-accent/15",
+  amber: "bg-warn-soft text-warn border-warn/15",
+  red: "bg-danger-soft text-danger border-danger/15",
+  blue: "bg-info-soft text-info border-info/15",
+  neutral: "bg-surface-2 text-muted border-line",
 };
 
 const STATUS_TONE: Record<string, keyof typeof TONES> = {
@@ -45,19 +82,25 @@ const STATUS_TONE: Record<string, keyof typeof TONES> = {
 };
 
 export function Badge({ status, label }: { status: string; label?: string }) {
+  const { t, locale } = useI18n();
   const tone = STATUS_TONE[status] ?? "neutral";
   return (
-    <span className={`inline-flex items-center border px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.06em] ${TONES[tone]}`}>
-      {label ?? status.replace(/_/g, " ").toLowerCase()}
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.04em] ${TONES[tone]}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${tone === "green" ? "bg-accent" : tone === "amber" ? "bg-warn" : tone === "red" ? "bg-danger" : tone === "blue" ? "bg-info" : "bg-muted"}`} />
+      {label ? t(label) : enumLabel(locale, status)}
     </span>
   );
 }
 
 export function EmptyState({ title, body, action }: { title: string; body?: string; action?: React.ReactNode }) {
+  const { t } = useI18n();
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <p className="text-sm font-medium">{title}</p>
-      {body && <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-muted">{body}</p>}
+    <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-surface-2 text-muted">
+        <span className="text-lg">·</span>
+      </div>
+      <p className="text-sm font-semibold">{t(title)}</p>
+      {body && <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-muted">{t(body)}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );
@@ -74,6 +117,7 @@ export function Pagination({
   basePath: string;
   params?: Record<string, string | undefined>;
 }) {
+  const { t } = useI18n();
   if (totalPages <= 1) return null;
   const build = (next: number) => {
     const search = new URLSearchParams();
@@ -82,11 +126,21 @@ export function Pagination({
     return `${basePath}?${search.toString()}`;
   };
   return (
-    <div className="flex items-center justify-between border-t border-line px-4 py-3 text-xs">
-      <p className="text-muted">Page {page} of {totalPages}</p>
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 text-xs">
+      <p className="text-muted">
+        {t("Page")} {page} {t("of")} {totalPages}
+      </p>
       <div className="flex gap-2">
-        {page > 1 && <Link href={build(page - 1)} className="a-btn a-btn-outline a-btn-sm">Previous</Link>}
-        {page < totalPages && <Link href={build(page + 1)} className="a-btn a-btn-outline a-btn-sm">Next</Link>}
+        {page > 1 && (
+          <Link href={build(page - 1)} className="a-btn a-btn-outline a-btn-sm">
+            <ArrowLeft className="h-3 w-3" /> {t("Previous")}
+          </Link>
+        )}
+        {page < totalPages && (
+          <Link href={build(page + 1)} className="a-btn a-btn-outline a-btn-sm">
+            {t("Next")} <ArrowRight className="h-3 w-3" />
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -97,18 +151,28 @@ export function Stat({
   value,
   hint,
   tone = "neutral",
+  icon,
 }: {
   label: string;
   value: string;
   hint?: string;
   tone?: "neutral" | "green" | "amber" | "red";
+  icon?: StatIcon;
 }) {
-  const toneClass =
-    tone === "green" ? "text-accent" : tone === "amber" ? "text-warn" : tone === "red" ? "text-danger" : "text-ink";
+  const { t } = useI18n();
+  const Icon = icon ? STAT_ICONS[icon] : null;
+  const toneClass = tone === "green" ? "text-accent" : tone === "amber" ? "text-warn" : tone === "red" ? "text-danger" : "text-ink";
   return (
-    <div className="panel p-4">
-      <p className="text-[10px] uppercase tracking-[0.1em] text-muted">{label}</p>
-      <p className={`mt-2 text-2xl font-medium tracking-tight ${toneClass}`}>{value}</p>
+    <div className="panel p-5">
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted">{t(label)}</p>
+        {Icon && (
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-2 text-muted">
+            <Icon className="h-4 w-4" />
+          </span>
+        )}
+      </div>
+      <p className={`mt-2.5 text-[26px] font-semibold tracking-[-0.04em] ${toneClass}`}>{value}</p>
       {hint && <p className="mt-1 text-[11px] text-muted">{hint}</p>}
     </div>
   );
