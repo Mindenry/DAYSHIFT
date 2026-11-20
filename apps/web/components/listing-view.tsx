@@ -226,9 +226,9 @@ export function ListingView({
                 <Link href={basePath} className="btn btn-outline mt-8">Clear filters</Link>
               </div>
             ) : (
-              <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-6 xl:grid-cols-3">
+              <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 min-[360px]:gap-x-4 md:gap-x-6 md:gap-y-10 xl:grid-cols-3">
                 {products.map((product, index) => (
-                  <ProductCard key={product.id} product={product} priority={index < 3} />
+                  <ProductCard key={product.id} product={product} priority={index < 3} revealDelay={index * 45} />
                 ))}
               </div>
             )}

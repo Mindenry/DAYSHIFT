@@ -6,17 +6,23 @@ import { WishlistButton } from "./wishlist-button";
 export function ProductCard({
   product,
   priority = false,
+  revealDelay = 0,
   className = "",
 }: {
   product: ProductCardDto;
   priority?: boolean;
+  revealDelay?: number;
   className?: string;
 }) {
   const onSale = product.compareAtPrice && Number(product.compareAtPrice) > Number(product.price);
   const colors = product.colors.slice(0, 3);
 
   return (
-    <article className={`group relative flex flex-col transition-transform duration-300 ease-out md:hover:-translate-y-1 ${className}`}>
+    <article
+      data-reveal
+      style={{ "--reveal-delay": `${revealDelay}ms` } as React.CSSProperties}
+      className={`group relative flex flex-col transition-transform duration-300 ease-out md:hover:-translate-y-1 ${className}`}
+    >
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-sand">
           {product.primaryImage ? (

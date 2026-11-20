@@ -19,7 +19,32 @@ export function SiteHeaderClient({
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mega, setMega] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
   const pathname = usePathname();
+
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const root = document.documentElement;
+      const max = root.scrollHeight - root.clientHeight;
+      setScrolled(window.scrollY > 12);
+      setProgress(max > 0 ? Math.min(1, window.scrollY / max) : 0);
+    };
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
 
   useEffect(() => {
     setMega(null);
@@ -42,10 +67,18 @@ export function SiteHeaderClient({
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur-md">
+      <header
+        className={`sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur-md transition-shadow duration-300 ${
+          scrolled ? "shadow-[0_10px_30px_rgba(26,25,23,0.07)]" : ""
+        }`}
+      >
       <div className="wrap">
-        <div className="flex h-16 items-center justify-between gap-4 md:h-20">
-          <nav aria-label="Primary" className="hidden flex-1 items-center gap-6 lg:flex">
+        <div
+          className={`flex items-center justify-between gap-4 transition-[height] duration-300 ease-out ${
+            scrolled ? "h-14 md:h-16" : "h-16 md:h-20"
+          }`}
+        >
+          <nav aria-label="Primary" className="hidden flex-1 items-stretch gap-6 lg:flex">
             {primary.map((root) => (
               <div
                 key={root.slug}
@@ -55,7 +88,7 @@ export function SiteHeaderClient({
               >
                 <Link
                   href={`/c/${root.slug}`}
-                  className="overline link-underline inline-flex h-20 items-center !text-[10.5px] !tracking-[0.18em]"
+                  className="overline link-underline inline-flex items-center self-stretch !text-[10.5px] !tracking-[0.18em]"
                   aria-haspopup={root.children?.length ? "true" : undefined}
                   aria-expanded={mega === root.slug}
                 >
@@ -63,10 +96,10 @@ export function SiteHeaderClient({
                 </Link>
               </div>
             ))}
-            <Link href="/collections/new-arrivals" className="overline link-underline !text-[10.5px] !tracking-[0.18em]">
+            <Link href="/collections/new-arrivals" className="overline link-underline inline-flex items-center self-stretch !text-[10.5px] !tracking-[0.18em]">
               New
             </Link>
-            <Link href="/collections/sale" className="overline link-underline !text-[10.5px] !tracking-[0.18em] text-sale">
+            <Link href="/collections/sale" className="overline link-underline inline-flex items-center self-stretch !text-[10.5px] !tracking-[0.18em] text-sale">
               Sale
             </Link>
           </nav>
@@ -83,7 +116,9 @@ export function SiteHeaderClient({
 
           <Link
             href="/"
-            className="shrink-0 whitespace-nowrap font-display text-[20px] tracking-[0.16em] min-[380px]:text-[24px] sm:text-[27px] md:text-[30px]"
+            className={`shrink-0 whitespace-nowrap font-display text-[20px] tracking-[0.16em] transition-transform duration-300 min-[380px]:text-[24px] sm:text-[27px] md:text-[30px] ${
+              scrolled ? "scale-95" : ""
+            }`}
             aria-label="DAYSHIFT home"
           >
             DAYSHIFT
@@ -170,6 +205,12 @@ export function SiteHeaderClient({
         </div>
       )}
 
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-line/50" aria-hidden>
+        <div
+          className="h-full origin-left bg-ink transition-transform duration-150 ease-out"
+          style={{ transform: `scaleX(${progress})` }}
+        />
+      </div>
       </header>
 
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} roots={roots} user={user} />

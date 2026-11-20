@@ -64,7 +64,20 @@ for (const [width, height, label] of [[390, 844, "390"], [320, 700, "320"]]) {
         if (style.display === "none" || style.visibility === "hidden" || style.position === "fixed") continue;
         const rect = node.getBoundingClientRect();
         if (rect.width === 0 || rect.height === 0) continue;
-        if (rect.right > width + 1 && style.overflowX !== "hidden") {
+        let clipped = false;
+        let parent = node.parentElement;
+        while (parent && parent !== document.body) {
+          const parentStyle = getComputedStyle(parent);
+          if (
+            (parentStyle.overflowX === "hidden" || parentStyle.overflowX === "clip") &&
+            parent.getBoundingClientRect().right <= document.documentElement.clientWidth + 1
+          ) {
+            clipped = true;
+            break;
+          }
+          parent = parent.parentElement;
+        }
+        if (rect.right > width + 1 && style.overflowX !== "hidden" && !clipped) {
           overflowing.push({
             tag: node.tagName.toLowerCase(),
             cls: (node.className && typeof node.className === "string" ? node.className : "").slice(0, 90),

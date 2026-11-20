@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, RotateCcw, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { apiGet } from "@/lib/api";
 import { ProductCard } from "@/components/product-card";
+import { ParallaxLayer } from "@/components/parallax-layer";
 import { serializeJsonLd } from "@dayshift/config";
 import type { ProductCardDto } from "@dayshift/types";
 
@@ -127,7 +128,7 @@ export default async function HomePage() {
 
       {/* Hero: full-bleed image on phones, split editorial panel from lg. */}
       <section className="relative isolate overflow-hidden border-b border-line bg-ink lg:bg-paper">
-        <div className="absolute inset-0 lg:hidden">
+        <ParallaxLayer className="absolute inset-0 lg:hidden">
           <img
             src={hero?.imageUrl ?? "/images/editorial-01.jpg"}
             alt=""
@@ -136,7 +137,7 @@ export default async function HomePage() {
             decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 to-ink/10" />
-        </div>
+        </ParallaxLayer>
 
         <div className="wrap relative">
           <div className="grid min-h-[88svh] items-stretch lg:min-h-[calc(100svh-116px)] lg:grid-cols-[0.95fr_1.05fr]">
@@ -145,9 +146,12 @@ export default async function HomePage() {
                 {hero?.subtitle ?? "New season / 2026"}
               </p>
               <h1 className="mt-5 font-display text-[clamp(3.1rem,13vw,4.8rem)] leading-[0.92] tracking-[-0.03em] text-paper lg:text-[clamp(4.2rem,6.4vw,7rem)] lg:text-ink">
-                Everyday style.
-                <br />
-                <span className="italic">Your way.</span>
+                <span className="hero-line" style={{ "--i": "80ms" } as React.CSSProperties}>
+                  Everyday style.
+                </span>
+                <span className="hero-line italic" style={{ "--i": "220ms" } as React.CSSProperties}>
+                  Your way.
+                </span>
               </h1>
               <p className="mt-6 max-w-md text-[15px] leading-relaxed text-paper/85 lg:mt-8 lg:text-ink-soft">
                 {hero?.body ??
@@ -183,14 +187,16 @@ export default async function HomePage() {
               </dl>
             </div>
 
-            <div className="relative hidden lg:block">
-              <img
-                src={hero?.imageUrl ?? "/images/editorial-01.jpg"}
-                alt="DAYSHIFT autumn studio collection"
-                className="absolute inset-0 h-full w-full animate-hero-image object-cover"
-                fetchPriority="high"
-                decoding="async"
-              />
+            <div className="relative hidden overflow-hidden lg:block">
+              <ParallaxLayer className="absolute inset-0">
+                <img
+                  src={hero?.imageUrl ?? "/images/editorial-01.jpg"}
+                  alt="DAYSHIFT autumn studio collection"
+                  className="h-full w-full animate-hero-image object-cover"
+                  fetchPriority="high"
+                  decoding="async"
+                />
+              </ParallaxLayer>
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 xl:p-8">
                 <span className="bg-paper/92 px-4 py-3 text-[10px] uppercase leading-relaxed tracking-[0.18em] backdrop-blur">
                   The Autumn 2026
@@ -233,7 +239,7 @@ export default async function HomePage() {
       {/* New arrivals */}
       <section aria-labelledby="new-arrivals" className="py-16 md:py-24">
         <div className="wrap">
-          <div className="flex items-end justify-between gap-8 border-b border-line pb-5">
+          <div className="flex items-end justify-between gap-8 border-b border-line pb-5" data-reveal>
             <div>
               <p className="overline text-muted">Just landed</p>
               <h2 id="new-arrivals" className="mt-2 font-display text-3xl md:text-5xl">New arrivals</h2>
@@ -244,7 +250,7 @@ export default async function HomePage() {
           </div>
           <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 min-[360px]:gap-x-4 md:gap-x-6 md:gap-y-10 lg:grid-cols-4">
             {newArrivals.map((product, index) => (
-              <ProductCard key={product.id} product={product} priority={index < 2} />
+              <ProductCard key={product.id} product={product} priority={index < 2} revealDelay={index * 60} />
             ))}
           </div>
           <div className="mt-8 sm:hidden">
@@ -259,7 +265,7 @@ export default async function HomePage() {
       <section aria-labelledby="shop-by-category" className="border-y border-line bg-paper-deep py-16 md:py-24">
         <div className="wrap">
           <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
-            <div className="lg:sticky lg:top-28 lg:self-start">
+            <div className="lg:sticky lg:top-28 lg:self-start" data-reveal>
               <p className="overline text-muted">Shop by category</p>
               <h2 id="shop-by-category" className="mt-3 font-display text-3xl leading-tight md:text-5xl">
                 The pieces that
@@ -274,10 +280,12 @@ export default async function HomePage() {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-3 md:gap-5">
-              {categoryTiles.map((tile) => (
+              {categoryTiles.map((tile, index) => (
                 <Link
                   key={tile.slug}
                   href={`/c/${tile.slug}`}
+                  data-reveal
+                  style={{ "--reveal-delay": `${index * 70}ms` } as React.CSSProperties}
                   className="group relative aspect-square overflow-hidden bg-sand transition-transform duration-200 active:scale-[0.99]"
                 >
                   <img
@@ -306,6 +314,8 @@ export default async function HomePage() {
               <Link
                 key={block.key}
                 href={block.ctaUrl ?? (index === 0 ? "/c/women" : "/c/men")}
+                data-reveal
+                style={{ "--reveal-delay": `${index * 90}ms` } as React.CSSProperties}
                 className="group relative block aspect-[4/5] overflow-hidden bg-sand transition-transform duration-200 active:scale-[0.995]"
               >
                 <img
@@ -337,7 +347,7 @@ export default async function HomePage() {
       {/* Campaign */}
       <section aria-labelledby="seasonal-edit" className="border-y border-line">
         <div className="grid lg:grid-cols-2">
-          <div className="order-2 flex flex-col justify-center bg-ink px-5 py-16 text-paper md:px-14 lg:order-1 lg:py-28">
+          <div className="order-2 flex flex-col justify-center bg-ink px-5 py-16 text-paper md:px-14 lg:order-1 lg:py-28" data-reveal>
             <p className="overline text-paper/60">Autumn 2026</p>
             <h2 id="seasonal-edit" className="mt-4 max-w-lg font-display text-4xl leading-[1.02] md:text-6xl">
               {content.campaign?.title ?? "The Seasonal Edit"}
@@ -358,7 +368,7 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="relative order-1 min-h-[46vh] bg-sand lg:order-2 lg:min-h-[70vh]">
+          <div className="relative order-1 min-h-[46vh] bg-sand lg:order-2 lg:min-h-[70vh]" data-reveal>
             <img
               src={content.campaign?.imageUrl ?? "/art/dress-stone.svg"}
               alt="The seasonal edit"
@@ -373,7 +383,7 @@ export default async function HomePage() {
       {/* Best sellers */}
       <section aria-labelledby="best-sellers" className="py-16 md:py-24">
         <div className="wrap">
-          <div className="flex items-end justify-between gap-8 border-b border-line pb-5">
+          <div className="flex items-end justify-between gap-8 border-b border-line pb-5" data-reveal>
             <div>
               <p className="overline text-muted">The ones you come back for</p>
               <h2 id="best-sellers" className="mt-2 font-display text-3xl md:text-5xl">Best sellers</h2>
@@ -383,8 +393,8 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 min-[360px]:gap-x-4 md:gap-x-6 md:gap-y-10 lg:grid-cols-4">
-            {bestSellers.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {bestSellers.map((product, index) => (
+              <ProductCard key={product.id} product={product} revealDelay={index * 60} />
             ))}
           </div>
           <div className="mt-8 sm:hidden">
@@ -398,7 +408,7 @@ export default async function HomePage() {
       {/* FAQ: concise answers for customers and answer engines. */}
       <section aria-labelledby="faq" className="border-y border-line bg-paper-deep py-16 md:py-24">
         <div className="wrap grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
-          <div>
+          <div data-reveal>
             <p className="overline text-muted">Before you order</p>
             <h2 id="faq" className="mt-3 font-display text-3xl md:text-4xl">Questions, answered.</h2>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
@@ -408,7 +418,7 @@ export default async function HomePage() {
               Contact customer care
             </Link>
           </div>
-          <div className="divide-y divide-line border-y border-line">
+          <div className="divide-y divide-line border-y border-line" data-reveal style={{ "--reveal-delay": "120ms" } as React.CSSProperties}>
             {FAQS.map((entry) => (
               <details key={entry.question} className="group py-4">
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-6 text-left">
@@ -424,7 +434,7 @@ export default async function HomePage() {
 
       {/* Closing statement */}
       <section className="py-20 md:py-32">
-        <div className="wrap text-center">
+        <div className="wrap text-center" data-reveal>
           <p className="overline text-muted">The DAYSHIFT note</p>
           <h2 className="mx-auto mt-5 max-w-4xl font-display text-[clamp(2.5rem,7vw,6rem)] leading-[0.98] tracking-[-0.02em]">
             Built for the days that

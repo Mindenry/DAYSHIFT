@@ -25,7 +25,7 @@ Defined in `apps/web/app/globals.css` under `@theme`:
 | `--color-line` | `#d8d0c1` | Hairlines and borders |
 | `--color-sale` | `#8a3b2e` | Sale price, destructive notes |
 
-Typography is self-hosted through `next/font/google` in `app/layout.tsx`:
+Typography is self-hosted via `@fontsource-variable` packages imported in `app/layout.tsx`, so builds never call Google Fonts:
 
 - **Display:** Bodoni Moda, weights 400/500/600, normal and italic. Used for `h1`–`h3`, product names and editorial statements.
 - **UI/body:** Manrope, variable. Used for navigation, controls, prices, labels and body copy.
@@ -64,9 +64,12 @@ Mobile menu, search, filters and size guide all lock `body` scrolling, close on 
 
 ## 5. Motion
 
-Motion is deliberate and short; there are no scroll-triggered reveals, parallax or carousels.
+Motion is deliberate and short; there are no scroll-jacking, timed carousels or hover tilt effects.
 
-- **Hero:** image scales from 1.06 to 1 while fading in; copy fades up once on load.
+- **Page transition:** every route fades in through `app/template.tsx`.
+- **Hero:** the headline lines rise and fade in sequence; the image scales from 1.06 to 1 and drifts with scroll (`ParallaxLayer`).
+- **Scroll reveal:** section headers, product cards, category tiles, editorial blocks and FAQ items rise 26px and fade in as they enter the viewport, with a 45–90ms stagger. A position check also reveals content skipped by anchor jumps.
+- **Header:** condenses from 81px to 65px on scroll, gains a soft shadow, and shows a live reading-progress line.
 - **Mobile menu:** left drawer slides in over a fading backdrop; navigation items stagger in at 30ms intervals. It slides out before unmounting.
 - **Search:** full-screen panel fades and drops 12px into place.
 - **Filters:** mobile bottom sheet slides up over a fading backdrop.
@@ -74,7 +77,7 @@ Motion is deliberate and short; there are no scroll-triggered reveals, parallax 
 - **Sticky bars:** product, cart and checkout bars slide up on mount.
 - **Buttons:** lift 1px on hover and compress to 0.985 on press.
 - **Cards:** product cards lift 1px and zoom their image; the cart badge pops when the count changes.
-- **Reduced motion:** every animation and transition collapses to 0.01ms with no delay.
+- **Reduced motion:** every animation, transition, delay and reveal collapses; content is always visible.
 
 Overlays use `components/use-presence.ts`. It keeps the element mounted for the exit transition and waits **two animation frames** before switching to the open state, so the closed layout is painted first and the transition actually runs. The same file explains why a single `requestAnimationFrame` is not enough.
 
@@ -148,6 +151,6 @@ Latest result: **passed at both widths for all 11 routes**. Interactive checks a
 ## 9. Known constraints
 
 - Product imagery is generated SVG studio art, not photography. Cards use a 3:4 frame; some art has generous internal padding.
-- Fonts are downloaded at build time by `next/font` and self-hosted by Next.js; the running app does not call Google Fonts.
+- Fonts ship inside the `@fontsource-variable` packages and are served by Next.js; the running app never calls Google Fonts, and Docker builds do not need font network access.
 - The demo uses a sandbox payment provider and local email files.
 - Canonical and social URLs use `NEXT_PUBLIC_SITE_URL`, currently the LAN address. Set it to the public HTTPS domain before launch.

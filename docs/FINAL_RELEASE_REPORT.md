@@ -129,7 +129,7 @@ Run the documented macOS checklist from a physical Mac and record the result in 
 
 After the LAN release, the customer storefront was upgraded without changing the audited commerce backend:
 
-- Self-hosted Bodoni Moda and Manrope typography, refined palette and spacing.
+- Self-hosted Bodoni Moda and Manrope typography (`@fontsource-variable`), refined palette and spacing.
 - Mobile-first hero with full-bleed imagery, service strip, category tiles and FAQ.
 - Rebuilt product cards, product detail with sticky mobile add-to-bag, cart free-delivery progress and sticky checkout, checkout with a fixed mobile submit bar, and a two-column account navigation.
 - Fixed a real mobile defect: the menu and search overlays were rendered inside the header's `backdrop-filter` containing block and appeared transparent; they now render outside the header.
