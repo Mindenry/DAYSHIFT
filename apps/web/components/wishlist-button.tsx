@@ -59,7 +59,7 @@ export function WishlistButton({
       aria-label={saved ? `Remove ${productName} from wishlist` : `Save ${productName} to wishlist`}
       aria-pressed={saved}
       className={`flex items-center justify-center border border-line bg-paper/85 backdrop-blur transition-colors hover:bg-paper ${
-        large ? "h-12 w-12" : "h-9 w-9"
+        large ? "h-12 w-12" : "h-10 w-10 sm:h-9 sm:w-9"
       }`}
     >
       <Heart className={`${large ? "h-5 w-5" : "h-4 w-4"} ${saved ? "fill-ink" : ""}`} />

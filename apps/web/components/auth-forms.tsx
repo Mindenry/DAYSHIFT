@@ -222,7 +222,7 @@ export function SignOutButton() {
           router.refresh();
         }
       }}
-      className="text-left text-sm text-muted underline underline-offset-4 hover:text-ink"
+      className="inline-flex min-h-11 items-center text-left text-sm text-muted underline underline-offset-4 hover:text-ink"
     >
       Sign out
     </button>

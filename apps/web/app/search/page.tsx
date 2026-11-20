@@ -16,7 +16,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const query = await searchParams;
   const q = typeof query.q === "string" ? query.q : "";
   return {
-    title: q ? `Search: ${q} — DAYSHIFT` : "Search — DAYSHIFT",
+    title: q ? `Search: ${q}` : "Search",
     robots: { index: false, follow: true },
   };
 }

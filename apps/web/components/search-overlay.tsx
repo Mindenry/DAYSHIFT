@@ -16,11 +16,18 @@ interface Suggestion {
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
   const [data, setData] = useState<Suggestion | null>(null);
+  const [recent, setRecent] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   useEffect(() => {
     if (!open) return;
+    try {
+      const stored = JSON.parse(localStorage.getItem("ds-recent-searches") ?? "[]");
+      setRecent(Array.isArray(stored) ? stored.slice(0, 5) : []);
+    } catch {
+      setRecent([]);
+    }
     const timer = setTimeout(() => inputRef.current?.focus(), 40);
     document.body.style.overflow = "hidden";
     return () => {
@@ -119,14 +126,43 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
               </>
             ) : (
               <div>
-                <p className="overline text-muted">Popular right now</p>
+                {recent.length > 0 && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <p className="overline text-muted">Recent searches</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          localStorage.removeItem("ds-recent-searches");
+                          setRecent([]);
+                        }}
+                        className="min-h-11 px-1 text-[10px] uppercase tracking-[0.12em] text-muted underline underline-offset-4"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {recent.map((term) => (
+                        <button
+                          key={term}
+                          type="button"
+                          onClick={() => setQuery(term)}
+                          className="min-h-11 border border-line px-4 text-xs hover:border-ink"
+                        >
+                          {term}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+                <p className={`overline text-muted ${recent.length ? "mt-8" : ""}`}>Popular right now</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {(data?.popular ?? ["Linen shirt", "Oversized tee", "Straight jeans", "Leather tote", "Merino knit"]).map((term) => (
                     <button
                       key={term}
                       type="button"
                       onClick={() => setQuery(term)}
-                      className="border border-line px-4 py-2 text-xs uppercase tracking-[0.14em] hover:border-ink"
+                      className="min-h-11 border border-line px-4 text-xs uppercase tracking-[0.14em] hover:border-ink"
                     >
                       {term}
                     </button>

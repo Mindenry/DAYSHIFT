@@ -22,6 +22,7 @@
     "test:integration": "node scripts/integration-test.mjs",
     "test:exchange": "node scripts/exchange-test.mjs",
     "test:smoke": "node scripts/api-smoke.mjs",
+    "test:mobile": "node tests/e2e/mobile-check.mjs",
     "audit:deps": "pnpm audit --audit-level=high",
     "db:generate": "pnpm --filter @dayshift/db generate",
     "db:migrate": "pnpm --filter @dayshift/db migrate:dev",

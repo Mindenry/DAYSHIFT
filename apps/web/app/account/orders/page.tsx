@@ -4,7 +4,7 @@ import { apiGet, money } from "@/lib/api";
 import { getCookieHeader } from "@/lib/session";
 import { statusLabel } from "@/components/order-detail-view";
 
-export const metadata: Metadata = { title: "Your orders — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Your orders", robots: { index: false } };
 
 interface OrdersResponse {
   items: Array<{

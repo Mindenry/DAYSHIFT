@@ -1,7 +1,10 @@
 import Link from "next/link";
 import type { ProductCardDto } from "@dayshift/types";
+import { serializeJsonLd } from "@dayshift/config";
 import { ProductCard } from "./product-card";
 import { ListingFilters } from "./listing-filters";
+
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
 export interface Facets {
   sizes: Array<{ name: string; count: number }>;
@@ -82,8 +85,48 @@ export function ListingView({
     typeof params.q === "string" && params.q && { label: `“${params.q}”`, key: "q" },
   ].filter(Boolean) as Array<{ label: string; key: string }>;
 
+  const itemListLd =
+    products.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: title,
+          numberOfItems: products.length,
+          itemListElement: products.map((product, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: `${SITE}/products/${product.slug}`,
+            name: product.name,
+          })),
+        }
+      : null;
+  const breadcrumbLd =
+    breadcrumbs && breadcrumbs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
+            ...breadcrumbs.map((crumb, index) => ({
+              "@type": "ListItem",
+              position: index + 2,
+              name: crumb.name,
+              item: `${SITE}${crumb.href}`,
+            })),
+            { "@type": "ListItem", position: breadcrumbs.length + 2, name: title },
+          ],
+        }
+      : null;
+
   return (
-    <div>
+    <>
+      {itemListLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListLd) }} />
+      )}
+      {breadcrumbLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }} />
+      )}
+      <div>
       <div className="border-b border-line">
         <div className="wrap py-10 md:py-14">
           {breadcrumbs && breadcrumbs.length > 0 && (
@@ -229,6 +272,7 @@ export function ListingView({
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

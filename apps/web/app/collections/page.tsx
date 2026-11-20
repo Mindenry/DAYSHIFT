@@ -5,8 +5,14 @@ import Link from "next/link";
 import { apiGet } from "@/lib/api";
 
 export const metadata: Metadata = {
-  title: "Collections — DAYSHIFT",
+  title: "Collections",
   description: "Curated edits from the DAYSHIFT studio: new arrivals, best sellers, essentials and limited drops.",
+  alternates: { canonical: "/collections" },
+  openGraph: {
+    title: "Collections",
+    description: "Curated edits from the DAYSHIFT studio: new arrivals, best sellers, essentials and limited drops.",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "DAYSHIFT collections" }],
+  },
 };
 
 interface Collection {

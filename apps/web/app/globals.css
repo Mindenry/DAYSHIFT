@@ -12,10 +12,11 @@
   --color-line: #d8d0c1;
   --color-sale: #8a3b2e;
 
-  --font-display: "Didot", "Bodoni MT", "Playfair Display", "Times New Roman", Georgia, serif;
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: var(--font-bodoni), "Bodoni MT", Didot, "Times New Roman", Georgia, serif;
+  --font-sans: var(--font-manrope), "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  --tracking-overline: 0.24em;
+  --tracking-overline: 0.22em;
+  --breakpoint-xs: 380px;
 }
 
 @layer base {
@@ -25,6 +26,7 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -51,6 +53,16 @@
     font-family: var(--font-display);
     font-weight: 400;
     letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  img,
+  video {
+    max-width: 100%;
   }
 
   input,
@@ -63,7 +75,17 @@
   img {
     user-select: none;
   }
+
+  /* Prevent iOS Safari from zooming when a field receives focus. */
+  @media (max-width: 767px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
 }
+
 
 @layer components {
   .wrap {
@@ -154,9 +176,15 @@
     border: 1px solid var(--color-line);
     background: transparent;
     padding: 12px 14px;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--color-ink);
     transition: border-color 160ms ease;
+  }
+
+  @media (min-width: 768px) {
+    .field {
+      font-size: 14px;
+    }
   }
 
   .field:focus {
@@ -195,6 +223,23 @@
 
   .editorial-rule {
     border-top: 1px solid var(--color-line);
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .safe-bottom {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  }
+
+  .hairline {
+    border-color: color-mix(in srgb, var(--color-ink) 14%, transparent);
   }
 }
 

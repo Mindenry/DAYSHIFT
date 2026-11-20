@@ -19,12 +19,14 @@ export function SearchBox({ initial }: { initial: string }) {
       <label htmlFor="search-page-input" className="sr-only">Search products</label>
       <input
         id="search-page-input"
+        type="search"
         value={value}
         onChange={(event) => setValue(event.target.value)}
         placeholder="Search products, categories or SKUs"
-        className="w-full bg-transparent font-display text-2xl outline-none placeholder:text-stone"
+        className="min-h-11 w-full bg-transparent font-display text-xl outline-none placeholder:text-stone sm:text-2xl"
+        autoComplete="off"
       />
-      <button type="submit" className="overline">Search</button>
+      <button type="submit" className="overline min-h-11 px-1">Search</button>
     </form>
   );
 }

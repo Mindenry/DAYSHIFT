@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Minus, Plus, Ruler, ShieldCheck, Truck, X } from "lucide-react";
@@ -88,35 +88,68 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
 
   const chart = (product.sizeGuide?.chart ?? null) as ChartShape | null;
 
+  useEffect(() => {
+    if (!sizeGuideOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSizeGuideOpen(false);
+    };
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [sizeGuideOpen]);
+
   return (
     <div className="wrap">
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 py-6 text-[11px] uppercase tracking-[0.14em] text-muted">
-        <Link href="/" className="link-underline">Home</Link>
+      <nav
+        aria-label="Breadcrumb"
+        className="no-scrollbar flex items-center gap-2 overflow-x-auto whitespace-nowrap py-5 text-[10px] uppercase tracking-[0.14em] text-muted md:py-6"
+      >
+        <Link href="/" className="link-underline shrink-0">Home</Link>
         {product.categories[0] && (
           <>
-            <span aria-hidden>/</span>
-            <Link href={`/c/${product.categories[0].slug}`} className="link-underline">
+            <span aria-hidden className="text-line">/</span>
+            <Link href={`/c/${product.categories[0].slug}`} className="link-underline shrink-0">
               {product.categories[0].name}
             </Link>
           </>
         )}
-        <span aria-hidden>/</span>
-        <span className="text-ink">{product.name}</span>
+        <span aria-hidden className="text-line">/</span>
+        <span className="truncate text-ink">{product.name}</span>
       </nav>
 
-      <div className="grid gap-10 lg:grid-cols-[1.12fr_0.88fr] lg:gap-16">
+      <div className="grid gap-8 lg:grid-cols-[1.12fr_0.88fr] lg:gap-16">
         {/* Gallery */}
         <div>
           <div className="relative aspect-[3/4] overflow-hidden bg-sand">
-            { }
-            <img src={mainImage ?? ""} alt={product.name} className="h-full w-full object-cover" fetchPriority="high" />
+            {mainImage ? (
+              <img
+                src={mainImage}
+                alt={product.name}
+                className="h-full w-full object-cover"
+                fetchPriority="high"
+                decoding="async"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.2em] text-muted">
+                Image coming soon
+              </div>
+            )}
             <div className="absolute left-3 top-3 flex flex-col gap-1">
               {onSale && <span className="bg-paper px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-sale">Sale</span>}
               {product.isNew && <span className="bg-paper px-2 py-1 text-[10px] uppercase tracking-[0.16em]">New</span>}
             </div>
+            {images.length > 1 && (
+              <span className="absolute bottom-3 right-3 bg-paper/90 px-2 py-1 text-[10px] tracking-[0.1em] text-muted">
+                {activeImage + 1} / {images.length}
+              </span>
+            )}
           </div>
           {images.length > 1 && (
-            <div className="mt-3 grid grid-cols-5 gap-2">
+            <div className="mt-2 grid grid-cols-5 gap-1.5 md:mt-3 md:gap-2">
               {images.map((image, index) => (
                 <button
                   key={image.id}
@@ -128,8 +161,7 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
                   aria-label={`View image ${index + 1}`}
                   aria-pressed={activeImage === index}
                 >
-                  { }
-                  <img src={image.url} alt="" className="h-full w-full object-cover" loading="lazy" />
+                  <img src={image.url} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>
@@ -139,17 +171,17 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
         {/* Info */}
         <div className="lg:sticky lg:top-28 lg:self-start">
           <p className="overline text-muted">{product.brand?.name ?? "DAYSHIFT"}</p>
-          <h1 className="mt-2 font-display text-4xl leading-[1.02] md:text-5xl">{product.name}</h1>
-          <div className="mt-3 flex items-center gap-3">
+          <h1 className="mt-2 font-display text-[2.5rem] leading-[1.02] sm:text-5xl md:text-[3.4rem]">{product.name}</h1>
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
             <p className={`text-lg ${onSale ? "text-sale" : ""}`}>{money(price)}</p>
             {onSale && <p className="text-sm text-muted line-through">{money(compareAt)}</p>}
             {product.rating.count > 0 && (
-              <a href="#reviews" className="ml-auto text-xs text-muted underline underline-offset-4">
+              <a href="#reviews" className="border-l border-line pl-3 text-xs text-muted underline underline-offset-4">
                 {product.rating.average.toFixed(1)} · {product.rating.count} {product.rating.count === 1 ? "review" : "reviews"}
               </a>
             )}
           </div>
-          <p className="mt-5 max-w-md text-sm leading-relaxed text-ink-soft">{product.shortDescription}</p>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-soft">{product.shortDescription}</p>
 
           {/* Colour */}
           <div className="mt-8">
@@ -326,8 +358,37 @@ export function ProductExperience({ product }: { product: ProductDetailDto }) {
         </div>
       </div>
 
+      {/* Mobile purchase bar */}
+      <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur-md lg:hidden">
+        <div className="mx-auto flex max-w-3xl items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[10px] uppercase tracking-[0.14em] text-muted">
+              {color}
+              {size ? ` · ${size}` : ""}
+            </p>
+            <p className={`text-sm ${onSale ? "text-sale" : ""}`}>{money(price)}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => add(false)}
+            disabled={!canBuy || busy}
+            className="btn btn-primary min-w-[9.5rem]"
+          >
+            {busy ? "Adding…" : canBuy ? "Add to bag" : "Sold out"}
+          </button>
+        </div>
+      </div>
+
       {sizeGuideOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" role="dialog" aria-modal="true" aria-label="Size guide">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Size guide"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setSizeGuideOpen(false);
+          }}
+        >
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-paper p-6 md:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>

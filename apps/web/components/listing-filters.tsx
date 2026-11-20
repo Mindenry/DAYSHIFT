@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import type { Facets } from "./listing-view";
 
@@ -26,8 +26,22 @@ export function ListingFilters({ facets, basePath, params, activeSort, sortOptio
   const activeMax = typeof params.maxPrice === "string" ? params.maxPrice : "";
   const activeStock = params.inStock === "true";
 
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   const panel = (
-    <form method="get" action={basePath} className="space-y-8">
+    <form method="get" action={basePath} className="space-y-8" onSubmit={() => setOpen(false)}>
       {hiddenFields(params, ["size", "color", "minPrice", "maxPrice", "inStock", "sort", "page"])}
       <div>
         <p className="overline mb-3">Sort</p>

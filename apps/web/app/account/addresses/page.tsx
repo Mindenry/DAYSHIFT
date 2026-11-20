@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AddressesView } from "@/components/addresses-view";
 
-export const metadata: Metadata = { title: "Addresses — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Addresses", robots: { index: false } };
 
 export default function AddressesPage() {
   return (

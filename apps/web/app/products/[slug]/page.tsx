@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { apiGet } from "@/lib/api";
+import { stripBrandSuffix } from "@/lib/seo";
 import { getSession } from "@/lib/session";
 import type { ProductDetailDto } from "@dayshift/types";
 import { ProductExperience } from "@/components/product-experience";
@@ -15,19 +16,31 @@ import { serializeJsonLd } from "@dayshift/config";
 
 type Product = ProductDetailDto & { reviewTotal?: number };
 
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const product = await apiGet<Product>(`/products/${slug}`, { revalidate: 60 });
   if (!product) return { title: "Product" };
+  const ogImage =
+    product.primaryImage && !product.primaryImage.toLowerCase().endsWith(".svg")
+      ? product.primaryImage
+      : "/og-default.png";
   return {
-    title: product.metaTitle ?? `${product.name} — DAYSHIFT`,
+    title: stripBrandSuffix(product.metaTitle, product.name),
     description: product.metaDescription ?? product.shortDescription ?? undefined,
     alternates: { canonical: `/products/${product.slug}` },
     openGraph: {
       title: product.name,
       description: product.shortDescription ?? undefined,
-      images: product.primaryImage ? [{ url: product.primaryImage }] : undefined,
+      images: [{ url: ogImage, alt: product.name }],
       type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.shortDescription ?? undefined,
+      images: [ogImage],
     },
   };
 }
@@ -61,16 +74,38 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     sku: product.sku,
     description: product.description,
     image: product.images.map((image) => image.url),
+    url: `${SITE}/products/${product.slug}`,
+    category: product.categories[0]?.name,
     brand: { "@type": "Brand", name: product.brand?.name ?? "DAYSHIFT" },
     offers: {
       "@type": "Offer",
       priceCurrency: product.currency,
       price: product.price,
+      url: `${SITE}/products/${product.slug}`,
+      priceValidUntil: new Date(Date.now() + 365 * 86_400_000).toISOString().slice(0, 10),
+      itemCondition: "https://schema.org/NewCondition",
       availability: product.inStock
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
-      url: `/products/${product.slug}`,
-      seller: { "@type": "Organization", name: "DAYSHIFT" },
+      seller: { "@type": "Organization", name: "DAYSHIFT", url: SITE },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "US",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 30,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+      },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: { "@type": "MonetaryAmount", value: "7.95", currency: "USD" },
+        shippingDestination: { "@type": "DefinedRegion", addressCountry: "US" },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
+          transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 5, unitCode: "DAY" },
+        },
+      },
     },
     ...(product.rating.count > 0
       ? {
@@ -78,7 +113,21 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             "@type": "AggregateRating",
             ratingValue: product.rating.average,
             reviewCount: product.rating.count,
+            bestRating: 5,
+            worstRating: 1,
           },
+        }
+      : {}),
+    ...(reviews.length
+      ? {
+          review: reviews.slice(0, 5).map((review) => ({
+            "@type": "Review",
+            author: { "@type": "Person", name: review.authorName },
+            datePublished: review.createdAt,
+            reviewRating: { "@type": "Rating", ratingValue: review.rating, bestRating: 5 },
+            ...(review.title ? { name: review.title } : {}),
+            reviewBody: review.body,
+          })),
         }
       : {}),
   };
@@ -87,16 +136,21 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
       ...(product.categories[0]
-        ? [{ "@type": "ListItem", position: 2, name: product.categories[0].name, item: `/c/${product.categories[0].slug}` }]
+        ? [{
+            "@type": "ListItem",
+            position: 2,
+            name: product.categories[0].name,
+            item: `${SITE}/c/${product.categories[0].slug}`,
+          }]
         : []),
-      { "@type": "ListItem", position: product.categories[0] ? 3 : 2, name: product.name, item: `/products/${product.slug}` },
+      { "@type": "ListItem", position: product.categories[0] ? 3 : 2, name: product.name, item: `${SITE}/products/${product.slug}` },
     ],
   };
 
   return (
-    <div>
+    <div className="pb-24 lg:pb-0">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }} />
 

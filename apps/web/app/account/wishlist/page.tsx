@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { WishlistView } from "@/components/wishlist-view";
 
-export const metadata: Metadata = { title: "Your wishlist — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Your wishlist", robots: { index: false } };
 
 export default function WishlistPage() {
   return (

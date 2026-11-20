@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { apiGet, money } from "@/lib/api";
 import { getCookieHeader } from "@/lib/session";
 
-export const metadata: Metadata = { title: "Loyalty — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Loyalty", robots: { index: false } };
 
 interface Loyalty {
   pointsBalance: number;

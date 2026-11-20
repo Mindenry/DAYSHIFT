@@ -58,10 +58,10 @@ export function SiteFooter() {
             {columns.map((column) => (
               <div key={column.title}>
                 <p className="overline text-muted">{column.title}</p>
-                <ul className="mt-4 space-y-2.5">
+                <ul className="mt-2 space-y-0.5 sm:mt-4 sm:space-y-2.5">
                   {column.links.map((link) => (
                     <li key={link.href}>
-                      <Link href={link.href} className="link-underline text-sm">
+                      <Link href={link.href} className="link-underline inline-flex min-h-10 items-center text-sm sm:min-h-0">
                         {link.label}
                       </Link>
                     </li>

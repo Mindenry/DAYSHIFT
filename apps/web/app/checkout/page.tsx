@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getSession } from "@/lib/session";
 import { CheckoutView } from "@/components/checkout-view";
 
-export const metadata: Metadata = { title: "Checkout — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Checkout", robots: { index: false } };
 
 export default async function CheckoutPage() {
   const session = await getSession();

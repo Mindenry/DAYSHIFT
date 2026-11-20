@@ -1,8 +1,8 @@
-﻿import { chromium } from "@playwright/test";
+import { chromium } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 const SITE = process.env.E2E_BASE_URL ?? "http://192.168.1.107:3000";
 const ADMIN = process.env.E2E_ADMIN_URL ?? "http://192.168.1.107:3001";
-const OUT = "docs/screenshots";
+const OUT = "../../docs/screenshots";
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch();
 
@@ -22,6 +22,8 @@ const mobile = await browser.newContext({ viewport: { width: 390, height: 844 },
 const mpage = await mobile.newPage();
 await mpage.goto(`${SITE}/`, { waitUntil: "networkidle" });
 await mpage.screenshot({ path: `${OUT}/storefront-mobile.png` });
+await mpage.goto(`${SITE}/products/the-everyday-oversized-tee`, { waitUntil: "networkidle" });
+await mpage.screenshot({ path: `${OUT}/storefront-mobile-product.png` });
 await mobile.close();
 
 const adminCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });

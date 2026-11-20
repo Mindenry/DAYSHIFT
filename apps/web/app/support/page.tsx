@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
+import { serializeJsonLd } from "@dayshift/config";
 
 export const metadata: Metadata = {
-  title: "Customer care — DAYSHIFT",
+  title: "Customer care",
   description: "Delivery, returns, sizing and order help from the DAYSHIFT customer care team.",
+  alternates: { canonical: "/support" },
+  openGraph: {
+    title: "Customer care",
+    description: "Delivery, returns, sizing and order help from the DAYSHIFT customer care team.",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "DAYSHIFT customer care" }],
+  },
 };
 
 const FAQS = [
@@ -32,8 +39,18 @@ const FAQS = [
 
 export default async function SupportPage() {
   const session = await getSession();
+  const faqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQS.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+  };
   return (
     <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqLd) }} />
       <div className="wrap py-12 md:py-20">
         <div className="max-w-2xl">
           <p className="overline text-muted">Customer care</p>

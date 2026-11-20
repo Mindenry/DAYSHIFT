@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SandboxPayment } from "@/components/sandbox-payment";
 
-export const metadata: Metadata = { title: "Payment — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Payment", robots: { index: false } };
 
 export default async function PaymentPage({
   searchParams,

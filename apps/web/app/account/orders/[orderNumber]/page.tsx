@@ -6,7 +6,7 @@ import { getCookieHeader } from "@/lib/session";
 import { OrderDetailView, type OrderView } from "@/components/order-detail-view";
 import { OrderActions } from "@/components/order-actions";
 
-export const metadata: Metadata = { title: "Order details — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Order details", robots: { index: false } };
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ orderNumber: string }> }) {
   const { orderNumber } = await params;

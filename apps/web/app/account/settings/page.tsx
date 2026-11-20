@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { SettingsView } from "@/components/settings-view";
 
-export const metadata: Metadata = { title: "Settings & security — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Settings & security", robots: { index: false } };
 
 export default async function SettingsPage() {
   const session = await getSession();

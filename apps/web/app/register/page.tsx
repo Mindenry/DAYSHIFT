@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { RegisterForm } from "@/components/auth-forms";
 
-export const metadata: Metadata = { title: "Create an account — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Create an account", robots: { index: false } };
 
 export default async function RegisterPage({
   searchParams,

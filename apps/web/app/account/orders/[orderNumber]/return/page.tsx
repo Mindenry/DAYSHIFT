@@ -6,7 +6,7 @@ import { getCookieHeader } from "@/lib/session";
 import { ReturnForm } from "@/components/return-form";
 import type { ProductDetailDto } from "@dayshift/types";
 
-export const metadata: Metadata = { title: "Start a return — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Start a return", robots: { index: false } };
 
 interface OrderForReturn {
   id: string;

@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { apiGet } from "@/lib/api";
+import { stripBrandSuffix } from "@/lib/seo";
 import { ListingView, type Facets } from "@/components/listing-view";
 import type { ProductCardDto } from "@dayshift/types";
 
@@ -28,10 +29,26 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const collection = await apiGet<CollectionResponse>(`/collections/${slug}`, { revalidate: 120 });
   if (!collection) return { title: "Collection" };
+  const ogImage =
+    collection.imageUrl && !collection.imageUrl.toLowerCase().endsWith(".svg")
+      ? collection.imageUrl
+      : "/og-default.png";
   return {
-    title: collection.metaTitle ?? `${collection.name} — DAYSHIFT`,
+    title: stripBrandSuffix(collection.metaTitle, collection.name),
     description: collection.metaDescription ?? collection.description ?? undefined,
     alternates: { canonical: `/collections/${collection.slug}` },
+    openGraph: {
+      title: `${collection.name}`,
+      description: collection.description ?? undefined,
+      images: [{ url: ogImage, alt: collection.name }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${collection.name}`,
+      description: collection.description ?? undefined,
+      images: [ogImage],
+    },
   };
 }
 

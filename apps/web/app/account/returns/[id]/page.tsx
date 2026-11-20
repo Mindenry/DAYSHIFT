@@ -4,7 +4,7 @@ import Link from "next/link";
 import { apiGet, money } from "@/lib/api";
 import { getCookieHeader } from "@/lib/session";
 
-export const metadata: Metadata = { title: "Return details — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Return details", robots: { index: false } };
 
 interface ReturnDetail {
   id: string;

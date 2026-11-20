@@ -4,7 +4,7 @@ import { apiGet } from "@/lib/api";
 import { getCookieHeader } from "@/lib/session";
 import { NewTicketForm } from "@/components/support-forms";
 
-export const metadata: Metadata = { title: "Customer care — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Customer care", robots: { index: false } };
 
 interface TicketSummary {
   id: string;

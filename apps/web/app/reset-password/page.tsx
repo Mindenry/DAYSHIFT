@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ResetPasswordForm } from "@/components/auth-forms";
 
-export const metadata: Metadata = { title: "Choose a new password — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Choose a new password", robots: { index: false } };
 
 export default async function ResetPasswordPage({
   searchParams,

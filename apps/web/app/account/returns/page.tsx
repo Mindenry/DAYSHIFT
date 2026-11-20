@@ -3,7 +3,7 @@ import Link from "next/link";
 import { apiGet, money } from "@/lib/api";
 import { getCookieHeader } from "@/lib/session";
 
-export const metadata: Metadata = { title: "Returns & exchanges — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Returns & exchanges", robots: { index: false } };
 
 interface ReturnSummary {
   id: string;

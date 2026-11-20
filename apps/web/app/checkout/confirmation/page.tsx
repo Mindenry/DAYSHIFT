@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ConfirmationView } from "@/components/confirmation-view";
 
-export const metadata: Metadata = { title: "Order confirmed — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Order confirmed", robots: { index: false } };
 
 export default async function ConfirmationPage({
   searchParams,

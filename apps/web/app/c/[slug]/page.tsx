@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { apiGet } from "@/lib/api";
+import { stripBrandSuffix } from "@/lib/seo";
 import { ListingView, type Facets } from "@/components/listing-view";
 import type { ProductCardDto } from "@dayshift/types";
 
@@ -29,10 +30,26 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const category = await apiGet<CategoryResponse>(`/categories/${slug}`, { revalidate: 120 });
   if (!category) return { title: "Category" };
+  const ogImage =
+    category.imageUrl && !category.imageUrl.toLowerCase().endsWith(".svg")
+      ? category.imageUrl
+      : "/og-default.png";
   return {
-    title: category.metaTitle ?? `${category.name} — DAYSHIFT`,
+    title: stripBrandSuffix(category.metaTitle, category.name),
     description: category.metaDescription ?? category.description ?? `Shop ${category.name} at DAYSHIFT.`,
     alternates: { canonical: `/c/${category.slug}` },
+    openGraph: {
+      title: `${category.name}`,
+      description: category.description ?? `Shop ${category.name} at DAYSHIFT.`,
+      images: [{ url: ogImage, alt: category.name }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${category.name}`,
+      description: category.description ?? `Shop ${category.name} at DAYSHIFT.`,
+      images: [ogImage],
+    },
   };
 }
 

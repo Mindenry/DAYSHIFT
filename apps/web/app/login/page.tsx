@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LoginForm } from "@/components/auth-forms";
 
-export const metadata: Metadata = { title: "Sign in — DAYSHIFT", robots: { index: false } };
+export const metadata: Metadata = { title: "Sign in", robots: { index: false } };
 
 export default async function LoginPage({
   searchParams,

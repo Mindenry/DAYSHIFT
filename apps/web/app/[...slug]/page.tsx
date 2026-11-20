@@ -329,9 +329,20 @@ const PAGES: Record<string, Page> = {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string[] }> }): Promise<Metadata> {
   const { slug } = await params;
-  const page = PAGES[slug.join("/")];
-  if (!page) return { title: "Not found — DAYSHIFT" };
-  return { title: `${page.title} — DAYSHIFT`, description: page.intro };
+  const key = slug.join("/");
+  const page = PAGES[key];
+  if (!page) return { title: "Not found", robots: { index: false } };
+  return {
+    title: `${page.title}`,
+    description: page.intro,
+    alternates: { canonical: `/${key}` },
+    openGraph: {
+      title: page.title,
+      description: page.intro,
+      type: "website",
+      images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "DAYSHIFT" }],
+    },
+  };
 }
 
 export default async function InfoPage({ params }: { params: Promise<{ slug: string[] }> }) {

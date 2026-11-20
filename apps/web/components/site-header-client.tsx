@@ -41,7 +41,8 @@ export function SiteHeaderClient({
   const activeRoot = roots.find((root) => root.slug === mega);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur-md">
+    <>
+      <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur-md">
       <div className="wrap">
         <div className="flex h-16 items-center justify-between gap-4 md:h-20">
           <nav aria-label="Primary" className="hidden flex-1 items-center gap-6 lg:flex">
@@ -72,7 +73,7 @@ export function SiteHeaderClient({
 
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center lg:hidden"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center lg:hidden"
             aria-label="Open menu"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
@@ -82,24 +83,24 @@ export function SiteHeaderClient({
 
           <Link
             href="/"
-            className="shrink-0 font-display text-[26px] tracking-[0.18em] md:text-[30px]"
+            className="shrink-0 whitespace-nowrap font-display text-[20px] tracking-[0.16em] min-[380px]:text-[24px] sm:text-[27px] md:text-[30px]"
             aria-label="DAYSHIFT home"
           >
             DAYSHIFT
           </Link>
 
-          <div className="flex flex-1 items-center justify-end gap-1 md:gap-2">
+          <div className="flex flex-1 shrink-0 items-center justify-end gap-0 sm:gap-1 md:gap-2">
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="inline-flex h-11 w-11 items-center justify-center transition-opacity hover:opacity-60"
+              className="inline-flex h-11 w-10 items-center justify-center transition-opacity hover:opacity-60 sm:w-11"
               aria-label="Search"
             >
               <Search className="h-[19px] w-[19px]" />
             </button>
             <Link
               href={user ? "/account" : "/login"}
-              className="inline-flex h-11 w-11 items-center justify-center transition-opacity hover:opacity-60"
+              className="hidden h-11 w-11 items-center justify-center transition-opacity hover:opacity-60 min-[420px]:inline-flex"
               aria-label={user ? "Your account" : "Sign in"}
             >
               <User className="h-[19px] w-[19px]" />
@@ -113,7 +114,7 @@ export function SiteHeaderClient({
             </Link>
             <Link
               href="/cart"
-              className="relative inline-flex h-11 w-11 items-center justify-center transition-opacity hover:opacity-60"
+              className="relative inline-flex h-11 w-10 items-center justify-center transition-opacity hover:opacity-60 sm:w-11"
               aria-label="Shopping bag"
             >
               <ShoppingBag className="h-[19px] w-[19px]" />
@@ -169,15 +170,10 @@ export function SiteHeaderClient({
         </div>
       )}
 
+      </header>
+
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} roots={roots} user={user} />
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
-
-      <Link
-        href="/collections/new-arrivals"
-        className="sr-only focus:not-sr-only"
-      >
-        Skip to new arrivals
-      </Link>
-    </header>
+    </>
   );
 }

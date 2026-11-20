@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { TrackOrder } from "@/components/track-order";
 
 export const metadata: Metadata = {
-  title: "Track your order — DAYSHIFT",
+  title: "Track your order",
   description: "Look up your DAYSHIFT order and follow its journey.",
+  alternates: { canonical: "/track" },
 };
 
 export default function TrackPage() {

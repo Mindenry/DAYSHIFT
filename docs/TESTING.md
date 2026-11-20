@@ -36,10 +36,10 @@ Latest result: **24/24 passed**.
 
 ## End-to-end — `pnpm --filter @dayshift/e2e test`
 
-Playwright, Chromium, against `localhost:3000` and `localhost:3001`.
+Playwright, Chromium. Defaults target `localhost`; set `E2E_BASE_URL`, `E2E_ADMIN_URL` and `E2E_API_URL` to run against the LAN deployment.
 
 `storefront.spec.ts`
-- Full guest purchase: browse → product → size L → quantity 3 → add to bag → cart → `DAYSHIFT15` → checkout → sandbox pay → confirmation with `DS-…` order number.
+- Full guest purchase: browse → choose a live in-stock variant → add to bag → cart → `WELCOME10` → checkout → sandbox pay → confirmation with `DS-…` order number.
 - Invalid coupon displays an inline error.
 - Search results for “linen”.
 
@@ -51,7 +51,26 @@ Playwright, Chromium, against `localhost:3000` and `localhost:3001`.
 
 Run prerequisites: API, web and admin running; seed loaded. Config: `tests/e2e/playwright.config.ts`; screenshots are under `tests/e2e/shots`.
 
-Latest result: **7/7 passed**.
+Latest result: **7/7 passed** at desktop and against the LAN URLs.
+
+## Mobile responsiveness — `pnpm test:mobile`
+
+`tests/e2e/mobile-check.mjs` loads 11 storefront routes at **390×844** and **320×700** and fails on horizontal overflow, elements crossing the viewport, controls below 40px, or console errors.
+
+Latest result: **passed on all 11 routes at both widths**. Interactive checks confirm the menu, search, filter and size-guide overlays lock background scroll and close correctly; a full mobile checkout reaches the sandbox payment page through the fixed submit bar.
+
+## SEO and AEO checks
+
+| Check | Result |
+| --- | --- |
+| JSON-LD parses on home, product, collection, category and support | 0 invalid blocks |
+| Canonical + Open Graph + Twitter metadata | Present on every key route |
+| Dynamic sitemap | 112 URLs |
+| `robots.txt` | Private routes disallowed; AI crawlers allowed |
+| `/llms.txt` | Served as `text/plain` |
+| `og-default.png` | 1200×630 |
+
+See [STOREFRONT_UX.md](STOREFRONT_UX.md) for the full SEO/AEO map.
 
 ## Build and static checks
 
@@ -68,6 +87,8 @@ Latest result: **7/7 passed**.
 | Docker Compose config | `docker compose config` | Pass |
 | Application images | `docker compose --profile app build` | API, worker, web, admin built; full stack started together for the LAN release |
 | Accessibility | `pnpm test:a11y` | 0 serious/critical on 6 surfaces |
+| Mobile responsiveness | `pnpm test:mobile` | 11 routes × 320/390, no overflow or console errors |
+| SEO/AEO | metadata, JSON-LD, sitemap, robots, llms.txt | Valid; 112 sitemap URLs |
 
 ## Not covered
 

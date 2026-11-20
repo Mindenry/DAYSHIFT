@@ -124,3 +124,16 @@ Not **STAGING READY** or **PRODUCTION READY**: external providers, TLS, MFA, obs
 ## 8. Next action
 
 Run the documented macOS checklist from a physical Mac and record the result in this report, then terminate TLS in front of the two web ports and set `COOKIE_SECURE=true`.
+
+## 9. Post-release storefront UX refresh
+
+After the LAN release, the customer storefront was upgraded without changing the audited commerce backend:
+
+- Self-hosted Bodoni Moda and Manrope typography, refined palette and spacing.
+- Mobile-first hero with full-bleed imagery, service strip, category tiles and FAQ.
+- Rebuilt product cards, product detail with sticky mobile add-to-bag, cart free-delivery progress and sticky checkout, checkout with a fixed mobile submit bar, and a two-column account navigation.
+- Fixed a real mobile defect: the menu and search overlays were rendered inside the header's `backdrop-filter` containing block and appeared transparent; they now render outside the header.
+- Added a 320px regression audit (`pnpm test:mobile`) covering 11 routes, overlay scroll locks and a full mobile checkout.
+- Added a complete SEO/AEO layer: per-page canonicals and social cards, a 1200×630 default social image, Organization/WebSite/Product/Breadcrumb/ItemList/FAQ structured data, a dynamic 112-URL sitemap, AI-crawler-aware robots rules and `/llms.txt`.
+
+Verification after the refresh: typecheck 12/12, lint 7/7, unit 18/18, integration 18/18, exchange 8/8, smoke 24/24, Playwright 7/7, mobile audit 11 routes × 320/390, Axe 0 serious/critical on six surfaces, production builds pass, and the web image was rebuilt and served through `http://192.168.1.107:3000`. Design and SEO details are in [STOREFRONT_UX.md](STOREFRONT_UX.md).

@@ -144,7 +144,7 @@ export function CartView() {
         <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
           Start with the new arrivals, or revisit a piece you saved.
         </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Link href="/collections/new-arrivals" className="btn btn-primary">Shop new arrivals</Link>
           <Link href="/account/wishlist" className="btn btn-outline">View wishlist</Link>
         </div>
@@ -152,9 +152,29 @@ export function CartView() {
     );
   }
 
+  const freeShippingThreshold = 150;
+  const subtotalValue = Number(cart.subtotal);
+  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotalValue);
+  const shippingProgress = Math.min(100, Math.round((subtotalValue / freeShippingThreshold) * 100));
+
   return (
-    <div className="grid gap-12 py-10 lg:grid-cols-[1.45fr_0.55fr] lg:gap-16">
+    <>
+    <div className="grid gap-10 py-8 lg:grid-cols-[1.45fr_0.55fr] lg:gap-16 lg:py-10">
       <div>
+        <div className="mb-6 border border-line bg-paper-deep px-4 py-3">
+          <div className="flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.12em]">
+            <span>
+              {remainingForFreeShipping === 0
+                ? "Your order ships free"
+                : `${money(remainingForFreeShipping)} away from free delivery`}
+            </span>
+            <span className="text-muted">{shippingProgress}%</span>
+          </div>
+          <div className="mt-2 h-1 w-full bg-line" role="presentation">
+            <div className="h-full bg-ink transition-[width] duration-500" style={{ width: `${shippingProgress}%` }} />
+          </div>
+        </div>
+
         {cart.warnings.length > 0 && (
           <div className="mb-6 border border-sale/30 bg-sale/5 p-4 text-sm text-sale" role="status">
             {cart.warnings.map((warning) => <p key={warning}>{warning}</p>)}
@@ -162,28 +182,27 @@ export function CartView() {
         )}
         <ul className="divide-y divide-line border-y border-line">
           {cart.lines.map((line) => (
-            <li key={line.id} className="flex gap-4 py-5 md:gap-6">
-              <Link href={`/products/${line.productSlug}`} className="block w-24 shrink-0 md:w-32">
+            <li key={line.id} className="flex gap-3 py-5 sm:gap-5">
+              <Link href={`/products/${line.productSlug}`} className="block w-20 shrink-0 sm:w-28">
                 <div className="aspect-[3/4] overflow-hidden bg-sand">
                   {line.imageUrl && (
-                     
-                    <img src={line.imageUrl} alt={line.productName} className="h-full w-full object-cover" />
+                    <img src={line.imageUrl} alt={line.productName} className="h-full w-full object-cover" decoding="async" />
                   )}
                 </div>
               </Link>
-              <div className="flex flex-1 flex-col justify-between gap-4 py-1">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <Link href={`/products/${line.productSlug}`} className="font-display text-lg leading-snug hover:underline md:text-xl">
+              <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 py-0.5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <Link href={`/products/${line.productSlug}`} className="font-display text-lg leading-snug hover:underline">
                       {line.productName}
                     </Link>
-                    <p className="mt-1 text-xs text-muted">
+                    <p className="mt-1 text-[11px] text-muted">
                       {line.color} {line.size && `· ${line.size}`}
                     </p>
-                    <p className="mt-0.5 text-[11px] uppercase tracking-[0.1em] text-muted/70">{line.variantSku}</p>
+                    <p className="mt-0.5 hidden text-[10px] uppercase tracking-[0.1em] text-muted/70 sm:block">{line.variantSku}</p>
                     {!line.inStock && <p className="mt-2 text-xs text-sale">Only {line.availableStock} available — adjust quantity</p>}
                   </div>
-                  <p className="text-sm">{money(line.lineTotal)}</p>
+                  <p className="shrink-0 text-sm">{money(line.lineTotal)}</p>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center border border-line">
@@ -191,17 +210,17 @@ export function CartView() {
                       type="button"
                       onClick={() => updateQuantity(line.id, line.quantity - 1)}
                       disabled={line.quantity <= 1 || busyLine === line.id}
-                      className="flex h-10 w-9 items-center justify-center hover:bg-sand disabled:opacity-40"
+                      className="flex h-11 w-10 items-center justify-center hover:bg-sand disabled:opacity-40"
                       aria-label={`Decrease quantity of ${line.productName}`}
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
-                    <span className="flex h-10 w-8 items-center justify-center text-xs">{line.quantity}</span>
+                    <span className="flex h-11 w-8 items-center justify-center text-xs">{line.quantity}</span>
                     <button
                       type="button"
                       onClick={() => updateQuantity(line.id, line.quantity + 1)}
                       disabled={line.quantity >= Math.min(10, line.availableStock) || busyLine === line.id}
-                      className="flex h-10 w-9 items-center justify-center hover:bg-sand disabled:opacity-40"
+                      className="flex h-11 w-10 items-center justify-center hover:bg-sand disabled:opacity-40"
                       aria-label={`Increase quantity of ${line.productName}`}
                     >
                       <Plus className="h-3.5 w-3.5" />
@@ -211,7 +230,7 @@ export function CartView() {
                     type="button"
                     onClick={() => remove(line.id, line.productName)}
                     disabled={busyLine === line.id}
-                    className="inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.1em] text-muted hover:text-ink"
+                    className="inline-flex min-h-11 items-center gap-1 px-2 text-[10px] uppercase tracking-[0.1em] text-muted hover:text-ink"
                   >
                     <X className="h-3.5 w-3.5" /> Remove
                   </button>
@@ -226,7 +245,7 @@ export function CartView() {
       </div>
 
       <aside className="lg:sticky lg:top-28 lg:self-start">
-        <div className="border border-line p-6">
+        <div className="border border-line p-5 sm:p-6">
           <p className="overline">Order summary</p>
           <dl className="mt-5 space-y-3 text-sm">
             <div className="flex justify-between"><dt>Subtotal</dt><dd>{money(cart.subtotal)}</dd></div>
@@ -248,7 +267,7 @@ export function CartView() {
                 </div>
                 <div className="text-right">
                   <p className="text-sale">−{money(cart.coupon.amount)}</p>
-                  <button type="button" onClick={removeCoupon} disabled={couponBusy} className="text-[11px] underline">Remove</button>
+                  <button type="button" onClick={removeCoupon} disabled={couponBusy} className="min-h-11 px-1 text-[11px] underline">Remove</button>
                 </div>
               </div>
             ) : (
@@ -274,10 +293,10 @@ export function CartView() {
             )}
           </div>
 
-          <Link href="/checkout" className="btn btn-primary mt-6 w-full">
+          <Link href="/checkout" className="btn btn-primary mt-6 hidden w-full lg:flex">
             Checkout · {money(cart.totalEstimate)}
           </Link>
-          <p className="mt-3 text-center text-[11px] text-muted">Secure sandbox checkout · No real payment</p>
+          <p className="mt-3 hidden text-center text-[11px] text-muted lg:block">Secure sandbox checkout · No real payment</p>
         </div>
 
         <div className="mt-6 space-y-2 border border-line p-5 text-xs text-muted">
@@ -287,5 +306,20 @@ export function CartView() {
         </div>
       </aside>
     </div>
+
+    {/* Mobile checkout bar */}
+    <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur-md lg:hidden">
+      <div className="mx-auto flex max-w-3xl items-center gap-3">
+        <div className="flex-1">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-muted">Total</p>
+          <p className="text-sm">{money(cart.totalEstimate)}</p>
+        </div>
+        <Link href="/checkout" className="btn btn-primary min-w-[10rem]">
+          Checkout
+        </Link>
+      </div>
+    </div>
+    <div className="h-20 lg:hidden" aria-hidden />
+    </>
   );
 }

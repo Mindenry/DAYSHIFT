@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
 import { apiGet } from "@/lib/api";
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+export const dynamic = "force-dynamic";
+
+const BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
 interface SitemapData {
   products: Array<{ slug: string; updatedAt: string }>;

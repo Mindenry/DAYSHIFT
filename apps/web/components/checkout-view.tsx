@@ -232,7 +232,7 @@ export function CheckoutView({ user }: Props) {
   }
 
   return (
-    <form onSubmit={placeOrder} className="grid gap-10 py-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16">
+    <form id="checkout-form" onSubmit={placeOrder} className="grid gap-10 pb-24 pt-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16 lg:pb-0">
       <div className="space-y-10">
         {error && <div role="alert" className="border border-sale/40 bg-sale/5 p-4 text-sm text-sale">{error}</div>}
 
@@ -258,7 +258,7 @@ export function CheckoutView({ user }: Props) {
             <span className="font-display text-2xl text-stone">02</span>
             <h2 className="font-display text-2xl">Delivery address</h2>
           </div>
-          <div className="mt-5 grid grid-cols-2 gap-4">
+          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="firstName" className="label">First name</label>
               <input id="firstName" required value={firstName} onChange={(e) => setFirstName(e.target.value)} className="field" autoComplete="given-name" />
@@ -267,11 +267,11 @@ export function CheckoutView({ user }: Props) {
               <label htmlFor="lastName" className="label">Last name</label>
               <input id="lastName" required value={lastName} onChange={(e) => setLastName(e.target.value)} className="field" autoComplete="family-name" />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label htmlFor="line1" className="label">Address</label>
               <input id="line1" required value={line1} onChange={(e) => setLine1(e.target.value)} className="field" autoComplete="address-line1" placeholder="Street and number" />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label htmlFor="line2" className="label">Apartment, suite (optional)</label>
               <input id="line2" value={line2} onChange={(e) => setLine2(e.target.value)} className="field" autoComplete="address-line2" />
             </div>
@@ -293,7 +293,7 @@ export function CheckoutView({ user }: Props) {
                 {COUNTRIES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
               </select>
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label htmlFor="phone" className="label">Phone (for delivery updates)</label>
               <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="field" autoComplete="tel" />
             </div>
@@ -410,6 +410,23 @@ export function CheckoutView({ user }: Props) {
           <Link href="/cart" className="mt-4 block text-center text-xs underline">Return to bag</Link>
         </div>
       </aside>
+
+      <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur-md lg:hidden">
+        <div className="mx-auto flex max-w-3xl items-center gap-3">
+          <div className="flex-1">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-muted">Total</p>
+            <p className="text-sm">{money(quote?.total)}</p>
+          </div>
+          <button
+            type="submit"
+            form="checkout-form"
+            disabled={placing || !quote || requiredErrors.length > 0}
+            className="btn btn-primary min-w-[10.5rem]"
+          >
+            {placing ? "Placing…" : paymentMethod === "CASH_ON_DELIVERY" ? "Place order" : "Continue"}
+          </button>
+        </div>
+      </div>
     </form>
   );
 }

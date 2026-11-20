@@ -20,7 +20,7 @@ It is a working reference implementation built as a production-shaped monorepo. 
 | --- | --- |
 | ![Product detail page](docs/screenshots/storefront-product.png) | ![Mobile home page](docs/screenshots/storefront-mobile.png) |
 
-All screenshots are captured from the running application. Additional views: [listing](docs/screenshots/storefront-listing.png), [cart](docs/screenshots/storefront-cart.png), [admin orders](docs/screenshots/admin-orders.png), [admin inventory](docs/screenshots/admin-inventory.png).
+All screenshots are captured from the running application at `192.168.1.107`. Additional views: [listing](docs/screenshots/storefront-listing.png), [cart](docs/screenshots/storefront-cart.png), [mobile product](docs/screenshots/storefront-mobile-product.png), [admin orders](docs/screenshots/admin-orders.png), [admin inventory](docs/screenshots/admin-inventory.png).
 
 ---
 
@@ -34,6 +34,12 @@ Dashboard with live commercial metrics, catalogue management (products, variants
 
 **Platform**
 Server-authoritative pricing in integer cents, atomic inventory reservations with expiry, HMAC-signed payment webhooks with event idempotency, serialised refunds, a controlled order state machine, permission-guarded API, structured error envelope with request IDs, Swagger in development, BullMQ worker, and a Playwright/Axe quality suite.
+
+**Responsive and accessible**
+The storefront is designed mobile-first and verified from **320px** upward: no horizontal overflow, 44px touch targets, full-screen menu and search, sticky add-to-bag and checkout bars, and dialogs that lock background scroll and close on Escape. Axe reports zero serious or critical violations on six surfaces.
+
+**SEO and answer-engine ready**
+Per-page metadata and canonicals, Open Graph and Twitter cards, a 1200×630 social image, JSON-LD for Organization, WebSite/SearchAction, Product with offers and return policy, BreadcrumbList, ItemList and FAQPage, a dynamic 112-URL sitemap, AI-crawler-aware robots rules, and a generated `/llms.txt` summary. See [Storefront UX and SEO](docs/STOREFRONT_UX.md).
 
 ---
 
@@ -179,13 +185,14 @@ pnpm test:exchange                      # exchange workflow
 pnpm test:smoke                         # live API smoke
 pnpm --filter @dayshift/e2e test        # Playwright purchase and admin flows
 pnpm test:a11y                          # Axe scan of six surfaces
+pnpm test:mobile                        # 320px and 390px overflow/tap-target audit
 pnpm build                              # all production builds
 pnpm audit:deps
 ```
 
 Live suites target `http://localhost:4000` by default. Point them at the LAN deployment with `INTEGRATION_API`, `SMOKE_API`, `EXCHANGE_API`, `INTEGRATION_STOREFRONT`, `E2E_BASE_URL`, `E2E_ADMIN_URL` and `E2E_API_URL`.
 
-Current results: typecheck 12/12, lint 7/7, unit 18/18, integration 18/18, exchange 8/8, smoke 24/24, Playwright 7/7, Axe 0 serious/critical on six surfaces, all four production images built. Details: [TESTING.md](docs/TESTING.md) · [TEST_MATRIX.md](docs/TEST_MATRIX.md).
+Current results: typecheck 12/12, lint 7/7, unit 18/18, integration 18/18, exchange 8/8, smoke 24/24, Playwright 7/7, mobile audit 11 pages × 2 widths, Axe 0 serious/critical on six surfaces, all four production images built. Details: [TESTING.md](docs/TESTING.md) · [TEST_MATRIX.md](docs/TEST_MATRIX.md).
 
 ---
 
@@ -268,6 +275,7 @@ These are tracked in [Production readiness](docs/PRODUCTION_READINESS.md).
 - [LAN deployment](docs/LAN_DEPLOYMENT.md)
 - [Docker deployment](docs/DOCKER_DEPLOYMENT.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Storefront UX, responsive rules and SEO/AEO](docs/STOREFRONT_UX.md)
 - [API reference](docs/API.md)
 - [Database](docs/DATABASE.md)
 - [Business workflows](docs/BUSINESS_WORKFLOWS.md)
