@@ -3,10 +3,10 @@ import { test, expect, type APIRequestContext } from "@playwright/test";
 const API = process.env.E2E_API_URL ?? "http://localhost:4000/api/v1";
 
 async function pickInStockProduct(request: APIRequestContext) {
-  const list = await request.get(`${API}/products?inStock=true&pageSize=30`);
+  const list = await request.get(`${API}/products?inStock=true&pageSize=30`, { headers: { "x-locale": "en" } });
   const cards = (await list.json()).data.items as Array<{ slug: string }>;
   for (const card of cards) {
-    const response = await request.get(`${API}/products/${card.slug}`);
+    const response = await request.get(`${API}/products/${card.slug}`, { headers: { "x-locale": "en" } });
     if (!response.ok()) continue;
     const product = (await response.json()).data;
     const variant = product.variants.find((item: { inStock: boolean }) => item.inStock);
@@ -24,7 +24,7 @@ test.describe("Customer purchase journey", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Everyday");
 
     await page.goto("/collections/new-arrivals");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("สินค้าใหม่");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("New Arrivals");
 
     await page.goto(`/products/${product.slug}`);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(product.name);
@@ -75,8 +75,8 @@ test.describe("Customer purchase journey", () => {
   });
 
   test("search returns relevant products", async ({ page }) => {
-    await page.goto("/search?q=" + encodeURIComponent("ลินิน"));
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("ลินิน");
-    await expect(page.getByText("เสื้อเชิ้ตผ้าลินินทรงหลวม").first()).toBeVisible();
+    await page.goto("/search?q=linen");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("linen");
+    await expect(page.getByText("Relaxed Linen Shirt").first()).toBeVisible();
   });
 });

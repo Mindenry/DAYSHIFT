@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { ProductCardDto } from "@dayshift/types";
-import { clientApi, money } from "@/lib/api";
+import { clientApi } from "@/lib/client-api";
+import { money } from "@/lib/money";
 import { useI18n } from "@/lib/i18n-client";
 
 interface WishlistItem {

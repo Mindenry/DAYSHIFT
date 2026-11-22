@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Check, Package } from "lucide-react";
-import { clientApi } from "@/lib/api";
+import { clientApi } from "@/lib/client-api";
 import { useI18n } from "@/lib/i18n-client";
 import { OrderDetailView, type OrderView } from "./order-detail-view";
 

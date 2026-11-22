@@ -41,6 +41,16 @@ interface ProductData {
   tags: string[];
   metaTitle: string | null;
   metaDescription: string | null;
+  nameEn: string | null;
+  shortDescriptionEn: string | null;
+  descriptionEn: string | null;
+  materialEn: string | null;
+  careInstructionsEn: string | null;
+  fitNotesEn: string | null;
+  featuresEn: string[];
+  tagsEn: string[];
+  metaTitleEn: string | null;
+  metaDescriptionEn: string | null;
   isFeatured: boolean;
   images: Array<{ id: string; url: string; alt: string; color: string | null }>;
   categories: Array<{ categoryId: string }>;
@@ -83,6 +93,16 @@ export function ProductForm({
   const [tags, setTags] = useState((product?.tags ?? []).join(", "));
   const [metaTitle, setMetaTitle] = useState(product?.metaTitle ?? "");
   const [metaDescription, setMetaDescription] = useState(product?.metaDescription ?? "");
+  const [nameEn, setNameEn] = useState(product?.nameEn ?? "");
+  const [shortDescriptionEn, setShortDescriptionEn] = useState(product?.shortDescriptionEn ?? "");
+  const [descriptionEn, setDescriptionEn] = useState(product?.descriptionEn ?? "");
+  const [materialEn, setMaterialEn] = useState(product?.materialEn ?? "");
+  const [careEn, setCareEn] = useState(product?.careInstructionsEn ?? "");
+  const [fitNotesEn, setFitNotesEn] = useState(product?.fitNotesEn ?? "");
+  const [featuresEn, setFeaturesEn] = useState((product?.featuresEn ?? []).join("\n"));
+  const [tagsEn, setTagsEn] = useState((product?.tagsEn ?? []).join(", "));
+  const [metaTitleEn, setMetaTitleEn] = useState(product?.metaTitleEn ?? "");
+  const [metaDescriptionEn, setMetaDescriptionEn] = useState(product?.metaDescriptionEn ?? "");
   const [isFeatured, setIsFeatured] = useState(product?.isFeatured ?? false);
   const [categoryIds, setCategoryIds] = useState<string[]>(product?.categories.map((c) => c.categoryId) ?? []);
   const [collectionIds, setCollectionIds] = useState<string[]>(product?.collections.map((c) => c.collectionId) ?? []);
@@ -149,6 +169,16 @@ export function ProductForm({
       tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
       metaTitle: metaTitle || undefined,
       metaDescription: metaDescription || undefined,
+      nameEn: nameEn || name,
+      shortDescriptionEn: shortDescriptionEn || undefined,
+      descriptionEn: descriptionEn || description,
+      materialEn: materialEn || undefined,
+      careInstructionsEn: careEn || undefined,
+      fitNotesEn: fitNotesEn || undefined,
+      featuresEn: featuresEn.split("\n").map((f) => f.trim()).filter(Boolean),
+      tagsEn: tagsEn.split(",").map((t) => t.trim()).filter(Boolean),
+      metaTitleEn: metaTitleEn || undefined,
+      metaDescriptionEn: metaDescriptionEn || undefined,
       isFeatured,
       categoryIds,
       collectionIds,
@@ -204,7 +234,10 @@ export function ProductForm({
 
       <div className="space-y-4">
         <section className="panel p-5">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Product details")}</h2>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("Thai content")}</h2>
+            <span className="a-chip">{t("Thai storefront")}</span>
+          </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label className="label" htmlFor="name">{t("Name")}</label>
@@ -238,6 +271,58 @@ export function ProductForm({
                 <option value="PUBLIC">{t("Public")}</option>
                 <option value="HIDDEN">{t("Hidden")}</option>
               </select>
+            </div>
+          </div>
+        </section>
+
+        <section className="panel p-5">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">{t("English content")}</h2>
+            <span className="a-chip">{t("English storefront")}</span>
+          </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-muted">
+            {t("Shown when a shopper uses the English interface. Leave blank to fall back to the Thai copy.")}
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label className="label" htmlFor="nameEn">{t("Name (English)")}</label>
+              <input id="nameEn" className="field" value={nameEn} onChange={(e) => setNameEn(e.target.value)} maxLength={160} placeholder={name} />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label" htmlFor="shortEn">{t("Short description (English)")}</label>
+              <input id="shortEn" className="field" value={shortDescriptionEn} onChange={(e) => setShortDescriptionEn(e.target.value)} maxLength={300} />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label" htmlFor="descriptionEn">{t("Description (English)")}</label>
+              <textarea id="descriptionEn" rows={5} className="field" value={descriptionEn} onChange={(e) => setDescriptionEn(e.target.value)} />
+            </div>
+            <div>
+              <label className="label" htmlFor="materialEn">{t("Materials (English)")}</label>
+              <input id="materialEn" className="field" value={materialEn} onChange={(e) => setMaterialEn(e.target.value)} />
+            </div>
+            <div>
+              <label className="label" htmlFor="fitEn">{t("Fit notes (English)")}</label>
+              <input id="fitEn" className="field" value={fitNotesEn} onChange={(e) => setFitNotesEn(e.target.value)} />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label" htmlFor="careEn">{t("Care instructions (English)")}</label>
+              <input id="careEn" className="field" value={careEn} onChange={(e) => setCareEn(e.target.value)} />
+            </div>
+            <div>
+              <label className="label" htmlFor="featuresEn">{t("Features (English, one per line)")}</label>
+              <textarea id="featuresEn" rows={4} className="field" value={featuresEn} onChange={(e) => setFeaturesEn(e.target.value)} />
+            </div>
+            <div>
+              <label className="label" htmlFor="tagsEn">{t("Tags (English, comma separated)")}</label>
+              <textarea id="tagsEn" rows={4} className="field" value={tagsEn} onChange={(e) => setTagsEn(e.target.value)} />
+            </div>
+            <div>
+              <label className="label" htmlFor="metaTitleEn">{t("SEO title (English)")}</label>
+              <input id="metaTitleEn" className="field" value={metaTitleEn} onChange={(e) => setMetaTitleEn(e.target.value)} maxLength={160} />
+            </div>
+            <div>
+              <label className="label" htmlFor="metaDescriptionEn">{t("SEO description (English)")}</label>
+              <input id="metaDescriptionEn" className="field" value={metaDescriptionEn} onChange={(e) => setMetaDescriptionEn(e.target.value)} maxLength={320} />
             </div>
           </div>
         </section>

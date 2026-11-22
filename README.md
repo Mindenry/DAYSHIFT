@@ -26,12 +26,12 @@ All screenshots are captured from the running application at `192.168.1.107`. Ad
 ## Features
 
 **Storefront**
-Editorial home and collection pages, category/collection/search listings with URL-driven filters and sorting, product detail with colour and size variants, cart and wishlist, guest or account checkout, sandbox payment, order tracking, account dashboard, returns and exchanges, addresses, loyalty balance and support tickets. Prices are in Thai baht with 7% VAT, delivery is ฿50 (free over ฿1,500) and the whole interface switches between **Thai and English** from the header or footer.
+Editorial home and collection pages, category/collection/search listings with URL-driven filters and sorting, product detail with colour and size variants, cart and wishlist, guest or account checkout, sandbox payment, order tracking, account dashboard, returns and exchanges, addresses, loyalty balance and support tickets. Prices are in Thai baht with 7% VAT, delivery is ฿50 (free over ฿1,500). The whole interface and the catalogue itself switch between **Thai and English** from the header or footer: names, descriptions, navigation, collections, policies and metadata all change language, not only the buttons.
 
 **Operations portal**
 Dashboard with live commercial metrics, catalogue management (products, variants, categories, collections, brands), multi-warehouse stock with transfers and movement history, suppliers and purchase orders, order fulfilment and shipments, returns and refunds, customers, support tickets, reviews, coupons, promotions, loyalty, staff and role permissions, audit log, sales reports, settings and system health.
 
-The portal was rebuilt on a single design system (Manrope, Noto Sans Thai, JetBrains Mono; warm canvas, forest sidebar, emerald accent), with a collapsible sidebar, mobile drawer, `Ctrl/⌘ K` command palette, quick actions and responsive tables and forms. Every surface switches between **English and Thai** from the top bar or the mobile drawer; the choice is stored in a cookie and re-renders server components in place.
+The portal was rebuilt on a single design system (Manrope, Noto Sans Thai, JetBrains Mono; warm canvas, forest sidebar, emerald accent), with a collapsible sidebar, mobile drawer, `Ctrl/⌘ K` command palette, quick actions and responsive tables and forms. Every surface switches between **English and Thai** from the top bar or the mobile drawer; the choice is stored in a cookie and re-renders server components in place. Product, category, collection and brand editors keep separate Thai and English fields, so both storefronts stay accurate.
 
 **Platform**
 Server-authoritative pricing in integer cents, atomic inventory reservations with expiry, HMAC-signed payment webhooks with event idempotency, serialised refunds, a controlled order state machine, permission-guarded API, structured error envelope with request IDs, Swagger in development, BullMQ worker, and a Playwright/Axe quality suite.

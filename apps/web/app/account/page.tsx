@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { apiGet, money } from "@/lib/api";
+import { apiGet } from "@/lib/api";
+import { money } from "@/lib/money";
 import { getCookieHeader } from "@/lib/session";
-import { statusLabel } from "@/components/order-detail-view";
+import { statusLabel } from "@/lib/order-status";
 import { getI18n } from "@/lib/i18n";
 
 interface Overview {

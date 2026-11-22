@@ -75,6 +75,8 @@ With a customer session, all eight pages return **200**:
 | Accessibility | `node tests/e2e/a11y-scan.mjs` | 0 serious/critical across 18 scans (storefront, admin, Thai, mobile) |
 | Admin redesign | `node tests/e2e/admin-redesign-check.mjs` | 23 routes × EN/TH at 200; 0 heading gaps, 0 page errors, 0 mobile overflow |
 | Storefront Thai/English | `node tests/e2e/storefront-th-check.mjs` | 6 routes × EN/TH at 200; switcher works; 0 overflow at 390/320 |
+| Bilingual content | `node tests/e2e/locale-full-audit.mjs` and `locale-switch-test.mjs` | English pages contain no Thai merchandising or UI text; switching TH↔EN swaps nav, hero, product copy and policies |
+| Admin bilingual editing | `node tests/e2e/admin-locale-test.mjs` | EN/TH lists localize; product editor exposes Thai and English fields; saving EN leaves TH intact |
 
 The new workflow suite verifies:
 
@@ -224,18 +226,24 @@ The demo now runs as a Bangkok-based label rather than a US storefront.
 
 - **Currency:** THB everywhere. Prices are stored as decimal baht, formatted with the ฿ symbol, and carts, orders and payments default to `THB` through a migration on `Product`, `Cart`, `Order` and `Payment`.
 - **Tax and delivery:** 7% VAT (inclusive), standard delivery ฿50 and free over ฿1,500, express ฿100, 30-day returns.
-- **Catalogue:** 40 products with Thai names, Thai descriptions, materials, care and fit notes, priced from ฿290 to ฿2,890. Slugs and SKUs are unchanged so links and imagery still resolve.
-- **Taxonomy:** Thai category tree (ผู้หญิง, ผู้ชาย, ยูนิเซ็กซ์, รองเท้า, กระเป๋า, เครื่องประดับ), Thai collections (สินค้าใหม่, ขายดี, เสื้อผ้าพื้นฐาน, ตามฤดูกาล, ลิมิเต็ด, ลดราคา) and Thai brand descriptions.
+- **Catalogue:** 40 products with Thai and English names, descriptions, materials, care and fit notes, priced from ฿290 to ฿2,890. Slugs and SKUs are unchanged so links and imagery still resolve.
+- **Taxonomy:** bilingual category tree (ผู้หญิง/Women, ผู้ชาย/Men, รองเท้า/Shoes…), collections (สินค้าใหม่/New Arrivals, ขายดี/Best Sellers…) and brand descriptions.
 - **People and places:** Thai staff and customers with Thai names, Bangkok and Chiang Mai addresses, `08x` phone numbers, Thai loyalty tiers and Thai support conversations.
 - **Operations data:** คลังบางนา (BKK1) and สตูดิโอเชียงใหม่ (CNX1), Thai textile and leather suppliers, Thai purchase orders and Kerry Express shipments with Thai tracking events.
 - **Marketing:** Thai hero copy, campaign blocks, navigation, coupons (WELCOME10, DAYSHIFT15, STYLE20, FLAT250) and promotions in baht.
 
+**Bilingual content, not just bilingual UI**
+
+- Merchandising content is stored twice: Thai is the canonical field and `*En` columns hold English copy for products, categories, collections, brands, content blocks, navigation, size guides, reviews and order-line names.
+- The API resolves a locale per request from `x-locale`, the `ds_locale` cookie or `Accept-Language`, and returns the matching fields through the existing response shape. Category/collection caches are keyed per locale and the Next data cache includes the locale in its key, so one language can never be served to the other.
+- Admin product, category, collection and brand editors expose both Thai and English fields and save them independently; lists display the language currently selected.
+
 **Storefront language switch**
 
-- The storefront now shares the `ds_locale` cookie with admin. `getI18n()` reads it on the server and `I18nProvider` exposes it to client components.
-- A Thai/English switch sits in the header and footer. Choosing a language writes the cookie and refreshes server components, so pages re-render in place.
-- English is the default interface; Thai covers the full shopping journey — home, listing, filters, product, cart, checkout, payment, confirmation, tracking, support, auth and the account area — with English fallback for anything untranslated.
-- Catalogue data stays Thai in both languages by design; interface labels, buttons, errors and status names translate.
+- Storefront and admin share the `ds_locale` cookie. `getI18n()` reads it on the server and `I18nProvider` exposes it to client components.
+- A Thai/English switch sits in the header and footer. Choosing a language writes the cookie and refreshes server components, so navigation, hero copy, product names, descriptions, collection titles and even policy pages re-render in place.
+- English is the default interface; Thai covers the full journey — home, listing, filters, product, cart, checkout, payment, confirmation, tracking, support, auth, account and the About/Help/Legal pages.
+- Customer-owned data keeps its original language: names, saved addresses, review and support text stay as entered, as they would on a real store.
 
 ## 13. Known limitations
 
@@ -243,6 +251,7 @@ The demo now runs as a Bangkok-based label rather than a US storefront.
 - Payments, shipping and email use sandbox/local adapters; no real provider is connected.
 - Product photography is licensed stand-in imagery, not the actual demo inventory.
 - No MFA, CSP, multi-currency, tax engine or file-upload pipeline.
+- Customer-generated text (names, addresses, reviews, support messages) is not translated automatically; only store-authored content has English fields.
 - No load, soak or external penetration test; Axe is automated, not a manual screen-reader audit.
 - Reservation expiry and daily reconciliation were not observed across their full real-time windows.
 - CI is validated locally; it has not run on GitHub.

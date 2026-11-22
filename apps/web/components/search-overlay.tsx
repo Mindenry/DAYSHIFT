@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
-import { clientApi, money } from "@/lib/api";
+import { clientApi } from "@/lib/client-api";
+import { money } from "@/lib/money";
 import { usePresence } from "./use-presence";
 import { useI18n } from "@/lib/i18n-client";
 

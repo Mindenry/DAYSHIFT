@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { apiGet, money } from "@/lib/api";
+import { apiGet } from "@/lib/api";
+import { money } from "@/lib/money";
 import { getCookieHeader } from "@/lib/session";
 import { getI18n } from "@/lib/i18n";
 

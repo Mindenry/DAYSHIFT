@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { clientApi } from "@/lib/api";
+import { clientApi } from "@/lib/client-api";
 import { useI18n } from "@/lib/i18n-client";
 
 interface Address {

@@ -5,6 +5,7 @@ import { apiGet } from "@/lib/api";
 import { STOREFRONT_URL } from "@/lib/site";
 import { getCookieHeader, requireStaff } from "@/lib/session";
 import { getI18n } from "@/lib/i18n";
+import { localized } from "@/lib/localize";
 import { ProductForm } from "@/components/product-form";
 import { VariantManager } from "@/components/variant-manager";
 
@@ -32,6 +33,16 @@ interface AdminProduct {
   tags: string[];
   metaTitle: string | null;
   metaDescription: string | null;
+  nameEn: string | null;
+  shortDescriptionEn: string | null;
+  descriptionEn: string | null;
+  materialEn: string | null;
+  careInstructionsEn: string | null;
+  fitNotesEn: string | null;
+  featuresEn: string[];
+  tagsEn: string[];
+  metaTitleEn: string | null;
+  metaDescriptionEn: string | null;
   isFeatured: boolean;
   images: Array<{ id: string; url: string; alt: string; color: string | null }>;
   categories: Array<{ categoryId: string }>;
@@ -45,7 +56,7 @@ interface AdminProduct {
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   await requireStaff();
-  const { t } = await getI18n();
+  const { t, locale } = await getI18n();
   const { id } = await params;
   const cookie = await getCookieHeader();
   const [product, categories, collections, brands] = await Promise.all([
@@ -60,7 +71,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     <div>
       <PageHeader
         eyebrow="Catalog"
-        title={product.name}
+        title={localized(locale, product.name, product.nameEn)}
         description={t("{sku} · {count} variants", { sku: product.sku, count: product.variants.length })}
         back={{ href: "/products", label: "Products" }}
         actions={

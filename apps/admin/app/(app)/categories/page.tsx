@@ -6,7 +6,7 @@ import { CategoryManager } from "@/components/taxonomy-managers";
 export default async function CategoriesPage() {
   await requireStaff();
   const cookie = await getCookieHeader();
-  const categories = await apiGet<Array<{ id: string; name: string; slug: string; description: string | null; imageUrl: string | null; parentId: string | null; position: number; isActive: boolean; _count: { products: number; children: number } }>>(
+  const categories = await apiGet<Array<{ id: string; name: string; nameEn: string | null; slug: string; description: string | null; descriptionEn: string | null; imageUrl: string | null; parentId: string | null; position: number; isActive: boolean; _count: { products: number; children: number } }>>(
     "/admin/catalog/categories",
     { cookie },
   );

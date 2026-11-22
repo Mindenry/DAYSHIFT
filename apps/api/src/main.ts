@@ -9,6 +9,7 @@ import { AppModule } from "./app.module";
 import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 import { requestIdMiddleware } from "./common/middleware/request-id.middleware";
 import { originCheckMiddleware } from "./common/middleware/origin-check.middleware";
+import { localeMiddleware } from "./common/locale";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: false, bodyParser: false });
@@ -28,6 +29,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix("api/v1");
   app.use(requestIdMiddleware);
+  app.use(localeMiddleware);
   app.use(originCheckMiddleware);
   app.use(
     helmet({
@@ -54,7 +56,7 @@ async function bootstrap() {
     origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Request-Id", "X-Idempotency-Key"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Request-Id", "X-Idempotency-Key", "X-Locale"],
     exposedHeaders: ["X-Request-Id"],
     maxAge: 86400,
   });

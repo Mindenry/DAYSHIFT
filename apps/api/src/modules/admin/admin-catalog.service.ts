@@ -67,7 +67,7 @@ export class AdminCatalogService {
         take,
         include: {
           images: { orderBy: { position: "asc" }, take: 1 },
-          categories: { include: { category: { select: { name: true, slug: true } } } },
+          categories: { include: { category: { select: { name: true, nameEn: true, slug: true } } } },
           variants: { include: { inventory: { select: { onHand: true, reserved: true, damaged: true } } } },
           _count: { select: { variants: true } },
         },
@@ -77,6 +77,7 @@ export class AdminCatalogService {
       products.map((product) => ({
         id: product.id,
         name: product.name,
+        nameEn: product.nameEn,
         slug: product.slug,
         sku: product.sku,
         status: product.status,
@@ -94,6 +95,7 @@ export class AdminCatalogService {
           0,
         ),
         categories: product.categories.map((pc) => pc.category.name),
+        categoriesEn: product.categories.map((pc) => pc.category.nameEn ?? pc.category.name),
         updatedAt: product.updatedAt,
       })),
       total,
@@ -131,10 +133,13 @@ export class AdminCatalogService {
       const created = await tx.product.create({
         data: {
           name: dto.name,
+          nameEn: dto.nameEn || dto.name,
           slug: dto.slug,
           sku: dto.sku,
           shortDescription: dto.shortDescription || null,
+          shortDescriptionEn: dto.shortDescriptionEn || null,
           description: dto.description,
+          descriptionEn: dto.descriptionEn || dto.description,
           brandId: dto.brandId || null,
           status: dto.status as never,
           visibility: dto.visibility as never,
@@ -142,13 +147,20 @@ export class AdminCatalogService {
           compareAtPrice: dto.compareAtPrice != null ? new Prisma.Decimal(dto.compareAtPrice) : null,
           costPrice: dto.costPrice != null ? new Prisma.Decimal(dto.costPrice) : null,
           material: dto.material || null,
+          materialEn: dto.materialEn || null,
           careInstructions: dto.careInstructions || null,
+          careInstructionsEn: dto.careInstructionsEn || null,
           fitNotes: dto.fitNotes || null,
+          fitNotesEn: dto.fitNotesEn || null,
           features: dto.features ?? [],
+          featuresEn: dto.featuresEn ?? [],
           tags: dto.tags ?? [],
+          tagsEn: dto.tagsEn ?? [],
           isFeatured: dto.isFeatured ?? false,
           metaTitle: dto.metaTitle || null,
+          metaTitleEn: dto.metaTitleEn || null,
           metaDescription: dto.metaDescription || null,
+          metaDescriptionEn: dto.metaDescriptionEn || null,
           publishedAt: dto.status === "ACTIVE" ? new Date() : null,
           categories: {
             create: dto.categoryIds.map((id, index) => ({ categoryId: id, isPrimary: index === 0 })),
@@ -239,10 +251,13 @@ export class AdminCatalogService {
         where: { id },
         data: {
           ...(dto.name !== undefined ? { name: dto.name } : {}),
+          ...(dto.nameEn !== undefined ? { nameEn: dto.nameEn || null } : {}),
           ...(dto.slug !== undefined ? { slug: dto.slug } : {}),
           ...(dto.sku !== undefined ? { sku: dto.sku } : {}),
           ...(dto.shortDescription !== undefined ? { shortDescription: dto.shortDescription || null } : {}),
+          ...(dto.shortDescriptionEn !== undefined ? { shortDescriptionEn: dto.shortDescriptionEn || null } : {}),
           ...(dto.description !== undefined ? { description: dto.description } : {}),
+          ...(dto.descriptionEn !== undefined ? { descriptionEn: dto.descriptionEn || null } : {}),
           ...(dto.brandId !== undefined ? { brandId: dto.brandId || null } : {}),
           ...(dto.status !== undefined
             ? {
@@ -260,13 +275,20 @@ export class AdminCatalogService {
             ? { costPrice: dto.costPrice == null ? null : new Prisma.Decimal(dto.costPrice) }
             : {}),
           ...(dto.material !== undefined ? { material: dto.material || null } : {}),
+          ...(dto.materialEn !== undefined ? { materialEn: dto.materialEn || null } : {}),
           ...(dto.careInstructions !== undefined ? { careInstructions: dto.careInstructions || null } : {}),
+          ...(dto.careInstructionsEn !== undefined ? { careInstructionsEn: dto.careInstructionsEn || null } : {}),
           ...(dto.fitNotes !== undefined ? { fitNotes: dto.fitNotes || null } : {}),
+          ...(dto.fitNotesEn !== undefined ? { fitNotesEn: dto.fitNotesEn || null } : {}),
           ...(dto.features !== undefined ? { features: dto.features } : {}),
+          ...(dto.featuresEn !== undefined ? { featuresEn: dto.featuresEn } : {}),
           ...(dto.tags !== undefined ? { tags: dto.tags } : {}),
+          ...(dto.tagsEn !== undefined ? { tagsEn: dto.tagsEn } : {}),
           ...(dto.isFeatured !== undefined ? { isFeatured: dto.isFeatured } : {}),
           ...(dto.metaTitle !== undefined ? { metaTitle: dto.metaTitle || null } : {}),
+          ...(dto.metaTitleEn !== undefined ? { metaTitleEn: dto.metaTitleEn || null } : {}),
           ...(dto.metaDescription !== undefined ? { metaDescription: dto.metaDescription || null } : {}),
+          ...(dto.metaDescriptionEn !== undefined ? { metaDescriptionEn: dto.metaDescriptionEn || null } : {}),
         },
       });
       if (dto.categoryIds) {
@@ -531,14 +553,18 @@ export class AdminCatalogService {
     const category = await this.prisma.category.create({
       data: {
         name: dto.name,
+        nameEn: dto.nameEn || dto.name,
         slug: dto.slug,
         description: dto.description,
+        descriptionEn: dto.descriptionEn || null,
         imageUrl: dto.imageUrl,
         parentId: dto.parentId || null,
         position: dto.position ?? 0,
         isActive: dto.isActive ?? true,
         metaTitle: dto.metaTitle,
+        metaTitleEn: dto.metaTitleEn || null,
         metaDescription: dto.metaDescription,
+        metaDescriptionEn: dto.metaDescriptionEn || null,
       },
     });
     await this.invalidate();
@@ -577,14 +603,18 @@ export class AdminCatalogService {
       where: { id },
       data: {
         ...(dto.name !== undefined ? { name: dto.name as string } : {}),
+        ...(dto.nameEn !== undefined ? { nameEn: (dto.nameEn as string) || null } : {}),
         ...(dto.slug !== undefined ? { slug: dto.slug as string } : {}),
         ...(dto.description !== undefined ? { description: dto.description as string } : {}),
+        ...(dto.descriptionEn !== undefined ? { descriptionEn: (dto.descriptionEn as string) || null } : {}),
         ...(dto.imageUrl !== undefined ? { imageUrl: dto.imageUrl as string } : {}),
         ...(dto.parentId !== undefined ? { parentId: (dto.parentId as string) || null } : {}),
         ...(dto.position !== undefined ? { position: dto.position as number } : {}),
         ...(dto.isActive !== undefined ? { isActive: dto.isActive as boolean } : {}),
         ...(dto.metaTitle !== undefined ? { metaTitle: dto.metaTitle as string } : {}),
+        ...(dto.metaTitleEn !== undefined ? { metaTitleEn: (dto.metaTitleEn as string) || null } : {}),
         ...(dto.metaDescription !== undefined ? { metaDescription: dto.metaDescription as string } : {}),
+        ...(dto.metaDescriptionEn !== undefined ? { metaDescriptionEn: (dto.metaDescriptionEn as string) || null } : {}),
       },
     });
     await this.invalidate();
@@ -632,8 +662,10 @@ export class AdminCatalogService {
     return this.prisma.collection.create({
       data: {
         name: dto.name,
+        nameEn: dto.nameEn || dto.name,
         slug: dto.slug,
         description: dto.description,
+        descriptionEn: dto.descriptionEn || null,
         imageUrl: dto.imageUrl,
         type: (dto.type ?? "EDITORIAL") as never,
         position: dto.position ?? 0,
@@ -649,8 +681,10 @@ export class AdminCatalogService {
       where: { id },
       data: {
         ...(dto.name !== undefined ? { name: dto.name as string } : {}),
+        ...(dto.nameEn !== undefined ? { nameEn: (dto.nameEn as string) || null } : {}),
         ...(dto.slug !== undefined ? { slug: dto.slug as string } : {}),
         ...(dto.description !== undefined ? { description: dto.description as string } : {}),
+        ...(dto.descriptionEn !== undefined ? { descriptionEn: (dto.descriptionEn as string) || null } : {}),
         ...(dto.imageUrl !== undefined ? { imageUrl: dto.imageUrl as string } : {}),
         ...(dto.type !== undefined ? { type: dto.type as never } : {}),
         ...(dto.position !== undefined ? { position: dto.position as number } : {}),

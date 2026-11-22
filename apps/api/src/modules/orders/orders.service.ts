@@ -15,6 +15,7 @@ import { NotificationsService } from "../notifications/notifications.service";
 import { AuditService } from "../audit/audit.service";
 import { CartService } from "../cart/cart.service";
 import { AppError } from "../../common/app-error";
+import { pickText } from "../../common/locale";
 import { getPaging, paged } from "../../common/pagination";
 import { AuthUser } from "../../common/types";
 import {
@@ -662,7 +663,7 @@ export class OrdersService {
       items: request.items.map((item) => ({
         id: item.id,
         orderItemId: item.orderItemId,
-        productName: item.orderItem.productName,
+        productName: pickText(item.orderItem.productName, item.orderItem.productNameEn),
         variantSku: item.orderItem.variantSku,
         size: item.orderItem.size,
         color: item.orderItem.color,

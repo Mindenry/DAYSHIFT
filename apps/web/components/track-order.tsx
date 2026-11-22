@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { clientApi } from "@/lib/api";
+import { clientApi } from "@/lib/client-api";
 import { useI18n } from "@/lib/i18n-client";
 import { OrderDetailView, type OrderView } from "./order-detail-view";
 

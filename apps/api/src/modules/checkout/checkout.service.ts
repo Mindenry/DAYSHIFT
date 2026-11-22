@@ -9,6 +9,7 @@ import { InventoryService } from "../inventory/inventory.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { AuditService } from "../audit/audit.service";
 import { AppError } from "../../common/app-error";
+import { pickText } from "../../common/locale";
 import { AuthUser } from "../../common/types";
 import { randomToken } from "../../common/crypto";
 import { CheckoutDto, QuoteDto } from "./checkout.dto";
@@ -219,6 +220,7 @@ export class CheckoutService {
                     variantId: item.variantId,
                     productId: item.variant.productId,
                     productName: item.variant.product.name,
+                    productNameEn: item.variant.product.nameEn,
                     productSlug: item.variant.product.slug,
                     brandName: item.variant.product.brand?.name ?? null,
                     variantSku: item.variant.sku,

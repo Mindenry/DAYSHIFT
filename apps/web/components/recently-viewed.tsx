@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { money } from "@/lib/api";
+import { money } from "@/lib/money";
 import { useI18n } from "@/lib/i18n-client";
 
 interface RecentItem {

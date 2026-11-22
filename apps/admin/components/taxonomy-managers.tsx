@@ -6,15 +6,17 @@ import { toast } from "sonner";
 import { clientApi } from "@/lib/api";
 import { useI18n } from "@/lib/i18n-client";
 import { enumLabel } from "@/lib/messages";
+import { localized } from "@/lib/localize";
 import { Modal, FormActions } from "./modal";
 
 type Category = {
-  id: string; name: string; slug: string; description: string | null; imageUrl: string | null;
+  id: string; name: string; nameEn: string | null; slug: string; description: string | null;
+  descriptionEn: string | null; imageUrl: string | null;
   parentId: string | null; position: number; isActive: boolean; _count?: { products: number; children: number };
 };
 
 const emptyCategory = {
-  name: "", slug: "", description: "", imageUrl: "", parentId: "", position: "0", isActive: true,
+  name: "", nameEn: "", slug: "", description: "", descriptionEn: "", imageUrl: "", parentId: "", position: "0", isActive: true,
 };
 
 const slugify = (value: string) =>
@@ -22,7 +24,7 @@ const slugify = (value: string) =>
 
 export function CategoryManager({ initial }: { initial: Category[] }) {
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
   const [form, setForm] = useState({ ...emptyCategory });
@@ -31,7 +33,8 @@ export function CategoryManager({ initial }: { initial: Category[] }) {
   const start = (category?: Category) => {
     setEditing(category ?? null);
     setForm(category ? {
-      name: category.name, slug: category.slug, description: category.description ?? "",
+      name: category.name, nameEn: category.nameEn ?? "", slug: category.slug,
+      description: category.description ?? "", descriptionEn: category.descriptionEn ?? "",
       imageUrl: category.imageUrl ?? "", parentId: category.parentId ?? "",
       position: String(category.position), isActive: category.isActive,
     } : { ...emptyCategory });
@@ -44,8 +47,10 @@ export function CategoryManager({ initial }: { initial: Category[] }) {
     try {
       const payload = {
         name: form.name,
+        nameEn: form.nameEn || form.name,
         slug: form.slug || slugify(form.name),
         description: form.description || undefined,
+        descriptionEn: form.descriptionEn || undefined,
         imageUrl: form.imageUrl || undefined,
         parentId: form.parentId || null,
         position: Number(form.position || 0),
@@ -84,9 +89,9 @@ export function CategoryManager({ initial }: { initial: Category[] }) {
             <tbody>
               {initial.map((category) => (
                 <tr key={category.id}>
-                  <td className="font-medium">{category.parentId ? <span className="text-muted">— </span> : null}{category.name}</td>
+                  <td className="font-medium">{category.parentId ? <span className="text-muted">— </span> : null}{localized(locale, category.name, category.nameEn)}</td>
                   <td className="font-mono text-[11px] text-muted">{category.slug}</td>
-                  <td className="text-[11px] text-muted">{initial.find((c) => c.id === category.parentId)?.name ?? "—"}</td>
+                  <td className="text-[11px] text-muted">{(() => { const parent = initial.find((c) => c.id === category.parentId); return parent ? localized(locale, parent.name, parent.nameEn) : "—"; })()}</td>
                   <td className="mono">{category._count?.products ?? 0}</td>
                   <td><span className={`text-[10px] font-semibold uppercase tracking-[0.06em] ${category.isActive ? "text-accent" : "text-muted"}`}>{category.isActive ? t("Active") : t("Hidden")}</span></td>
                   <td className="mono">{category.position}</td>
@@ -125,6 +130,10 @@ export function CategoryManager({ initial }: { initial: Category[] }) {
                 <textarea id="c-desc" rows={3} className="field" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
               </div>
               <div className="sm:col-span-2">
+                <label className="label" htmlFor="c-descEn">{t("Description (English)")}</label>
+                <textarea id="c-descEn" rows={2} className="field" value={form.descriptionEn} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} />
+              </div>
+              <div className="sm:col-span-2">
                 <label className="label" htmlFor="c-image">{t("Image URL")}</label>
                 <input id="c-image" className="field" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="/images/products/knit-oat.jpg" />
               </div>
@@ -146,12 +155,13 @@ export function CategoryManager({ initial }: { initial: Category[] }) {
 }
 
 type Collection = {
-  id: string; name: string; slug: string; description: string | null; imageUrl: string | null;
+  id: string; name: string; nameEn: string | null; slug: string; description: string | null;
+  descriptionEn: string | null; imageUrl: string | null;
   type: string; position: number; isActive: boolean; startsAt: string | null; endsAt: string | null;
   _count?: { products: number };
 };
 
-const emptyCollection = { name: "", slug: "", description: "", imageUrl: "", type: "EDITORIAL", position: "0", isActive: true, startsAt: "", endsAt: "" };
+const emptyCollection = { name: "", nameEn: "", slug: "", description: "", descriptionEn: "", imageUrl: "", type: "EDITORIAL", position: "0", isActive: true, startsAt: "", endsAt: "" };
 
 export function CollectionManager({ initial }: { initial: Collection[] }) {
   const router = useRouter();
@@ -164,7 +174,8 @@ export function CollectionManager({ initial }: { initial: Collection[] }) {
   const start = (collection?: Collection) => {
     setEditing(collection ?? null);
     setForm(collection ? {
-      name: collection.name, slug: collection.slug, description: collection.description ?? "",
+      name: collection.name, nameEn: collection.nameEn ?? "", slug: collection.slug,
+      description: collection.description ?? "", descriptionEn: collection.descriptionEn ?? "",
       imageUrl: collection.imageUrl ?? "", type: collection.type, position: String(collection.position),
       isActive: collection.isActive, startsAt: collection.startsAt?.slice(0, 10) ?? "", endsAt: collection.endsAt?.slice(0, 10) ?? "",
     } : { ...emptyCollection });
@@ -176,7 +187,8 @@ export function CollectionManager({ initial }: { initial: Collection[] }) {
     setBusy(true);
     try {
       const payload = {
-        name: form.name, slug: form.slug || slugify(form.name), description: form.description || undefined,
+        name: form.name, nameEn: form.nameEn || form.name, slug: form.slug || slugify(form.name),
+        description: form.description || undefined, descriptionEn: form.descriptionEn || undefined,
         imageUrl: form.imageUrl || undefined, type: form.type, position: Number(form.position || 0),
         isActive: form.isActive, startsAt: form.startsAt || undefined, endsAt: form.endsAt || undefined,
       };
@@ -202,7 +214,7 @@ export function CollectionManager({ initial }: { initial: Collection[] }) {
             <tbody>
               {initial.map((collection) => (
                 <tr key={collection.id}>
-                  <td className="font-medium">{collection.name}</td>
+                  <td className="font-medium">{localized(locale, collection.name, collection.nameEn)}</td>
                   <td className="font-mono text-[11px] text-muted">{collection.slug}</td>
                   <td className="text-[11px]">{enumLabel(locale, collection.type)}</td>
                   <td className="mono">{collection._count?.products ?? 0}</td>
@@ -227,6 +239,10 @@ export function CollectionManager({ initial }: { initial: Collection[] }) {
                 <input id="col-name" className="field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value, slug: editing ? form.slug : slugify(e.target.value) })} required />
               </div>
               <div>
+                <label className="label" htmlFor="col-nameEn">{t("Name (English)")}</label>
+                <input id="col-nameEn" className="field" value={form.nameEn} onChange={(e) => setForm({ ...form, nameEn: e.target.value })} placeholder={form.name} />
+              </div>
+              <div>
                 <label className="label" htmlFor="col-slug">{t("Slug")}</label>
                 <input id="col-slug" className="field font-mono text-xs" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
               </div>
@@ -239,6 +255,10 @@ export function CollectionManager({ initial }: { initial: Collection[] }) {
               <div className="sm:col-span-2">
                 <label className="label" htmlFor="col-desc">{t("Description")}</label>
                 <textarea id="col-desc" rows={2} className="field" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="label" htmlFor="col-descEn">{t("Description (English)")}</label>
+                <textarea id="col-descEn" rows={2} className="field" value={form.descriptionEn} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} />
               </div>
               <div className="sm:col-span-2">
                 <label className="label" htmlFor="col-image">{t("Image URL")}</label>
@@ -269,21 +289,21 @@ export function CollectionManager({ initial }: { initial: Collection[] }) {
   );
 }
 
-type Brand = { id: string; name: string; slug: string; description: string | null; isActive: boolean; _count?: { products: number } };
+type Brand = { id: string; name: string; slug: string; description: string | null; descriptionEn: string | null; isActive: boolean; _count?: { products: number } };
 
 export function BrandManager({ initial }: { initial: Brand[] }) {
   const router = useRouter();
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Brand | null>(null);
-  const [form, setForm] = useState({ name: "", slug: "", description: "", isActive: true });
+  const [form, setForm] = useState({ name: "", slug: "", description: "", descriptionEn: "", isActive: true });
   const [busy, setBusy] = useState(false);
 
   const save = async (event: React.FormEvent) => {
     event.preventDefault();
     setBusy(true);
     try {
-      const payload = { name: form.name, slug: form.slug || slugify(form.name), description: form.description || undefined, isActive: form.isActive };
+      const payload = { name: form.name, slug: form.slug || slugify(form.name), description: form.description || undefined, descriptionEn: form.descriptionEn || undefined, isActive: form.isActive };
       if (editing) await clientApi(`/admin/catalog/brands/${editing.id}`, { method: "PATCH", body: JSON.stringify(payload) });
       else await clientApi("/admin/catalog/brands", { method: "POST", body: JSON.stringify(payload) });
       toast(editing ? t("Brand updated") : t("Brand created"));
@@ -299,7 +319,7 @@ export function BrandManager({ initial }: { initial: Brand[] }) {
   return (
     <>
       <div className="mb-3 flex justify-end">
-        <button type="button" className="a-btn" onClick={() => { setEditing(null); setForm({ name: "", slug: "", description: "", isActive: true }); setOpen(true); }}>{t("New brand")}</button>
+        <button type="button" className="a-btn" onClick={() => { setEditing(null); setForm({ name: "", slug: "", description: "", descriptionEn: "", isActive: true }); setOpen(true); }}>{t("New brand")}</button>
       </div>
       <div className="panel overflow-hidden">
         <div className="table-wrap">
@@ -314,7 +334,7 @@ export function BrandManager({ initial }: { initial: Brand[] }) {
                   <td><span className={`text-[10px] font-semibold uppercase ${brand.isActive ? "text-accent" : "text-muted"}`}>{brand.isActive ? t("Active") : t("Hidden")}</span></td>
                   <td className="text-right">
                     <button type="button" className="a-link" onClick={() => {
-                      setEditing(brand); setForm({ name: brand.name, slug: brand.slug, description: brand.description ?? "", isActive: brand.isActive }); setOpen(true);
+                      setEditing(brand); setForm({ name: brand.name, slug: brand.slug, description: brand.description ?? "", descriptionEn: brand.descriptionEn ?? "", isActive: brand.isActive }); setOpen(true);
                     }}>{t("Edit")}</button>
                   </td>
                 </tr>
@@ -330,6 +350,7 @@ export function BrandManager({ initial }: { initial: Brand[] }) {
               <div><label className="label" htmlFor="b-name">{t("Name")}</label><input id="b-name" className="field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value, slug: editing ? form.slug : slugify(e.target.value) })} required /></div>
               <div><label className="label" htmlFor="b-slug">{t("Slug")}</label><input id="b-slug" className="field font-mono text-xs" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required /></div>
               <div><label className="label" htmlFor="b-desc">{t("Description")}</label><textarea id="b-desc" rows={3} className="field" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+              <div><label className="label" htmlFor="b-descEn">{t("Description (English)")}</label><textarea id="b-descEn" rows={2} className="field" value={form.descriptionEn} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} /></div>
               <label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={form.isActive} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} className="h-4 w-4 accent-[#2f6b4f]" /> {t("Active")}</label>
             </div>
             <FormActions busy={busy} onCancel={() => setOpen(false)} submitLabel="Save" />

@@ -808,6 +808,21 @@ const ENUM_TH: Record<string, string> = {
   GOLD: "โกลด์",
   PLATINUM: "แพลทินัม",
   EXPRESS: "ด่วน",
+  "English content": "เนื้อหาภาษาอังกฤษ",
+  "English storefront": "หน้าร้านภาษาอังกฤษ",
+  "Shown when a shopper uses the English interface. Leave blank to fall back to the Thai copy.": "แสดงเมื่อผู้ใช้เลือกภาษาอังกฤษ หากเว้นว่างจะใช้เนื้อหาภาษาไทยแทน",
+  "Name (English)": "ชื่อ (อังกฤษ)",
+  "Short description (English)": "คำอธิบายสั้น (อังกฤษ)",
+  "Description (English)": "คำอธิบาย (อังกฤษ)",
+  "Materials (English)": "วัสดุ (อังกฤษ)",
+  "Fit notes (English)": "หมายเหตุทรง (อังกฤษ)",
+  "Care instructions (English)": "วิธีดูแล (อังกฤษ)",
+  "Features (English, one per line)": "คุณสมบัติ (อังกฤษ บรรทัดละรายการ)",
+  "Tags (English, comma separated)": "แท็ก (อังกฤษ คั่นด้วยจุลภาค)",
+  "SEO title (English)": "หัวข้อ SEO (อังกฤษ)",
+  "SEO description (English)": "คำอธิบาย SEO (อังกฤษ)",
+  "Thai content": "เนื้อหาภาษาไทย",
+  "Thai storefront": "หน้าร้านภาษาไทย",
 };
 
 /** Human-readable enum label, translated to Thai when a translation exists. */

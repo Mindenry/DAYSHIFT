@@ -1,4 +1,5 @@
 import { Prisma } from "@dayshift/db";
+import { pickList, pickNullable, pickText } from "../../common/locale";
 
 type DecimalLike = { toString(): string };
 
@@ -68,7 +69,8 @@ export function toProductCard(product: ProductWithRelations) {
 
   return {
     id: product.id,
-    name: product.name,
+    name: pickText(product.name, product.nameEn),
+    nameEn: product.nameEn ?? undefined,
     slug: product.slug,
     price: price.toFixed(2),
     compareAtPrice: compareAt?.toFixed(2) ?? null,
@@ -93,6 +95,8 @@ export function toProductDetail(
       rating: number;
       title: string | null;
       body: string;
+      titleEn: string | null;
+      bodyEn: string | null;
       isVerifiedPurchase: boolean;
       helpfulCount: number;
       createdAt: Date;
@@ -106,15 +110,15 @@ export function toProductDetail(
   return {
     ...card,
     sku: product.sku,
-    shortDescription: product.shortDescription,
-    description: product.description,
-    material: product.material,
-    careInstructions: product.careInstructions,
-    fitNotes: product.fitNotes,
-    features: product.features,
-    tags: product.tags,
-    metaTitle: product.metaTitle,
-    metaDescription: product.metaDescription,
+    shortDescription: pickNullable(product.shortDescription, product.shortDescriptionEn),
+    description: pickText(product.description, product.descriptionEn),
+    material: pickNullable(product.material, product.materialEn),
+    careInstructions: pickNullable(product.careInstructions, product.careInstructionsEn),
+    fitNotes: pickNullable(product.fitNotes, product.fitNotesEn),
+    features: pickList(product.features, product.featuresEn),
+    tags: pickList(product.tags, product.tagsEn),
+    metaTitle: pickNullable(product.metaTitle, product.metaTitleEn),
+    metaDescription: pickNullable(product.metaDescription, product.metaDescriptionEn),
     publishedAt: product.publishedAt,
     images: product.images.map((image) => ({
       id: image.id,
@@ -144,27 +148,27 @@ export function toProductDetail(
     }),
     categories: product.categories.map((pc) => ({
       id: pc.category.id,
-      name: pc.category.name,
+      name: pickText(pc.category.name, pc.category.nameEn),
       slug: pc.category.slug,
     })),
     collections: product.collections.map((pc) => ({
       id: pc.collection.id,
-      name: pc.collection.name,
+      name: pickText(pc.collection.name, pc.collection.nameEn),
       slug: pc.collection.slug,
     })),
     sizeGuide: product.sizeGuide
       ? {
           id: product.sizeGuide.id,
-          name: product.sizeGuide.name,
+          name: pickText(product.sizeGuide.name, product.sizeGuide.nameEn),
           chart: product.sizeGuide.chart,
-          notes: product.sizeGuide.notes,
+          notes: pickNullable(product.sizeGuide.notes, product.sizeGuide.notesEn),
         }
       : null,
     reviews: options.reviews.map((review) => ({
       id: review.id,
       rating: review.rating,
-      title: review.title,
-      body: review.body,
+      title: pickNullable(review.title, review.titleEn),
+      body: pickText(review.body, review.bodyEn),
       authorName: `${review.user.firstName} ${review.user.lastName.slice(0, 1).toUpperCase()}.`,
       isVerifiedPurchase: review.isVerifiedPurchase,
       helpfulCount: review.helpfulCount,

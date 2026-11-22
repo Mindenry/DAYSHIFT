@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { clientApi } from "@/lib/api";
+import { clientApi } from "@/lib/client-api";
 import { useI18n } from "@/lib/i18n-client";
 
 async function completeSignIn(router: ReturnType<typeof useRouter>, next: string) {

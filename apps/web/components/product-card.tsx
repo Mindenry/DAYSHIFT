@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ProductCardDto } from "@dayshift/types";
-import { money } from "@/lib/api";
+import { money } from "@/lib/money";
 import { WishlistButton } from "./wishlist-button";
 import { useI18n } from "@/lib/i18n-client";
 

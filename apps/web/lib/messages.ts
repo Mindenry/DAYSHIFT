@@ -812,6 +812,8 @@ const TH: Record<string, string> = {
   "This is a demonstration storefront with a simulated sandbox payment provider. No real card data is accepted or stored, and no money is processed.": "นี่คือหน้าร้านสาธิตที่ใช้ระบบชำระเงินจำลอง ไม่รับหรือเก็บข้อมูลบัตรจริง และไม่มีการตัดเงินจริง",
   "Where is DAYSHIFT made?": "DAYSHIFT ผลิตที่ไหน?",
   "Pieces are produced in small runs with suppliers the studio knows by name. Materials and care instructions are listed on every product page.": "สินค้าผลิตจำนวนไม่มากกับซัพพลายเออร์ที่สตูดิโอรู้จักเป็นอย่างดี วัสดุและวิธีดูแลระบุในทุกหน้าสินค้า",
+  "On this page": "ในหน้านี้",
+  "Last reviewed November 2026. This content is part of a demonstration platform.": "ปรับปรุงล่าสุด พฤศจิกายน 2569 เนื้อหานี้เป็นส่วนหนึ่งของแพลตฟอร์มสาธิต",
 };
 
 export function translate(locale: Locale, text: string, vars?: Record<string, string | number>): string {

@@ -34,10 +34,13 @@ export class VariantInputDto {
 
 export class CreateProductDto {
   @IsString() @MinLength(2) @MaxLength(160) name!: string;
+  @IsOptional() @IsString() @MaxLength(160) nameEn?: string;
   @IsString() @MinLength(2) @MaxLength(180) slug!: string;
   @IsString() @MinLength(2) @MaxLength(60) sku!: string;
   @IsOptional() @IsString() @MaxLength(300) shortDescription?: string;
+  @IsOptional() @IsString() @MaxLength(300) shortDescriptionEn?: string;
   @IsString() @MinLength(20) description!: string;
+  @IsOptional() @IsString() descriptionEn?: string;
   @IsOptional() @IsString() brandId?: string;
   @IsIn(["DRAFT", "ACTIVE", "ARCHIVED", "DISCONTINUED"]) status!: string;
   @IsIn(["PUBLIC", "HIDDEN"]) visibility!: string;
@@ -45,15 +48,22 @@ export class CreateProductDto {
   @IsOptional() @IsNumber() @Min(0) compareAtPrice?: number;
   @IsOptional() @IsNumber() @Min(0) costPrice?: number;
   @IsOptional() @IsString() @MaxLength(300) material?: string;
+  @IsOptional() @IsString() @MaxLength(300) materialEn?: string;
   @IsOptional() @IsString() @MaxLength(500) careInstructions?: string;
+  @IsOptional() @IsString() @MaxLength(500) careInstructionsEn?: string;
   @IsOptional() @IsString() @MaxLength(500) fitNotes?: string;
+  @IsOptional() @IsString() @MaxLength(500) fitNotesEn?: string;
   @IsOptional() @IsArray() features?: string[];
+  @IsOptional() @IsArray() featuresEn?: string[];
   @IsOptional() @IsArray() tags?: string[];
+  @IsOptional() @IsArray() tagsEn?: string[];
   @IsArray() @IsString({ each: true }) categoryIds!: string[];
   @IsOptional() @IsArray() @IsString({ each: true }) collectionIds?: string[];
   @IsOptional() @IsBoolean() isFeatured?: boolean;
   @IsOptional() @IsString() @MaxLength(160) metaTitle?: string;
+  @IsOptional() @IsString() @MaxLength(160) metaTitleEn?: string;
   @IsOptional() @IsString() @MaxLength(320) metaDescription?: string;
+  @IsOptional() @IsString() @MaxLength(320) metaDescriptionEn?: string;
   @IsOptional() @ValidateNested({ each: true }) @Type(() => ProductImageInputDto) images?: ProductImageInputDto[];
   @IsOptional() @ValidateNested({ each: true }) @Type(() => VariantInputDto) variants?: VariantInputDto[];
 }
@@ -84,21 +94,27 @@ export class BulkProductDto {
 
 export class CategoryInputDto {
   @IsString() @MinLength(2) @MaxLength(120) name!: string;
+  @IsOptional() @IsString() @MaxLength(120) nameEn?: string;
   @IsString() @MinLength(2) @MaxLength(140) slug!: string;
   @IsOptional() @IsString() @MaxLength(500) description?: string;
+  @IsOptional() @IsString() @MaxLength(500) descriptionEn?: string;
   @IsOptional() @IsString() @MaxLength(500) imageUrl?: string;
   @IsOptional() @IsString() parentId?: string | null;
   @IsOptional() @IsInt() @Min(0) position?: number;
   @IsOptional() @IsBoolean() isActive?: boolean;
   @IsOptional() @IsString() @MaxLength(160) metaTitle?: string;
+  @IsOptional() @IsString() @MaxLength(160) metaTitleEn?: string;
   @IsOptional() @IsString() @MaxLength(320) metaDescription?: string;
+  @IsOptional() @IsString() @MaxLength(320) metaDescriptionEn?: string;
 }
 export class UpdateCategoryDto extends PartialType(CategoryInputDto) {}
 
 export class CollectionInputDto {
   @IsString() @MinLength(2) @MaxLength(120) name!: string;
+  @IsOptional() @IsString() @MaxLength(120) nameEn?: string;
   @IsString() @MinLength(2) @MaxLength(140) slug!: string;
   @IsOptional() @IsString() @MaxLength(500) description?: string;
+  @IsOptional() @IsString() @MaxLength(500) descriptionEn?: string;
   @IsOptional() @IsString() @MaxLength(500) imageUrl?: string;
   @IsOptional() @IsIn(["EDITORIAL", "NEW_ARRIVALS", "BEST_SELLERS", "SALE", "SEASONAL", "LIMITED"]) type?: string;
   @IsOptional() @IsInt() position?: number;
@@ -112,6 +128,7 @@ export class BrandInputDto {
   @IsString() @MinLength(2) @MaxLength(120) name!: string;
   @IsString() @MinLength(2) @MaxLength(140) slug!: string;
   @IsOptional() @IsString() @MaxLength(500) description?: string;
+  @IsOptional() @IsString() @MaxLength(500) descriptionEn?: string;
   @IsOptional() @IsString() logoUrl?: string;
   @IsOptional() @IsBoolean() isActive?: boolean;
 }

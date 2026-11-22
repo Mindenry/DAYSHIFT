@@ -1,28 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { money } from "@/lib/api";
+import { money } from "@/lib/money";
 import { useI18n } from "@/lib/i18n-client";
+import { statusLabel as statusKey } from "@/lib/order-status";
 
-const STATUS_LABELS: Record<string, string> = {
-  PENDING_PAYMENT: "Pending payment",
-  PAID: "Paid",
-  PROCESSING: "Processing",
-  PICKING: "Picking",
-  PACKED: "Packed",
-  SHIPPED: "Shipped",
-  OUT_FOR_DELIVERY: "Out for delivery",
-  DELIVERED: "Delivered",
-  COMPLETED: "Completed",
-  PAYMENT_FAILED: "Payment failed",
-  CANCELLED: "Cancelled",
-  ON_HOLD: "On hold",
-  RETURN_REQUESTED: "Return requested",
-  PARTIALLY_RETURNED: "Partially returned",
-  RETURNED: "Returned",
-  REFUND_PENDING: "Refund pending",
-  REFUNDED: "Refunded",
-};
+
 
 export interface OrderView {
   orderNumber: string;
@@ -75,13 +58,9 @@ export interface OrderView {
   returnWindowEndsAt?: string | null;
 }
 
-export function statusLabel(status: string) {
-  return STATUS_LABELS[status] ?? status.replace(/_/g, " ").toLowerCase();
-}
-
 export function OrderDetailView({ order }: { order: OrderView }) {
   const { t, locale } = useI18n();
-  const statusLabel = (status: string) => t(STATUS_LABELS[status] ?? status.replace(/_/g, " ").toLowerCase());
+  const statusLabel = (status: string) => t(statusKey(status));
   const dateTime = (value: string) =>
     new Date(value).toLocaleString(locale === "th" ? "th-TH" : "en-US", {
       month: "short",

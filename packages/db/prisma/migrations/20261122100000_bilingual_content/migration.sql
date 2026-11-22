@@ -1,0 +1,44 @@
+-- Bilingual merchandising content. Thai remains the canonical field; *En holds English copy.
+ALTER TABLE "Product"
+  ADD COLUMN IF NOT EXISTS "nameEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "shortDescriptionEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "descriptionEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "materialEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "careInstructionsEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "fitNotesEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "featuresEn" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  ADD COLUMN IF NOT EXISTS "tagsEn" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  ADD COLUMN IF NOT EXISTS "metaTitleEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "metaDescriptionEn" TEXT;
+
+ALTER TABLE "Category"
+  ADD COLUMN IF NOT EXISTS "nameEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "descriptionEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "metaTitleEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "metaDescriptionEn" TEXT;
+
+ALTER TABLE "Brand"
+  ADD COLUMN IF NOT EXISTS "descriptionEn" TEXT;
+
+ALTER TABLE "Collection"
+  ADD COLUMN IF NOT EXISTS "nameEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "descriptionEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "metaTitleEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "metaDescriptionEn" TEXT;
+
+ALTER TABLE "ContentBlock"
+  ADD COLUMN IF NOT EXISTS "titleEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "subtitleEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "bodyEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "ctaLabelEn" TEXT;
+
+ALTER TABLE "NavigationItem"
+  ADD COLUMN IF NOT EXISTS "labelEn" TEXT;
+
+ALTER TABLE "Review"
+  ADD COLUMN IF NOT EXISTS "titleEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "bodyEn" TEXT;
+
+ALTER TABLE "SizeGuide"
+  ADD COLUMN IF NOT EXISTS "nameEn" TEXT,
+  ADD COLUMN IF NOT EXISTS "notesEn" TEXT;

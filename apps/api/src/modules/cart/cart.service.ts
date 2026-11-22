@@ -4,6 +4,7 @@ import { toCents } from "@dayshift/config";
 import { PrismaService } from "../../prisma/prisma.module";
 import { PricingService } from "../pricing/pricing.service";
 import { AppError } from "../../common/app-error";
+import { currentLocale, pickText } from "../../common/locale";
 import { AuthUser } from "../../common/types";
 import { randomToken } from "../../common/crypto";
 
@@ -156,10 +157,16 @@ export class CartService {
       const effective = this.effectiveCents(item.variant);
       const inStock = stock >= item.quantity;
       if (!inStock) {
+        const name = pickText(item.variant.product.name, item.variant.product.nameEn);
+        const size = item.variant.size ?? (currentLocale() === "en" ? "One size" : "ไซซ์เดียว");
         warnings.push(
-          stock === 0
-            ? `${item.variant.product.name} (${item.variant.size ?? "One size"}) is out of stock.`
-            : `Only ${stock} left of ${item.variant.product.name} (${item.variant.size ?? "One size"}).`,
+          currentLocale() === "en"
+            ? stock === 0
+              ? `${name} (${size}) is out of stock.`
+              : `Only ${stock} left of ${name} (${size}).`
+            : stock === 0
+              ? `${name} (${size}) สินค้าหมด`
+              : `${name} (${size}) เหลือเพียง ${stock} ชิ้น`,
         );
       }
       const priced = quote.pricing.lines.find((line) => line.id === item.id);
@@ -167,7 +174,7 @@ export class CartService {
         id: item.id,
         variantId: item.variantId,
         productId: item.variant.productId,
-        productName: item.variant.product.name,
+        productName: pickText(item.variant.product.name, item.variant.product.nameEn),
         productSlug: item.variant.product.slug,
         variantSku: item.variant.sku,
         size: item.variant.size,

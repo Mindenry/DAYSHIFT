@@ -4,12 +4,13 @@ import { apiGet, money, date } from "@/lib/api";
 import { getCookieHeader, requireStaff } from "@/lib/session";
 import { getI18n } from "@/lib/i18n";
 import { enumLabel } from "@/lib/messages";
+import { localized } from "@/lib/localize";
 
 interface ProductsResponse {
   items: Array<{
-    id: string; name: string; slug: string; sku: string; status: string; price: string;
+    id: string; name: string; nameEn: string | null; slug: string; sku: string; status: string; price: string;
     compareAtPrice: string | null; image: string | null; variantCount: number; stock: number;
-    categories: string[]; updatedAt: string;
+    categories: string[]; categoriesEn?: string[]; updatedAt: string;
   }>;
   meta: { page: number; total: number; totalPages: number };
 }
@@ -75,13 +76,13 @@ export default async function ProductsPage({
                             )}
                           </div>
                           <div>
-                            <Link href={`/products/${product.id}`} className="font-medium hover:underline">{product.name}</Link>
+                            <Link href={`/products/${product.id}`} className="font-medium hover:underline">{localized(locale, product.name, product.nameEn)}</Link>
                             <p className="mt-0.5 font-mono text-[10px] text-muted">{product.sku}</p>
                           </div>
                         </div>
                       </td>
                       <td><Badge status={product.status} /></td>
-                      <td className="text-[11px] text-muted">{product.categories.join(", ") || "—"}</td>
+                      <td className="text-[11px] text-muted">{localized(locale, product.categories.join(", "), (product.categoriesEn ?? product.categories).join(", ")) || "—"}</td>
                       <td>{product.variantCount}</td>
                       <td className={product.stock <= 0 ? "text-danger" : product.stock < 10 ? "text-warn" : ""}>{product.stock}</td>
                       <td className="text-right">{money(product.price)}</td>

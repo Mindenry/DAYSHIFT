@@ -4,6 +4,7 @@ import { PrismaService } from "../../prisma/prisma.module";
 import { CacheService } from "../../redis/cache.service";
 import { getPaging, paged } from "../../common/pagination";
 import { AppError } from "../../common/app-error";
+import { currentLocale, pickNullable, pickText } from "../../common/locale";
 import { ProductQueryDto, ReviewQueryDto } from "./catalog.dto";
 import {
   availableOf,
@@ -21,7 +22,8 @@ export class CatalogService {
 
   // ── Categories & collections ──────────────────────────────────────────
   async categoryTree() {
-    const cached = await this.cache.get<unknown[]>("catalog:categories");
+    const cacheKey = `catalog:categories:${currentLocale()}`;
+    const cached = await this.cache.get<unknown[]>(cacheKey);
     if (cached) return cached;
 
     const categories = await this.prisma.category.findMany({
@@ -37,16 +39,16 @@ export class CatalogService {
     }
     const mapNode = (category: (typeof categories)[number]): unknown => ({
       id: category.id,
-      name: category.name,
+      name: pickText(category.name, category.nameEn),
       slug: category.slug,
-      description: category.description,
+      description: pickNullable(category.description, category.descriptionEn),
       imageUrl: category.imageUrl,
       parentId: category.parentId,
       productCount: category._count.products,
       children: (byParent.get(category.id) ?? []).map(mapNode),
     });
     const tree = (byParent.get(null) ?? []).map(mapNode);
-    await this.cache.set("catalog:categories", tree, 300);
+    await this.cache.set(cacheKey, tree, 300);
     return tree;
   }
 
@@ -60,27 +62,27 @@ export class CatalogService {
     let cursorId: string | null = category.id;
     let depth = 0;
     while (cursorId && depth < 5) {
-      const node: { id: string; name: string; slug: string; parentId: string | null } | null =
+      const node: { id: string; name: string; nameEn: string | null; slug: string; parentId: string | null } | null =
         await this.prisma.category.findUnique({
           where: { id: cursorId },
-          select: { id: true, name: true, slug: true, parentId: true },
+          select: { id: true, name: true, nameEn: true, slug: true, parentId: true },
         });
       if (!node) break;
-      breadcrumbs.unshift({ id: node.id, name: node.name, slug: node.slug });
+      breadcrumbs.unshift({ id: node.id, name: pickText(node.name, node.nameEn), slug: node.slug });
       cursorId = node.parentId;
       depth += 1;
     }
     return {
       id: category.id,
-      name: category.name,
+      name: pickText(category.name, category.nameEn),
       slug: category.slug,
-      description: category.description,
+      description: pickNullable(category.description, category.descriptionEn),
       imageUrl: category.imageUrl,
-      metaTitle: category.metaTitle,
-      metaDescription: category.metaDescription,
+      metaTitle: pickNullable(category.metaTitle, category.metaTitleEn),
+      metaDescription: pickNullable(category.metaDescription, category.metaDescriptionEn),
       children: category.children.map((child) => ({
         id: child.id,
-        name: child.name,
+        name: pickText(child.name, child.nameEn),
         slug: child.slug,
         imageUrl: child.imageUrl,
       })),
@@ -89,7 +91,8 @@ export class CatalogService {
   }
 
   async collections() {
-    const cached = await this.cache.get<unknown[]>("catalog:collections");
+    const cacheKey = `catalog:collections:${currentLocale()}`;
+    const cached = await this.cache.get<unknown[]>(cacheKey);
     if (cached) return cached;
     const now = new Date();
     const collections = await this.prisma.collection.findMany({
@@ -105,14 +108,14 @@ export class CatalogService {
     });
     const mapped = collections.map((collection) => ({
       id: collection.id,
-      name: collection.name,
+      name: pickText(collection.name, collection.nameEn),
       slug: collection.slug,
-      description: collection.description,
+      description: pickNullable(collection.description, collection.descriptionEn),
       imageUrl: collection.imageUrl,
       type: collection.type,
       productCount: collection._count.products,
     }));
-    await this.cache.set("catalog:collections", mapped, 300);
+    await this.cache.set(cacheKey, mapped, 300);
     return mapped;
   }
 
@@ -129,22 +132,28 @@ export class CatalogService {
     }
     return {
       id: collection.id,
-      name: collection.name,
+      name: pickText(collection.name, collection.nameEn),
       slug: collection.slug,
-      description: collection.description,
+      description: pickNullable(collection.description, collection.descriptionEn),
       imageUrl: collection.imageUrl,
       type: collection.type,
-      metaTitle: collection.metaTitle,
-      metaDescription: collection.metaDescription,
+      metaTitle: pickNullable(collection.metaTitle, collection.metaTitleEn),
+      metaDescription: pickNullable(collection.metaDescription, collection.metaDescriptionEn),
     };
   }
 
   async brands() {
-    return this.prisma.brand.findMany({
+    const brands = await this.prisma.brand.findMany({
       where: { isActive: true },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, slug: true, description: true },
+      select: { id: true, name: true, slug: true, description: true, descriptionEn: true },
     });
+    return brands.map((brand) => ({
+      id: brand.id,
+      name: brand.name,
+      slug: brand.slug,
+      description: pickNullable(brand.description, brand.descriptionEn),
+    }));
   }
 
   // ── Product listing ──────────────────────────────────────────────────
@@ -169,14 +178,19 @@ export class CatalogService {
       SELECT id FROM "Product"
       WHERE status::text = 'ACTIVE' AND visibility::text = 'PUBLIC'
         AND (
-          to_tsvector('english',
+          to_tsvector('simple',
             coalesce(name,'') || ' ' ||
+            coalesce("nameEn",'') || ' ' ||
             coalesce("shortDescription",'') || ' ' ||
+            coalesce("shortDescriptionEn",'') || ' ' ||
             coalesce(description,'') || ' ' ||
+            coalesce("descriptionEn",'') || ' ' ||
             coalesce(sku,'') || ' ' ||
-            array_to_string(tags, ' ')
-          ) @@ websearch_to_tsquery('english', ${term})
+            array_to_string(tags, ' ') || ' ' ||
+            array_to_string("tagsEn", ' ')
+          ) @@ websearch_to_tsquery('simple', ${term})
           OR name ILIKE ${"%" + term + "%"}
+          OR "nameEn" ILIKE ${"%" + term + "%"}
           OR sku ILIKE ${"%" + term + "%"}
         )
       LIMIT 300
@@ -384,8 +398,8 @@ export class CatalogService {
       items.map((review) => ({
         id: review.id,
         rating: review.rating,
-        title: review.title,
-        body: review.body,
+        title: pickNullable(review.title, review.titleEn),
+        body: pickText(review.body, review.bodyEn),
         authorName: `${review.user.firstName} ${review.user.lastName.slice(0, 1).toUpperCase()}.`,
         isVerifiedPurchase: review.isVerifiedPurchase,
         helpfulCount: review.helpfulCount,
@@ -463,13 +477,16 @@ export class CatalogService {
           visibility: "PUBLIC",
           OR: [
             { name: { contains: term, mode: "insensitive" } },
+            { nameEn: { contains: term, mode: "insensitive" } },
             { sku: { contains: term, mode: "insensitive" } },
             { tags: { has: term.toLowerCase() } },
+            { tagsEn: { has: term.toLowerCase() } },
           ],
         },
         select: {
           id: true,
           name: true,
+          nameEn: true,
           slug: true,
           price: true,
           images: { select: { url: true }, orderBy: { position: "asc" }, take: 1 },
@@ -478,27 +495,41 @@ export class CatalogService {
         orderBy: { isFeatured: "desc" },
       }),
       this.prisma.category.findMany({
-        where: { isActive: true, name: { contains: term, mode: "insensitive" } },
-        select: { id: true, name: true, slug: true },
+        where: {
+          isActive: true,
+          OR: [
+            { name: { contains: term, mode: "insensitive" } },
+            { nameEn: { contains: term, mode: "insensitive" } },
+          ],
+        },
+        select: { id: true, name: true, nameEn: true, slug: true },
         take: 4,
       }),
       this.prisma.collection.findMany({
-        where: { isActive: true, name: { contains: term, mode: "insensitive" } },
-        select: { id: true, name: true, slug: true },
+        where: {
+          isActive: true,
+          OR: [
+            { name: { contains: term, mode: "insensitive" } },
+            { nameEn: { contains: term, mode: "insensitive" } },
+          ],
+        },
+        select: { id: true, name: true, nameEn: true, slug: true },
         take: 3,
       }),
     ]);
     return {
       products: products.map((p) => ({
         id: p.id,
-        name: p.name,
+        name: pickText(p.name, p.nameEn),
         slug: p.slug,
         price: p.price.toString(),
         image: p.images[0]?.url ?? null,
       })),
-      categories,
-      collections,
-      popular: ["Linen shirt", "Oversized tee", "Straight jeans", "Leather tote", "Merino knit"],
+      categories: categories.map((c) => ({ id: c.id, name: pickText(c.name, c.nameEn), slug: c.slug })),
+      collections: collections.map((c) => ({ id: c.id, name: pickText(c.name, c.nameEn), slug: c.slug })),
+      popular: currentLocale() === "en"
+        ? ["Linen shirt", "Oversized tee", "Straight jeans", "Leather tote", "Merino knit"]
+        : ["เสื้อลินิน", "เสื้อยืดโอเวอร์ไซซ์", "กางเกงยีนส์ขาตรง", "กระเป๋าโท้ต", "ไหมพรมเมอริโน"],
     };
   }
 

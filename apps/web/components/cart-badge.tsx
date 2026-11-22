@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { clientApi } from "@/lib/api";
+import { clientApi } from "@/lib/client-api";
 
 export function CartBadge() {
   const [count, setCount] = useState<number | null>(null);

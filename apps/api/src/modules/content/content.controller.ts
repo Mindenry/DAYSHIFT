@@ -6,6 +6,7 @@ import { PrismaService } from "../../prisma/prisma.module";
 import { Public } from "../../common/decorators";
 import { productInclude, toProductCard } from "../catalog/catalog.mapper";
 import { AppError } from "../../common/app-error";
+import { pickNullable, pickText } from "../../common/locale";
 
 class NewsletterDto {
   @IsEmail() @MaxLength(254) email!: string;
@@ -31,7 +32,18 @@ export class ContentController {
       },
       orderBy: { position: "asc" },
     });
-    return Object.fromEntries(rows.map((row) => [row.key, row]));
+    return Object.fromEntries(
+      rows.map((row) => [
+        row.key,
+        {
+          ...row,
+          title: pickNullable(row.title, row.titleEn),
+          subtitle: pickNullable(row.subtitle, row.subtitleEn),
+          body: pickNullable(row.body, row.bodyEn),
+          ctaLabel: pickNullable(row.ctaLabel, row.ctaLabelEn),
+        },
+      ]),
+    );
   }
 
   @Get("home")
@@ -53,7 +65,7 @@ export class ContentController {
         this.prisma.category.findMany({
           where: { isActive: true, parentId: null },
           orderBy: { position: "asc" },
-          select: { id: true, name: true, slug: true, imageUrl: true },
+          select: { id: true, name: true, nameEn: true, slug: true, imageUrl: true },
         }),
         this.prisma.collection.findMany({
           where: {
@@ -61,7 +73,16 @@ export class ContentController {
             OR: [{ endsAt: null }, { endsAt: { gte: new Date() } }],
           },
           orderBy: { position: "asc" },
-          select: { id: true, name: true, slug: true, description: true, imageUrl: true, type: true },
+          select: {
+            id: true,
+            name: true,
+            nameEn: true,
+            slug: true,
+            description: true,
+            descriptionEn: true,
+            imageUrl: true,
+            type: true,
+          },
         }),
         this.prisma.product.findMany({
           where: { status: "ACTIVE", visibility: "PUBLIC", isFeatured: true },
@@ -91,9 +112,23 @@ export class ContentController {
       announcement: blocks["announcement.bar"] ?? null,
       editorial: [blocks["home.editorial.women"], blocks["home.editorial.men"]].filter(Boolean),
       campaign: blocks["home.campaign.seasonal"] ?? null,
-      navigation,
-      categories,
-      collections,
+      navigation: navigation.map((item) => ({
+        ...item,
+        label: pickText(item.label, item.labelEn),
+        children: item.children.map((child) => ({ ...child, label: pickText(child.label, child.labelEn) })),
+      })),
+      categories: categories.map((category) => ({
+        ...category,
+        name: pickText(category.name, category.nameEn),
+        nameEn: undefined,
+      })),
+      collections: collections.map((collection) => ({
+        ...collection,
+        name: pickText(collection.name, collection.nameEn),
+        description: pickNullable(collection.description, collection.descriptionEn),
+        nameEn: undefined,
+        descriptionEn: undefined,
+      })),
       featured: featured.map(toProductCard),
       newArrivals: newArrivals.map(toProductCard),
       bestSellers: bestSellers.map(toProductCard),
@@ -104,16 +139,27 @@ export class ContentController {
   async page(@Param("key") key: string) {
     const block = await this.prisma.contentBlock.findUnique({ where: { key } });
     if (!block || block.status !== "PUBLISHED") throw AppError.notFound("Page not found");
-    return block;
+    return {
+      ...block,
+      title: pickNullable(block.title, block.titleEn),
+      subtitle: pickNullable(block.subtitle, block.subtitleEn),
+      body: pickNullable(block.body, block.bodyEn),
+      ctaLabel: pickNullable(block.ctaLabel, block.ctaLabelEn),
+    };
   }
 
   @Get("navigation")
   async navigation() {
-    return this.prisma.navigationItem.findMany({
+    const items = await this.prisma.navigationItem.findMany({
       where: { isActive: true, parentId: null },
       orderBy: { position: "asc" },
       include: { children: { orderBy: { position: "asc" } } },
     });
+    return items.map((item) => ({
+      ...item,
+      label: pickText(item.label, item.labelEn),
+      children: item.children.map((child) => ({ ...child, label: pickText(child.label, child.labelEn) })),
+    }));
   }
 
   @Get("settings")

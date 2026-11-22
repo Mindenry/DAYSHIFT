@@ -238,6 +238,10 @@ model Category {
   isActive        Boolean  @default(true)
   metaTitle       String?
   metaDescription String?
+  nameEn          String?
+  descriptionEn   String?
+  metaTitleEn     String?
+  metaDescriptionEn String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -257,6 +261,7 @@ model Brand {
   name        String
   slug        String   @unique
   description String?
+  descriptionEn String?
   logoUrl     String?
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -280,6 +285,10 @@ model Collection {
   endsAt          DateTime?
   metaTitle       String?
   metaDescription String?
+  nameEn          String?
+  descriptionEn   String?
+  metaTitleEn     String?
+  metaDescriptionEn String?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
@@ -291,6 +300,8 @@ model Collection {
 model SizeGuide {
   id         String   @id @default(cuid())
   name       String
+  nameEn     String?
+  notesEn    String?
   categoryId String?
   chart      Json
   notes      String?
@@ -323,6 +334,16 @@ model Product {
   fitNotes         String?
   features         String[]      @default([])
   tags             String[]      @default([])
+  nameEn           String?
+  shortDescriptionEn String?
+  descriptionEn    String?
+  materialEn       String?
+  careInstructionsEn String?
+  fitNotesEn       String?
+  featuresEn       String[]      @default([])
+  tagsEn           String[]      @default([])
+  metaTitleEn      String?
+  metaDescriptionEn String?
   sizeGuideId      String?
   weightGrams      Int?
   lengthCm         Decimal?      @db.Decimal(8, 2)
@@ -811,6 +832,7 @@ model OrderItem {
   variantId         String?
   productId         String?
   productName       String
+  productNameEn      String?
   productSlug       String
   brandName         String?
   variantSku        String
@@ -975,7 +997,9 @@ model ShipmentEvent {
   shipmentId  String
   status      ShipmentStatus
   description String
+  descriptionEn    String?
   location    String?
+  locationEn       String?
   occurredAt  DateTime       @default(now())
   createdAt   DateTime       @default(now())
 
@@ -1080,6 +1104,8 @@ model Review {
   rating             Int
   title              String?
   body               String
+  titleEn            String?
+  bodyEn             String?
   status             ReviewStatus @default(PENDING)
   isVerifiedPurchase Boolean      @default(false)
   helpfulCount       Int          @default(0)
@@ -1122,6 +1148,10 @@ model ContentBlock {
   imageUrl  String?
   ctaLabel  String?
   ctaUrl    String?
+  titleEn   String?
+  subtitleEn String?
+  bodyEn    String?
+  ctaLabelEn String?
   position  Int           @default(0)
   status    ContentStatus @default(PUBLISHED)
   startsAt  DateTime?
@@ -1135,6 +1165,7 @@ model ContentBlock {
 model NavigationItem {
   id       String  @id @default(cuid())
   label    String
+  labelEn  String?
   url      String
   parentId String?
   position Int     @default(0)

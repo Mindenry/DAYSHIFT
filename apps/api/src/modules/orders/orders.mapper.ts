@@ -1,5 +1,6 @@
 import { Prisma } from "@dayshift/db";
 import { COMMERCE } from "@dayshift/config";
+import { pickNullable, pickText } from "../../common/locale";
 
 export const orderInclude = {
   items: { orderBy: { id: "asc" as const } },
@@ -50,7 +51,7 @@ export function returnEligibility(order: OrderWithRelations) {
     returnWindowEndsAt: windowEnds,
     returnableItems: returnableItems.map((item) => ({
       id: item.id,
-      productName: item.productName,
+      productName: pickText(item.productName, item.productNameEn),
       size: item.size,
       color: item.color,
       imageUrl: item.imageUrl,
@@ -99,7 +100,7 @@ export function toOrderDetail(order: OrderWithRelations) {
       id: item.id,
       variantId: item.variantId,
       productId: item.productId,
-      productName: item.productName,
+      productName: pickText(item.productName, item.productNameEn),
       productSlug: item.productSlug,
       variantSku: item.variantSku,
       size: item.size,
@@ -132,8 +133,8 @@ export function toOrderDetail(order: OrderWithRelations) {
       events: shipment.events.map((event) => ({
         id: event.id,
         status: event.status,
-        description: event.description,
-        location: event.location,
+        description: pickText(event.description, event.descriptionEn),
+        location: pickNullable(event.location, event.locationEn),
         occurredAt: event.occurredAt,
       })),
     })),

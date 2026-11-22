@@ -24,7 +24,9 @@ test.describe("Administration", () => {
   test("products and inventory are operable", async ({ page }) => {
     await page.getByRole("link", { name: "Products", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Products" })).toBeVisible();
-    await expect(page.getByText("เสื้อยืดโอเวอร์ไซซ์ Everyday").first()).toBeVisible();
+    await page.locator("#q").fill("DS-TEE-001");
+    await page.getByRole("button", { name: "Filter" }).click();
+    await expect(page.getByText("The Everyday Oversized Tee").first()).toBeVisible();
 
     await page.getByRole("link", { name: "Stock", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Stock" })).toBeVisible();

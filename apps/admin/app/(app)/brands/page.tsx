@@ -6,7 +6,7 @@ import { BrandManager } from "@/components/taxonomy-managers";
 export default async function BrandsPage() {
   await requireStaff();
   const cookie = await getCookieHeader();
-  const brands = await apiGet<Array<{ id: string; name: string; slug: string; description: string | null; isActive: boolean; _count: { products: number } }>>(
+  const brands = await apiGet<Array<{ id: string; name: string; slug: string; description: string | null; descriptionEn: string | null; isActive: boolean; _count: { products: number } }>>(
     "/admin/catalog/brands",
     { cookie },
   );

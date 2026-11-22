@@ -9,6 +9,8 @@ import {
 } from "@dayshift/config";
 import demoPhotos from "./demo-photos.json";
 import { products } from "./catalog-th";
+import { productsEn } from "./catalog-en";
+import { brandEn, categoryEn, collectionEn, contentEn, navEn, reviewEn, sizeGuideEn } from "./content-en";
 
 const prisma = new PrismaClient();
 const d = (value: number) => new Prisma.Decimal(value.toFixed(2));
@@ -403,14 +405,25 @@ async function main() {
   // ── Categories ─────────────────────────────────────────────────────────
   const categoryIds = new Map<string, string>();
   for (const [index, c] of categoryDefs.entries()) {
+    const en = categoryEn[c.slug];
     const parentId = c.parent ? categoryIds.get(c.parent) : null;
     const cat = await prisma.category.upsert({
       where: { slug: c.slug },
-      update: { name: c.name, parentId: parentId ?? null, position: index },
+      update: {
+        name: c.name,
+        parentId: parentId ?? null,
+        position: index,
+        nameEn: en?.name ?? c.name,
+        descriptionEn: en?.description ?? null,
+      },
       create: {
         name: c.name,
         slug: c.slug,
         description: c.description,
+        nameEn: en?.name ?? c.name,
+        descriptionEn: en?.description ?? null,
+        metaTitleEn: en ? `${en.name} — DAYSHIFT` : null,
+        metaDescriptionEn: en?.description ?? null,
         parentId: parentId ?? null,
         position: index,
         isActive: true,
@@ -428,19 +441,28 @@ async function main() {
     { name: "NORTHLINE", slug: "northline", description: "โรงงานหนังเล็ก ๆ ในเชียงใหม่ งานทำมือทุกชิ้น" },
     { name: "ATELIER NINE", slug: "atelier-nine", description: "เครื่องประดับจากวัสดุธรรมชาติ ดีไซน์เรียบง่าย" },
   ]) {
-    const brand = await prisma.brand.upsert({ where: { slug: b.slug }, update: {}, create: b });
+    const brand = await prisma.brand.upsert({
+      where: { slug: b.slug },
+      update: { descriptionEn: brandEn[b.slug] ?? b.description },
+      create: { ...b, descriptionEn: brandEn[b.slug] ?? b.description },
+    });
     brands.set(b.slug, brand.id);
   }
 
   const collectionIds = new Map<string, string>();
   for (const [index, c] of collectionDefs.entries()) {
+    const en = collectionEn[c.slug];
     const col = await prisma.collection.upsert({
       where: { slug: c.slug },
-      update: {},
+      update: { nameEn: en?.name ?? c.name, descriptionEn: en?.description ?? null },
       create: {
         name: c.name,
         slug: c.slug,
         description: c.description,
+        nameEn: en?.name ?? c.name,
+        descriptionEn: en?.description ?? null,
+        metaTitleEn: en ? `${en.name} — DAYSHIFT` : null,
+        metaDescriptionEn: en?.description ?? null,
         type: c.type,
         position: index,
         isActive: true,
@@ -454,6 +476,8 @@ async function main() {
   const sizeGuideWomen = await prisma.sizeGuide.create({
     data: {
       name: "เสื้อผ้าผู้หญิง",
+      nameEn: sizeGuideEn.women.name,
+      notesEn: sizeGuideEn.women.notes,
       categoryId: categoryIds.get("women")!,
       notes: "หน่วยเป็นเซนติเมตร นางแบบสูง 175 ซม. ใส่ไซซ์ S",
       chart: {
@@ -472,6 +496,8 @@ async function main() {
   const sizeGuideMen = await prisma.sizeGuide.create({
     data: {
       name: "เสื้อผ้าผู้ชาย",
+      nameEn: sizeGuideEn.men.name,
+      notesEn: sizeGuideEn.men.notes,
       categoryId: categoryIds.get("men")!,
       notes: "หน่วยเป็นเซนติเมตร นายแบบสูง 187 ซม. ใส่ไซซ์ M",
       chart: {
@@ -488,6 +514,8 @@ async function main() {
   const sizeGuideShoes = await prisma.sizeGuide.create({
     data: {
       name: "รองเท้า",
+      nameEn: sizeGuideEn.shoes.name,
+      notesEn: sizeGuideEn.shoes.notes,
       categoryId: categoryIds.get("shoes")!,
       notes: "ใช้ไซซ์ EU หากอยู่ระหว่างสองไซซ์แนะนำให้เลือกไซซ์ใหญ่กว่า",
       chart: {
@@ -517,6 +545,7 @@ async function main() {
     const categoryLinks = [primaryCategory];
     if (parentSlug && categoryIds.get(parentSlug)) categoryLinks.push(categoryIds.get(parentSlug)!);
 
+    const en = productsEn[def.slug];
     const isSale = def.compareAt !== undefined;
     const collectionSlugs = [...(def.collections ?? [])];
     if (isSale) collectionSlugs.push("sale");
@@ -539,6 +568,16 @@ async function main() {
         fitNotes: def.fit,
         features: def.features ?? [],
         tags: def.tags ?? [],
+        nameEn: en?.name ?? def.name,
+        shortDescriptionEn: en?.short ?? def.short,
+        descriptionEn: en?.description ?? def.description,
+        materialEn: en?.material ?? def.material,
+        careInstructionsEn: en?.care ?? def.care,
+        fitNotesEn: en?.fit ?? def.fit,
+        featuresEn: en?.features ?? [],
+        tagsEn: en?.tags ?? [],
+        metaTitleEn: en ? `${en.name} — DAYSHIFT` : null,
+        metaDescriptionEn: en?.short ?? null,
         sizeGuideId: def.category.startsWith("shoes") ? sizeGuideShoes.id : def.category.startsWith("women") ? sizeGuideWomen.id : def.category.startsWith("men") ? sizeGuideMen.id : null,
         isFeatured: def.featured ?? false,
         metaTitle: `${def.name} — DAYSHIFT`,
@@ -669,7 +708,23 @@ async function main() {
     },
   ];
   for (const c of content) {
-    await prisma.contentBlock.upsert({ where: { key: c.key }, update: {}, create: c });
+    const en = contentEn[c.key];
+    await prisma.contentBlock.upsert({
+      where: { key: c.key },
+      update: {
+        titleEn: en?.title ?? null,
+        subtitleEn: en?.subtitle ?? null,
+        bodyEn: en?.body ?? null,
+        ctaLabelEn: en?.ctaLabel ?? null,
+      },
+      create: {
+        ...c,
+        titleEn: en?.title ?? null,
+        subtitleEn: en?.subtitle ?? null,
+        bodyEn: en?.body ?? null,
+        ctaLabelEn: en?.ctaLabel ?? null,
+      },
+    });
   }
 
   const nav = [
@@ -685,7 +740,9 @@ async function main() {
   for (const [i, n] of nav.entries()) {
     const existingNav = await prisma.navigationItem.findFirst({ where: { label: n.label, parentId: null } });
     if (!existingNav) {
-      await prisma.navigationItem.create({ data: { ...n, position: i } });
+      await prisma.navigationItem.create({ data: { ...n, labelEn: navEn[n.url] ?? n.label, position: i } });
+    } else if (navEn[n.url]) {
+      await prisma.navigationItem.update({ where: { id: existingNav.id }, data: { labelEn: navEn[n.url] } });
     }
   }
 
@@ -826,6 +883,7 @@ async function main() {
             variantId: i.variantId,
             productId: productIds.get(i.product.slug),
             productName: i.product.name,
+            productNameEn: productsEn[i.product.slug]?.name ?? i.product.name,
             productSlug: i.product.slug,
             brandName: "DAYSHIFT",
             variantSku: `${i.product.sku}-${i.color.slice(0, 3).toUpperCase()}-${i.size}`,
@@ -877,12 +935,12 @@ async function main() {
       });
       await prisma.shipmentEvent.createMany({
         data: [
-          { shipmentId: shipment.id, status: "READY_TO_SHIP", description: "สร้างพัสดุแล้ว", occurredAt: new Date(placedAt.getTime() + 1 * 86_400_000) },
+          { shipmentId: shipment.id, status: "READY_TO_SHIP", description: "สร้างพัสดุแล้ว", descriptionEn: "Shipment created", occurredAt: new Date(placedAt.getTime() + 1 * 86_400_000) },
           ...(opts.shipment.status !== "READY_TO_SHIP"
-            ? [{ shipmentId: shipment.id, status: "IN_TRANSIT" as const, description: "พัสดุอยู่ระหว่างขนส่ง", location: "กรุงเทพมหานคร", occurredAt: new Date(placedAt.getTime() + 3 * 86_400_000) }]
+            ? [{ shipmentId: shipment.id, status: "IN_TRANSIT" as const, description: "พัสดุอยู่ระหว่างขนส่ง", descriptionEn: "Parcel in transit", location: "กรุงเทพมหานคร", locationEn: "Bangkok", occurredAt: new Date(placedAt.getTime() + 3 * 86_400_000) }]
             : []),
           ...(opts.shipment.status === "DELIVERED"
-            ? [{ shipmentId: shipment.id, status: "DELIVERED" as const, description: "ส่งถึงผู้รับแล้ว", location: "กรุงเทพมหานคร", occurredAt: new Date(placedAt.getTime() + 5 * 86_400_000) }]
+            ? [{ shipmentId: shipment.id, status: "DELIVERED" as const, description: "ส่งถึงผู้รับแล้ว", descriptionEn: "Delivered to recipient", location: "กรุงเทพมหานคร", locationEn: "Bangkok", occurredAt: new Date(placedAt.getTime() + 5 * 86_400_000) }]
             : []),
         ],
       });
@@ -896,6 +954,8 @@ async function main() {
           rating: 5,
           title: "ตรงตามที่ต้องการเลย",
           body: "เนื้อผ้าหนาดี ทรงตรงตามที่อธิบายไว้ กลายเป็นชิ้นที่หยิบใส่บ่อยที่สุดไปแล้ว",
+          titleEn: reviewEn[opts.reviewProduct]?.title ?? null,
+          bodyEn: reviewEn[opts.reviewProduct]?.body ?? null,
           status: "APPROVED",
           isVerifiedPurchase: true,
           helpfulCount: 6,
@@ -1068,6 +1128,8 @@ async function main() {
         rating: r.rating,
         title: r.title,
         body: r.body,
+        titleEn: reviewEn[r.slug]?.title ?? null,
+        bodyEn: reviewEn[r.slug]?.body ?? null,
         status: "APPROVED",
         isVerifiedPurchase: true,
         helpfulCount: 2 + i,

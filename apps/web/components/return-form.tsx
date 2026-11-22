@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { clientApi, money } from "@/lib/api";
+import { clientApi } from "@/lib/client-api";
+import { money } from "@/lib/money";
 import { useI18n } from "@/lib/i18n-client";
 
 interface ReturnItem {
